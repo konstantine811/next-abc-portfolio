@@ -1,7 +1,7 @@
 import NotionService from "@/services/notion-service";
 import { unstable_setRequestLocale } from "next-intl/server";
 // models
-import { BlogPost } from "@/types/schema.notion";
+import { BlogPost } from "@/@types/schema.notion";
 
 type Props = {
   params: { locale: string };
