@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "blog": "Блог",
+    "home": "Головна",
+    "three-train": {
+      "title": "Практика з 3d Web",
+      "first-scene": "Перша сцена",
+      "second-scene": "Друга сцена"
+    }
+  },
+  "Home": {
+    "title": "Привіт з домашньої сторінки"
+  },
+  "LocaleLayout": {
+    "title": "Abramkin | Portfolii"
+  }
+}

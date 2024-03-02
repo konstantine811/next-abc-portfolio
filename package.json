@@ -9,19 +9,46 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.14",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-navigation-menu": "^1.1.4",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@react-three/drei": "^9.99.4",
+    "@react-three/fiber": "^8.15.16",
+    "@reduxjs/toolkit": "^2.2.1",
+    "@studio-freight/lenis": "^1.0.39",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "framer-motion": "^11.0.5",
+    "framer-motion-3d": "^11.0.8",
+    "glsl-noise": "^0.0.0",
+    "glslify": "^7.1.1",
+    "lucide-react": "^0.336.0",
+    "next": "14.1.0",
+    "next-intl": "^3.9.0",
+    "next-themes": "^0.2.1",
+    "notion-to-md": "^3.1.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.0"
+    "react-markdown": "^9.0.1",
+    "react-redux": "^9.1.0",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.161.0"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/three": "^0.161.2",
     "autoprefixer": "^10.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
     "eslint": "^8",
-    "eslint-config-next": "14.1.0"
+    "eslint-config-next": "14.1.0",
+    "glslify-loader": "^2.0.0",
+    "postcss": "^8",
+    "raw-loader": "^4.0.2",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   }
 }

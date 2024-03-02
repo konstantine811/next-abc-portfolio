@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "blog": "Blog",
+    "home": "Home",
+    "three-train": {
+      "title": "ThreeJs train",
+      "first-scene": "First scene",
+      "second-scene": "Second scene"
+    }
+  },
+  "Home": {
+    "title": "Hell from Home page"
+  },
+  "LocaleLayout": {
+    "title": "Abramkin | Portfolio"
+  }
+}
