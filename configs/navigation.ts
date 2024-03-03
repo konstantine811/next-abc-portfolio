@@ -9,7 +9,7 @@ export interface INaviagationConfig {
 export enum PATH_ROUTE_NAME {
   home = "/",
   blog = "/blog",
-  threeTrain = "/tree-train",
+  threeTrain = "/three-train",
   firstScene = "/first-scene",
   secondScene = "/second-scene",
 }

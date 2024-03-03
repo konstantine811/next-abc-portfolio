@@ -7,39 +7,7 @@ const Preloader = () => {
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.value.headerHeight
   );
-  return (
-    <div
-      style={{ height: `calc(100vh - ${headerHeight}px)` }}
-      className="flex justify-center items-center"
-    >
-      <div className={styles.boxes}>
-        <div className={styles.box}>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className={styles.box}>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className={styles.box}>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className={styles.box}>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    </div>
-  );
+  return;
 };
 
 export default Preloader;
