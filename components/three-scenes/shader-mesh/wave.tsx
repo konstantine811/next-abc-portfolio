@@ -8,7 +8,6 @@ const fragment = require("@/shaders/fragment.frag").default;
 const Wave = () => {
   const shaderRef = useRef<ShaderMaterial>(null!);
   const [image] = useLoader(TextureLoader, ["/assets/images/profilePhoto.png"]);
-  console.log(image);
   useFrame(({ clock }) => {
     shaderRef.current.uniforms.uTime.value = clock.getElapsedTime();
   });

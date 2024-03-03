@@ -9,6 +9,7 @@ import { LOCALES } from "@/configs/locale";
 import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import NavigationConfig from "@/configs/navigation";
 import ReduxProvider from "@/lib/store/StoreProvider";
+import { NextIntlClientProvider, useMessages } from "next-intl";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -41,6 +42,7 @@ export default function RootLayout({ children, params: { locale } }: Props) {
   // Enable static rendering
   unstable_setRequestLocale(locale);
   const navConfig = NavigationConfig();
+  const messages = useMessages();
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
@@ -50,14 +52,16 @@ export default function RootLayout({ children, params: { locale } }: Props) {
           fontSans.variable
         )}
       >
-        <ReduxProvider>
-          <ThemeProvider
-            props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
-          >
-            <Header navConfig={navConfig} />
-            {children}
-          </ThemeProvider>
-        </ReduxProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ReduxProvider>
+            <ThemeProvider
+              props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
+            >
+              <Header navConfig={navConfig} />
+              {children}
+            </ThemeProvider>
+          </ReduxProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

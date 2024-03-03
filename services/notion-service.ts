@@ -1,4 +1,4 @@
-import { BlogPost } from "@/@types/schema.notion";
+import { BlogPost, BlogPostEntity } from "@/@types/schema.notion";
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 
@@ -10,7 +10,7 @@ export default class NotionService {
     this.n2m = new NotionToMarkdown({ notionClient: this.client });
   }
 
-  async getPublishedBlogPosts() {
+  async getPublishedBlogPosts(): Promise<BlogPostEntity> {
     const database = process.env.DATA_BASE_ID ?? "";
     // list blog posts
     try {
@@ -23,17 +23,27 @@ export default class NotionService {
           },
         },
       });
-      return response.results.map((res) => {
-        return NotionService.pageToPostTransformer(res);
-      });
+
+      return this.groupPostsByCategory(response.results);
     } catch (e) {
-      console.log("error", e);
-      return [];
+      console.error(e);
+      return {};
     }
   }
 
-  private static pageToPostTransformer(page: any): BlogPost {
-    console.log(page);
+  private groupPostsByCategory(pages: any[]): BlogPostEntity {
+    return pages.reduce((acc: any, page: any) => {
+      const post = this.pageToPostTransformer(page);
+      const name = post.category.name;
+      if (!acc[name]) {
+        acc[name] = [];
+      }
+      acc[name].push(post);
+      return acc;
+    }, {} as Record<string, BlogPost[]>);
+  }
+
+  private pageToPostTransformer(page: any): BlogPost {
     let cover = page.cover;
     switch (cover?.type) {
       case "flie":

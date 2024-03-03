@@ -1,5 +1,7 @@
+import Preloader from "@/components/partials/prelaoder/preloader";
+
 const Loading = () => {
-  return <p>Loading...</p>;
+  return <Preloader />;
 };
 
 export default Loading;

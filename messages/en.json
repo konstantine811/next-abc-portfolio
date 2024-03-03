@@ -8,6 +8,11 @@
       "second-scene": "Second scene"
     }
   },
+  "Blog": {
+    "categories": {
+      "all": "All"
+    }
+  },
   "Home": {
     "title": "Hell from Home page"
   },

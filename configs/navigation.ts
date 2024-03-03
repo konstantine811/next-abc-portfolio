@@ -6,28 +6,36 @@ export interface INaviagationConfig {
   children?: INaviagationConfig[];
 }
 
+export enum PATH_ROUTE_NAME {
+  home = "/",
+  blog = "/blog",
+  threeTrain = "/tree-train",
+  firstScene = "/first-scene",
+  secondScene = "/second-scene",
+}
+
 const NavigationConfig = (): INaviagationConfig[] => {
   const t = useTranslations();
   return [
     {
       title: t("nav.home"),
-      href: "/",
+      href: PATH_ROUTE_NAME.home,
     },
     {
       title: t("nav.blog"),
-      href: "/blog",
+      href: PATH_ROUTE_NAME.blog,
     },
     {
       title: t("nav.three-train.title"),
-      href: "/three-train",
+      href: PATH_ROUTE_NAME.threeTrain,
       children: [
         {
           title: t("nav.three-train.first-scene"),
-          href: "/first-scene",
+          href: PATH_ROUTE_NAME.firstScene,
         },
         {
           title: t("nav.three-train.second-scene"),
-          href: "/second-scene",
+          href: PATH_ROUTE_NAME.secondScene,
         },
       ],
     },

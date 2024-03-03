@@ -1,9 +1,7 @@
+import Preloader from "@/components/partials/prelaoder/preloader";
+
 const SecondScenePage = () => {
-  return (
-    <>
-      <h1>Second Scene</h1>
-    </>
-  );
+  return <Preloader />;
 };
 
 export default SecondScenePage;

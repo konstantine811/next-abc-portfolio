@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "@notionhq/client": "^2.2.14",
+    "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-navigation-menu": "^1.1.4",
+    "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-toggle": "^1.0.3",
+    "@radix-ui/react-toggle-group": "^1.0.4",
     "@react-three/drei": "^9.99.4",
     "@react-three/fiber": "^8.15.16",
     "@reduxjs/toolkit": "^2.2.1",
@@ -48,6 +53,7 @@
     "glslify-loader": "^2.0.0",
     "postcss": "^8",
     "raw-loader": "^4.0.2",
+    "sass": "^1.71.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

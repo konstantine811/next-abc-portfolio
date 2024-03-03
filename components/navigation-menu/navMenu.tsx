@@ -15,6 +15,7 @@ import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 // models
 import { INaviagationConfig } from "@/configs/navigation";
 import { usePathname } from "@/lib/navigation";
+import { useParams } from "next/navigation";
 
 export function NavigationHeaderMenu({
   navConfig,
@@ -22,12 +23,13 @@ export function NavigationHeaderMenu({
   navConfig: INaviagationConfig[];
 }) {
   const pathname = usePathname();
+  const { slug } = useParams<{ slug: string; locale: string }>();
   return (
     <NavigationMenu>
       <NavigationMenuList>
         {navConfig.map((item) => {
-          const isActive = pathname.startsWith(item.href);
           if (item.children && item.children.length) {
+            const isActive = pathname.startsWith(item.href);
             return (
               <NavigationMenuItem key={item.title}>
                 <NavigationMenuTrigger className={isActive ? "bg-accent" : ""}>
@@ -52,13 +54,14 @@ export function NavigationHeaderMenu({
               </NavigationMenuItem>
             );
           } else {
-            console.log(pathname, isActive);
+            const isActive =
+              pathname === item.href || pathname === `${item.href}/${slug}`;
             return (
               <NavigationMenuItem key={item.title}>
                 <Link href={item.href} legacyBehavior passHref>
                   <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      isActive ? "bg-accent" : ""
+                      isActive ? "!bg-accent" : ""
                     }`}
                   >
                     {item.title}
