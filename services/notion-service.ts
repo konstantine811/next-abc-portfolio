@@ -7,7 +7,9 @@ export default class NotionService {
   client: Client;
   n2m: NotionToMarkdown;
   constructor() {
-    this.client = new Client({ auth: process.env.NOTION_ACCESS_TOKEN });
+    this.client = new Client({
+      auth: process.env.NOTION_ACCESS_TOKEN,
+    });
     this.n2m = new NotionToMarkdown({ notionClient: this.client });
   }
 
@@ -27,6 +29,30 @@ export default class NotionService {
       });
 
       return this.groupPostsByCategory(response.results);
+    } catch (e) {
+      console.error(e);
+      return {};
+    }
+  }
+
+  async fetcher(url: string, method = "GET") {
+    return fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${process.env.NOTION_ACCESS_TOKEN}`,
+      },
+    });
+  }
+
+  async getSingleBlogPost(id: string): Promise<any> {
+    try {
+      const page = await this.client.pages.retrieve({
+        page_id: id,
+      });
+      const post = await this.client.blocks.children.list({
+        block_id: id,
+      });
+      return { post: post.results, page: this.pageToPostTransformer(page) };
     } catch (e) {
       console.error(e);
       return {};
@@ -62,6 +88,7 @@ export default class NotionService {
       cover,
       title: page.properties.Name.title[0].plain_text,
       category: page.properties.Category.select,
+      langId: page.properties.lang.id,
     };
   }
 }

@@ -34,7 +34,7 @@ const ContentBlog = ({ data, children }: Props) => {
           }}
           data={data}
         />
-        <MainContent className="flex gap-3">{children}</MainContent>
+        <MainContent className="flex flex-col gap-3">{children}</MainContent>
       </div>
     </>
   );

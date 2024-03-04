@@ -4,30 +4,48 @@ import { BlogPost } from "@/@types/schema.notion";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+// utils
+import { getPathName } from "@/utils/blog-path";
+import { Badge } from "@/components/ui/badge";
 
 type Prop = {
   data: BlogPost;
 };
 
 const BlogCard = ({ data }: Prop) => {
+  console.log("data", data);
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{data.title}</CardTitle>
-        <CardDescription>{data.category.name}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>Card Content</p>
-      </CardContent>
-      <CardFooter>
-        <p>Card Footer</p>
-      </CardFooter>
-    </Card>
+    <Link href={getPathName(data.id)}>
+      <Card className={cn("flex flex-col justify-center overflow-hidden")}>
+        <CardHeader
+          className={cn(`mb-3 p-0 relative ${data.cover ? "min-h-32" : ""}`)}
+        >
+          {data.cover ? (
+            <Image
+              fill
+              className="object-cover"
+              src={data.cover}
+              alt={data.title}
+            />
+          ) : (
+            ""
+          )}
+        </CardHeader>
+        <CardContent>
+          <CardTitle>{data.title}</CardTitle>
+        </CardContent>
+        <CardFooter>
+          <Badge variant={"secondary"}>{data.category.name}</Badge>
+        </CardFooter>
+      </Card>
+    </Link>
   );
 };
 

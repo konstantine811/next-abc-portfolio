@@ -17,7 +17,7 @@ import { useAppSelector } from "@/lib/store/hooks";
 // models
 import { BlogPostEntity } from "@/@types/schema.notion";
 // configs
-import { PATH_ROUTE_NAME } from "@/configs/navigation";
+import { getPathName } from "@/utils/blog-path";
 
 type Prop = {
   className?: string;
@@ -31,9 +31,6 @@ const AsidePanel = ({ className, data }: Prop) => {
     (state) => state.uiStateReducer.value.headerHeight
   );
 
-  function getPathName(id: number) {
-    return `${PATH_ROUTE_NAME.blog}/${id}`;
-  }
   useEffect(() => {
     setMounted(true);
   }, []);
