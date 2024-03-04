@@ -1,4 +1,5 @@
 import { BlogPost, BlogPostEntity } from "@/@types/schema.notion";
+import { LocaleType } from "@/configs/locale";
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 
@@ -10,8 +11,9 @@ export default class NotionService {
     this.n2m = new NotionToMarkdown({ notionClient: this.client });
   }
 
-  async getPublishedBlogPosts(): Promise<BlogPostEntity> {
-    const database = process.env.DATA_BASE_ID ?? "";
+  async getPublishedBlogPosts(lang: LocaleType): Promise<BlogPostEntity> {
+    const database =
+      process.env[`DATA_BLOG_BASE_ID_${lang.toUpperCase()}`] ?? "";
     // list blog posts
     try {
       const response = await this.client.databases.query({

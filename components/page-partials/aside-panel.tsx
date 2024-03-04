@@ -59,11 +59,15 @@ const AsidePanel = ({ className, data }: Prop) => {
               <AccordionItem key={key} value={key}>
                 <AccordionTrigger>{key}</AccordionTrigger>
                 <AccordionContent>
-                  {items.map((post) => {
+                  {items?.map((post) => {
                     return (
                       <Button
                         className={cn(
-                          pathname === getPathName(post.id) ? "underline" : ""
+                          `${
+                            pathname === getPathName(post.id)
+                              ? "!text-foreground"
+                              : ""
+                          } whitespace-normal mb-1 last:mb-0 text-muted-foreground`
                         )}
                         key={post.id}
                         asChild

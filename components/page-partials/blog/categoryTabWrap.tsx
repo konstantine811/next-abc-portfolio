@@ -14,7 +14,7 @@ const CategoryTabWrap = ({ data, selectedPost }: Prop) => {
   const selectedAll = t("categories.all");
   const categories = [selectedAll, ...Object.keys(data).map((i) => i)];
   function filterCategory(value: string) {
-    if (value === selectedAll) {
+    if (value === selectedAll || !value) {
       selectedPost(data);
     } else {
       selectedPost({ [value]: data[value] });
