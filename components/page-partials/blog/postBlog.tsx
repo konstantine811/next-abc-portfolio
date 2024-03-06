@@ -1,20 +1,21 @@
 "use client";
-import {
-  BlockObjectResponse,
-  BulletedListItemBlockObjectResponse,
-} from "@notionhq/client/build/src/api-endpoints";
-import { useRouter } from "@/lib/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ChevronsLeftIcon } from "lucide-react";
+// models
 import { BLogPostPage } from "@/@types/schema.notion";
-import Image from "next/image";
+// util helpers
+import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+// componetns
+import NotionSwitchParse from "./notion-parse/notionSwitchParse";
 
 interface Props {
   data: BLogPostPage;
 }
 
 const PostBlog = ({ data: { page, post } }: Props) => {
+  console.log("post____", post);
   const router = useRouter();
   return (
     <>
@@ -40,14 +41,9 @@ const PostBlog = ({ data: { page, post } }: Props) => {
         >
           <ChevronsLeftIcon className="h-4 w-4" />
         </Button>
-        <h1 className="grow text-center text-4xl px-10">{page.title}</h1>
+        <h1 className="grow text-center text-4xl px-10">{page?.title}</h1>
       </div>
-      {post.map((item: BlockObjectResponse) => {
-        switch (item.type) {
-          case "bulleted_list_item":
-            console.log(item as BulletedListItemBlockObjectResponse);
-        }
-      })}
+      <NotionSwitchParse post={post} />
     </>
   );
 };

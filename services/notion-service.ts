@@ -1,6 +1,12 @@
-import { BlogPost, BlogPostEntity } from "@/@types/schema.notion";
+import {
+  BLogPostPage,
+  BlockObjectChildResponse,
+  BlogPost,
+  BlogPostEntity,
+} from "@/@types/schema.notion";
 import { LocaleType } from "@/configs/locale";
 import { Client } from "@notionhq/client";
+import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { NotionToMarkdown } from "notion-to-md";
 
 export default class NotionService {
@@ -44,7 +50,7 @@ export default class NotionService {
     });
   }
 
-  async getSingleBlogPost(id: string): Promise<any> {
+  async getSingleBlogPost(id: string): Promise<BLogPostPage | null> {
     try {
       const page = await this.client.pages.retrieve({
         page_id: id,
@@ -52,10 +58,16 @@ export default class NotionService {
       const post = await this.client.blocks.children.list({
         block_id: id,
       });
-      return { post: post.results, page: this.pageToPostTransformer(page) };
+      const results = (
+        await this.getNestedItems(post.results as BlockObjectResponse[])
+      ).filter((i) => i) as BlockObjectChildResponse[];
+      if (results) {
+        return { post: results, page: this.pageToPostTransformer(page) };
+      }
+      return null;
     } catch (e) {
       console.error(e);
-      return {};
+      return null;
     }
   }
 
@@ -69,6 +81,28 @@ export default class NotionService {
       acc[name].push(post);
       return acc;
     }, {} as Record<string, BlogPost[]>);
+  }
+
+  private getNestedItems(
+    results: BlockObjectResponse[]
+  ): Promise<(BlockObjectChildResponse | undefined)[]> {
+    return Promise.all(
+      results?.map(async (i) => {
+        if (i.has_children) {
+          const children = await this.client.blocks.children.list({
+            block_id: i.id,
+          });
+          const results = (
+            await this.getNestedItems(children.results as BlockObjectResponse[])
+          ).filter((i) => i) as BlockObjectChildResponse[];
+          return {
+            ...i,
+            children: results,
+          } as any;
+        }
+        return i;
+      })
+    );
   }
 
   private pageToPostTransformer(page: any): BlogPost {

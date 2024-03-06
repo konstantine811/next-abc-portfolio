@@ -1,3 +1,5 @@
+import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+
 export interface Tag {
   color: string;
   id: string;
@@ -21,7 +23,13 @@ export interface BlogPostEntity {
   [key: string]: BlogPost[];
 }
 
+export interface BlockObjectChild {
+  children: BlockObjectChildResponse[];
+}
+
+export type BlockObjectChildResponse = BlockObjectResponse & BlockObjectChild;
+
 export interface BLogPostPage {
-  post: BlockObjectResponse[];
+  post: BlockObjectChildResponse[];
   page: BlogPost;
 }

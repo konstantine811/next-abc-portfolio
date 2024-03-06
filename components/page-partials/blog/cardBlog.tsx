@@ -30,6 +30,7 @@ const BlogCard = ({ data }: Prop) => {
           {data.cover ? (
             <Image
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
               src={data.cover}
               alt={data.title}
