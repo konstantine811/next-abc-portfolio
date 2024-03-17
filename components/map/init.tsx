@@ -11,6 +11,7 @@ const InitMap = () => {
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.value.headerHeight
   );
+  const [currentLocation, setCurrentLocation] = useState<number[]>([]);
   useEffect(() => {
     // set map
     const node = mapNode.current;
@@ -44,12 +45,37 @@ const InitMap = () => {
       geoControl.trigger();
     });
 
+    // Отримання поточного місцезнаходження
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition((position) => {
+        console.log("position", position);
+        const currentLocation = [
+          position.coords.longitude,
+          position.coords.latitude,
+        ];
+        setCurrentLocation(currentLocation);
+
+        // Тут додавайте логіку для визначення маршруту використовуючи Mapbox Directions API або інший сервіс
+        // і після отримання даних маршруту, додайте шлях на карту
+      });
+    } else {
+      console.log("Геолокація не підтримується вашим браузером");
+    }
+
     return () => {
       map?.remove();
     };
   }, [headerHeight]);
 
-  return <div ref={mapNode} style={{ width: "100%" }}></div>;
+  return (
+    <div className="relative">
+      <div className="absolute bg-black text-white top-0 left-0 m-4 rounded-sm z-10">
+        <p>Longitude: {currentLocation[0]}</p>
+        <p>Latitude: {currentLocation[1]}</p>
+      </div>
+      <div ref={mapNode} style={{ width: "100%" }}></div>
+    </div>
+  );
 };
 
 export default InitMap;
