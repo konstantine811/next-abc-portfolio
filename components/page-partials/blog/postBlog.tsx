@@ -15,7 +15,6 @@ interface Props {
 }
 
 const PostBlog = ({ data: { page, post } }: Props) => {
-  console.log("post____", post);
   const router = useRouter();
   return (
     <>

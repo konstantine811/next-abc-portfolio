@@ -32,7 +32,11 @@ export function NavigationHeaderMenu({
             const isActive = pathname.startsWith(item.href);
             return (
               <NavigationMenuItem key={item.title}>
-                <NavigationMenuTrigger className={isActive ? "bg-accent" : ""}>
+                <NavigationMenuTrigger
+                  className={`${
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                >
                   {item.title}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -45,7 +49,13 @@ export function NavigationHeaderMenu({
                           key={itemCh.title}
                           title={itemCh.title}
                           href={concatHref}
-                          className={isActive ? "bg-accent" : ""}
+                          className={cn(
+                            `${
+                              isActive
+                                ? "text-foreground"
+                                : "text-muted-foreground"
+                            } hover:bg-transparent focus:bg-transparent`
+                          )}
                         />
                       );
                     })}
@@ -61,8 +71,8 @@ export function NavigationHeaderMenu({
                 <Link href={item.href} legacyBehavior passHref>
                   <NavigationMenuLink
                     className={`${navigationMenuTriggerStyle()} ${
-                      isActive ? "!bg-accent" : ""
-                    }`}
+                      isActive ? "text-foreground" : "text-muted-foreground"
+                    } ${cn(`hover:bg-transparent focus:bg-transparent`)}`}
                   >
                     {item.title}
                   </NavigationMenuLink>

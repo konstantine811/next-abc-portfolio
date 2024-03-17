@@ -12,12 +12,15 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 // storage
-import { useAppSelector } from "@/lib/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 // models
 import { BlogPostEntity } from "@/@types/schema.notion";
 // configs
 import { getPathName } from "@/utils/blog-path";
+import CategoryTabWrap from "./blog/categoryTabWrap";
+import { onFilteredBlogPost } from "@/lib/store/features/blog-post-state.slice";
 
 type Prop = {
   className?: string;
@@ -30,6 +33,13 @@ const AsidePanel = ({ className, data }: Prop) => {
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.value.headerHeight
   );
+  const [selectedPost, setSelectedPost] = useState<BlogPostEntity>({});
+
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    setSelectedPost(data);
+    dispatch(onFilteredBlogPost(data));
+  }, [data, dispatch]);
 
   useEffect(() => {
     setMounted(true);
@@ -37,6 +47,7 @@ const AsidePanel = ({ className, data }: Prop) => {
   if (!mounted) {
     return;
   }
+
   return (
     <div className={cn(`${className}`)}>
       <div
@@ -46,12 +57,20 @@ const AsidePanel = ({ className, data }: Prop) => {
         }}
         className={cn("sticky py-8  overflow-auto")}
       >
+        <CategoryTabWrap
+          selectedPost={(data) => {
+            setSelectedPost(data);
+            dispatch(onFilteredBlogPost(data));
+          }}
+          data={data}
+        />
+        <Separator />
         <Accordion
           type="multiple"
           className="w-full"
-          defaultValue={Object.keys(data).map((i) => i)}
+          defaultValue={Object.keys(selectedPost).map((i) => i)}
         >
-          {Object.entries(data).map(([key, items]) => {
+          {Object.entries(selectedPost).map(([key, items]) => {
             return (
               <AccordionItem key={key} value={key}>
                 <AccordionTrigger>{key}</AccordionTrigger>

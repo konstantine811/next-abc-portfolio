@@ -1,26 +1,40 @@
 "use client";
 
+// models
 import { BulletedListItemBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import NotionText from "./notionText";
-import NotionSwitchParse from "./notionSwitchParse";
 import { BlockObjectChildResponse } from "@/@types/schema.notion";
+// utils function
 import { cn } from "@/lib/utils";
+// components
+import NotionSwitchParse from "./notionSwitchParse";
+import NotionText from "./notionText";
 
 interface Prop {
   data: BulletedListItemBlockObjectResponse;
-  className?: string;
   level?: number;
 }
 
-const NotionBulletListItem = ({ data, className, level = 0 }: Prop) => {
+const NotionBulletListItem = ({ data, level = 0 }: Prop) => {
+  function getCircleLevelClass() {
+    switch ((level + 1) % 3) {
+      case 1:
+        return "before:bg-foreground before:rounded";
+      case 2:
+        return "before:border before:border before:rounded";
+      case 3:
+        return "before:bg-foreground";
+      default:
+        return "before:bg-foreground";
+    }
+  }
   return (
     <div
-      className="flex flex-col gap-2"
-      style={{ paddingLeft: `${level * 20 * 0.8}px` }}
+      className={cn("flex flex-col gap-2")}
+      style={{ marginLeft: `${level * 12}px` }}
     >
       <div
         className={cn(
-          `before:w-[5px] before:h-[5px] before:bg-white before:inline-block before:rounded flex items-center gap-2 `
+          `before:w-[6px] before:h-[6px] before:m-[6px] before:inline-block flex items-center ${getCircleLevelClass()}`
         )}
       >
         {data.bulleted_list_item.rich_text.map((item, index) => {

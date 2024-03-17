@@ -12,6 +12,7 @@ const BlogPostIdPage = async ({
     data = await notionService.getSingleBlogPost(slug);
   } catch (e) {
     console.error(e);
+  } finally {
   }
 
   return <>{data ? <PostBlog data={data} /> : ""}</>;

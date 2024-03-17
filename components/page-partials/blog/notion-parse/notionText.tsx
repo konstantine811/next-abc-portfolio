@@ -1,5 +1,6 @@
+"use client";
+
 import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
-import Link from "next/link";
 import NotionLink from "./notionLink";
 
 interface Prop {

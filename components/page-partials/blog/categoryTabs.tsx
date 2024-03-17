@@ -31,12 +31,11 @@ const CategoryTabs = ({
       {categories && categories.length ? (
         <ToggleGroup
           defaultValue={defaultSelected ? defaultSelected : categories[0]}
-          style={{ top: `${headerHeight}px` }}
           className={cn(
-            "py-4 sticky bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30"
+            "py-4 bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30 flex flex-wrap justify-start"
           )}
           type="single"
-          variant={"outline"}
+          variant={"default"}
           onValueChange={(value) => (onValueChange ? onValueChange(value) : "")}
         >
           {categories.map((category) => {

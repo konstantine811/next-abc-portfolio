@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 // utils
 import { cn } from "@/lib/utils";
 // models
@@ -13,9 +13,15 @@ import { useAppSelector } from "@/lib/store/hooks";
 interface Prop {}
 
 const CategoryBlockBlog = ({}: Prop) => {
+  const [mounted, setMounted] = useState(false);
   const data = useAppSelector(
     (state) => state.blogPostStateReducer.value.filteredBlogPost
   );
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return;
   return (
     <div className={cn("w-full flex flex-col gap-10")}>
       {Object.entries(data).map(([key, posts]) => {

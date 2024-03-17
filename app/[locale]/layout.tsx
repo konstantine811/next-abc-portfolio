@@ -1,4 +1,4 @@
-import { Inter as FontSans } from "next/font/google";
+import { Sofia_Sans as FontSans } from "next/font/google";
 // components
 import Header from "@/components/header";
 // theme providers
@@ -33,7 +33,7 @@ export async function generateMetadata({
   return {
     title: t("title"),
     icons: {
-      icon: "/icon/tent.png",
+      icon: "/icon/logoLeko.svg",
     },
   };
 }
