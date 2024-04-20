@@ -10,6 +10,7 @@ import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import NavigationConfig from "@/configs/navigation";
 import ReduxProvider from "@/lib/store/StoreProvider";
 import { NextIntlClientProvider, useMessages } from "next-intl";
+import ErrorBoundary from "../errorBoundary";
 
 export const fontSans = FontSans({
   subsets: ["latin"],

@@ -1,10 +1,10 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 // components
-import MainWrapper from "@/components/wrapper/main-wrapper";
-import SmoothScroll from "@/components/wrapper/smoothScroll";
 import Projects from "@/components/portfolio-content/projects";
 import ShaderTrain from "@/components/three-scenes/shader-train";
+import MainWrapper from "@/components/wrapper/main-wrapper";
+import SmoothScroll from "@/components/wrapper/smoothScroll";
 
 const EarthScene = dynamic(() => import("@/components/three-scenes/earth"), {
   ssr: false,
