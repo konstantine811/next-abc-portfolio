@@ -1,4 +1,4 @@
-import { RapierRigidBody } from "@react-three/rapier";
+import { RapierRigidBody, useRapier } from "@react-three/rapier";
 import {
   ForwardRefRenderFunction,
   RefObject,
@@ -13,6 +13,14 @@ import { Group, Object3D, Vector3 } from "three";
 import { useAppSelector } from "@/lib/store/hooks";
 import { setCameraBased } from "@/lib/store/features/character-contoller/game-state.slice";
 import { useDispatch } from "react-redux";
+import { useControls } from "leva";
+import {
+  AutoBalanceForceDebug,
+  CharacterControlsDebug,
+  FloatingRayDebug,
+  SlopeRayDebug,
+} from "./debug.config";
+import { useKeyboardControls } from "@react-three/drei";
 
 const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   {
@@ -140,7 +148,165 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   const vectorZ = useMemo(() => new Vector3(0, 0, 1), []);
   const bodyContactForce = useMemo(() => new Vector3(), []);
 
-  // Animation
+  // Animation change functions
+  const idle = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.idle
+  );
+  const walk = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.walk
+  );
+  const run = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.run
+  );
+  const jump = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.jump
+  );
+  const jumpIdle = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.jumpIdle
+  );
+  const fall = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.fall
+  );
+  const action1 = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.action1
+  );
+  const action2 = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.action2
+  );
+  const action3 = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.action3
+  );
+  const action4 = useAppSelector(
+    (state) => state.gameStateReducer.animationSet.action4
+  );
+  const idleAnimation = !animated ? null : idle;
+  const walkAnimation = !animated ? null : walk;
+  const runAnimation = !animated ? null : run;
+  const jumpAnimation = !animated ? null : jump;
+  const jumpIdleAnimation = !animated ? null : jumpIdle;
+  const fallAnimation = !animated ? null : fall;
+  const action1Animation = !animated ? null : action1;
+  const action2Animation = !animated ? null : action2;
+  const action3Animation = !animated ? null : action3;
+  const action4Animation = !animated ? null : action4;
+
+  // Debug settings
+  let characterControlsDebug = null;
+  let floatingRayDebug = null;
+  let slopeRayDebug = null;
+  let autoBalanceForceDebug = null;
+  // Character Controls
+  characterControlsDebug = useControls(
+    "Character Controls",
+    new CharacterControlsDebug(
+      maxVelLimit,
+      turnVelMultiplier,
+      turnSpeed,
+      sprintMult,
+      jumpVel,
+      jumpForceToGroundMult,
+      slopJumpMult,
+      sprintJumpMult,
+      airDragMultiplier,
+      dragDampingC,
+      accDeltaTime,
+      rejectVelMult,
+      moveImpulsePointY,
+      camFollowMult
+    ).config,
+    { collapsed: true }
+  ) as any;
+  // Apply debug values
+  maxVelLimit = characterControlsDebug.maxVelLimit.value;
+  turnVelMultiplier = characterControlsDebug.turnVelMultiplier.value;
+  turnSpeed = characterControlsDebug.turnSpeed.value;
+  sprintMult = characterControlsDebug.sprintMult.value;
+  jumpVel = characterControlsDebug.jumpVel.value;
+  jumpForceToGroundMult = characterControlsDebug.jumpForceToGroundMult.value;
+  slopJumpMult = characterControlsDebug.slopJumpMult.value;
+  sprintJumpMult = characterControlsDebug.sprintJumpMult.value;
+  airDragMultiplier = characterControlsDebug.airDragMultiplier.value;
+  dragDampingC = characterControlsDebug.dragDampingC.value;
+  accDeltaTime = characterControlsDebug.accDeltaTime.value;
+  rejectVelMult = characterControlsDebug.rejectVelMult.value;
+  moveImpulsePointY = characterControlsDebug.moveImpulsePointY.value;
+  camFollowMult = characterControlsDebug.camFollowMult.value;
+
+  // Floating Ray
+  floatingRayDebug = useControls(
+    "Floating Ray",
+    new FloatingRayDebug(
+      capsuleHalfHeight,
+      capsuleRadius,
+      floatHeight,
+      rayHitForgiveness,
+      springK,
+      dampingC
+    ).config,
+    { collapsed: true }
+  ) as any;
+  // Apply debug values
+  rayOriginOffset = floatingRayDebug.rayOriginOffset.value;
+  rayHitForgiveness = floatingRayDebug.rayHitForgiveness.value;
+  rayLength = floatingRayDebug.rayLength.value;
+  rayDir = floatingRayDebug.rayDir.value;
+  floatingDis = floatingRayDebug.floatingDis.value;
+  springK = floatingRayDebug.springK.value;
+  dampingC = floatingRayDebug.dampingC.value;
+
+  // Slope Ray
+  slopeRayDebug = useControls(
+    "Slope Ray",
+    new SlopeRayDebug(
+      slopeMaxAngle,
+      capsuleRadius,
+      slopeUpExtraForce,
+      slopeDownExtraForce
+    ).config,
+    { collapsed: true }
+  ) as any;
+  // Apply debug values
+  showSlopeRayOrigin = slopeRayDebug.showSlopeRayOrigin.value;
+  slopeMaxAngle = slopeRayDebug.slopeMaxAngle.value;
+  slopeRayLength = slopeRayDebug.slopeRayLength.value;
+  slopeRayDir = slopeRayDebug.slopeRayDir.value;
+  slopeUpExtraForce = slopeRayDebug.slopeUpExtraForce.value;
+  slopeDownExtraForce = slopeRayDebug.slopeDownExtraForce.value;
+
+  // Auto Balance Force
+  autoBalanceForceDebug = useControls(
+    "Auto Balance Force",
+    new AutoBalanceForceDebug(
+      autoBalanceSpringK,
+      autoBalanceDampingC,
+      autoBalanceSpringOnY,
+      autoBalanceDampingOnY
+    ).config,
+    { collapsed: true }
+  ) as any;
+  // Apply debug values
+  autoBalance = autoBalanceForceDebug.autoBalance.value;
+  autoBalanceSpringK = autoBalanceForceDebug.autoBalanceSpringK.value;
+  autoBalanceDampingC = autoBalanceForceDebug.autoBalanceDampingC.value;
+  autoBalanceSpringOnY = autoBalanceForceDebug.autoBalanceSpringOnY.value;
+  autoBalanceDampingOnY = autoBalanceForceDebug.autoBalanceDampingOnY.value;
+
+  // Check if inside keyboardcontrols
+  function useIsInsideKeyboardControls() {
+    try {
+        return !!useKeyboardControls();
+    } catch {
+        return false;
+    }
+  }
+  const isInsideKeyboardControls = useIsInsideKeyboardControls();
+
+  // keyboard controls setup
+  const [subscribeKeys, getKeys] = useKeyboardControls();
+  const presetKeys = {forward: false, backward: false, leftward: false, rightward: false, jump: false, run: false};
+  const { rapier, world } = useRapier();
+
+  // Joistick controls setup;
   return <></>;
 };
 
