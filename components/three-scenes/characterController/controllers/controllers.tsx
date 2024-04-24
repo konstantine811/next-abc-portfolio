@@ -1,14 +1,26 @@
-import { RapierRigidBody, useRapier } from "@react-three/rapier";
+import { RapierRigidBody, quat, useRapier } from "@react-three/rapier";
 import {
   ForwardRefRenderFunction,
   RefObject,
   forwardRef,
   use,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
-import { ControllerProps } from "./models";
-import { Group, Object3D, Vector3 } from "three";
+import { ControllerProps, userDataType } from "./models";
+import {
+  DirectionalLight,
+  Euler,
+  Group,
+  Mesh,
+  Object3D,
+  Quaternion,
+  Vector2,
+  Vector3,
+} from "three";
 // storeage
 import { useAppSelector } from "@/lib/store/hooks";
 import { setCameraBased } from "@/lib/store/features/character-contoller/game-state.slice";
@@ -21,6 +33,20 @@ import {
   SlopeRayDebug,
 } from "./debug.config";
 import { useKeyboardControls } from "@react-three/drei";
+import {
+  onJoystick,
+  pressButton1,
+  pressButton2,
+  pressButton3,
+  pressButton4,
+  pressButton5,
+  resetAllButtons,
+  resetJoystick,
+} from "@/lib/store/features/character-contoller/joystick-controlls-state";
+import useFollowCam from "../hooks/useFollowCam";
+import { Collider, RayColliderToi, Vector } from "@dimforge/rapier3d-compat";
+import { useFrame } from "@react-three/fiber";
+import { dir } from "console";
 
 const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   {
@@ -37,6 +63,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     // Follow camera setups
     camInitDis = -5,
     camMaxDis = -7,
+    camMinDis = -0.7,
     camInitDir = { x: 0, y: 0 }, // in rad
     camTargetPos = { x: 0, y: 0, z: 0 },
     camMoveSpeed = 1,
@@ -107,22 +134,25 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   ref
 ) => {
   const dispatch = useDispatch();
-  const characterRef = useRef<RapierRigidBody>(null);
+  const characterRef = useRef<RapierRigidBody>(null!);
   const forwardRef = ref as RefObject<RapierRigidBody>; // Forward ref to parent
   const controllerRef = forwardRef || characterRef; // Use parent ref if available
-  const characterModelRef = useRef<Group>();
+  const characterModelRef = useRef<Group>(null!);
   const characterModelIndicator = useMemo(() => new Object3D(), []);
-  const defaultControllerKeys = {
-    forward: 12,
-    backward: 13,
-    leftward: 14,
-    rightward: 15,
-    jump: 2,
-    action1: 11,
-    action2: 3,
-    action3: 1,
-    action4: 0,
-  };
+  const defaultControllerKeys = useMemo(
+    () => ({
+      forward: 12,
+      backward: 13,
+      leftward: 14,
+      rightward: 15,
+      jump: 2,
+      action1: 11,
+      action2: 3,
+      action3: 1,
+      action4: 0,
+    }),
+    []
+  );
 
   //   Mode setups
   let isModePointMove = false;
@@ -142,11 +172,16 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   const bodyFacingVec = useMemo(() => new Vector3(), []);
   const bodyBalanceVec = useMemo(() => new Vector3(), []);
   const bodyBalanceVecOnX = useMemo(() => new Vector3(), []);
-  const bodyBalanceVecOnY = useMemo(() => new Vector3(), []);
+  const bodyFacingVecOnY = useMemo(() => new Vector3(), []);
   const bodyBalanceVecOnZ = useMemo(() => new Vector3(), []);
   const vectorY = useMemo(() => new Vector3(0, 1, 0), []);
   const vectorZ = useMemo(() => new Vector3(0, 0, 1), []);
+  const crossVecOnX = useMemo(() => new Vector3(), []);
+  const crossVecOnY = useMemo(() => new Vector3(), []);
+  const crossVecOnZ = useMemo(() => new Vector3(), []);
   const bodyContactForce = useMemo(() => new Vector3(), []);
+  const slopeRayOriginUpdatePosition = useMemo(() => new Vector3(), []);
+  const camBasedMoveCrossVecOnY = useMemo(() => new Vector3(), []);
 
   // Animation change functions
   const idle = useAppSelector(
@@ -294,19 +329,663 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   // Check if inside keyboardcontrols
   function useIsInsideKeyboardControls() {
     try {
-        return !!useKeyboardControls();
+      return !!useKeyboardControls();
     } catch {
-        return false;
+      return false;
     }
   }
   const isInsideKeyboardControls = useIsInsideKeyboardControls();
 
   // keyboard controls setup
   const [subscribeKeys, getKeys] = useKeyboardControls();
-  const presetKeys = {forward: false, backward: false, leftward: false, rightward: false, jump: false, run: false};
+  const presetKeys = {
+    forward: false,
+    backward: false,
+    leftward: false,
+    rightward: false,
+    jump: false,
+    run: false,
+  };
   const { rapier, world } = useRapier();
 
-  // Joistick controls setup;
+  // Joistick controls setup
+  const joystickDis = useAppSelector(
+    (state) => state.joystickControllsReducer.curJoystickDis
+  );
+  const joystickAng = useAppSelector(
+    (state) => state.joystickControllsReducer.curJoystickAngle
+  );
+  const joystickState = useAppSelector(
+    (state) => state.joystickControllsReducer.curRunState
+  );
+  const pressedButton1 = useAppSelector(
+    (state) => state.joystickControllsReducer.curButton1Pressed
+  );
+  const pressedButton2 = useAppSelector(
+    (state) => state.joystickControllsReducer.curButton2Pressed
+  );
+  const pressedButton3 = useAppSelector(
+    (state) => state.joystickControllsReducer.curButton3Pressed
+  );
+  const pressedButton4 = useAppSelector(
+    (state) => state.joystickControllsReducer.curButton4Pressed
+  );
+  const pressedButton5 = useAppSelector(
+    (state) => state.joystickControllsReducer.curButton5Pressed
+  );
+
+  // Gamepade controls setup
+  const [controllerIndex, setControllerIndex] = useState<number | null>(null);
+  const gamepadKeys = {
+    forward: false,
+    backward: false,
+    leftward: false,
+    rightward: false,
+  };
+  const gamepadJoystickVec2 = useMemo(() => new Vector2(), []);
+  let gamepadJoystickDis = 0;
+  let gamepadJoystickAngle = 0;
+  const gamepadConnect = useCallback((e: any) => {
+    setControllerIndex(e.gamepad.index);
+  }, []);
+  const gamepadDisconnect = useCallback((e: any) => {
+    setControllerIndex(null);
+  }, []);
+  const mergedKeys = useMemo(
+    () => Object.assign({}, defaultControllerKeys, controllerKeys),
+    [defaultControllerKeys, controllerKeys]
+  );
+  const handleButtons = (buttons: readonly GamepadButton[]) => {
+    gamepadKeys.forward = buttons[mergedKeys.forward].pressed;
+    gamepadKeys.backward = buttons[mergedKeys.backward].pressed;
+    gamepadKeys.leftward = buttons[mergedKeys.leftward].pressed;
+    gamepadKeys.rightward = buttons[mergedKeys.rightward].pressed;
+
+    // Gampepad trigger the ControllerJoystick to play animations
+    if (buttons[mergedKeys.action4].pressed) {
+      dispatch(pressButton2());
+    } else if (buttons[mergedKeys.action3].pressed) {
+      dispatch(pressButton4());
+    } else if (buttons[mergedKeys.jump].pressed) {
+      dispatch(pressButton1());
+    } else if (buttons[mergedKeys.action2].pressed) {
+      dispatch(pressButton3());
+    } else if (buttons[mergedKeys.action1].pressed) {
+      dispatch(pressButton5());
+    } else {
+      dispatch(resetAllButtons());
+    }
+  };
+
+  const handleSticks = (axes: readonly number[]) => {
+    // Gamepad first joystick trigger the CharacterJoystick event to move the character
+    if (Math.abs(axes[0]) > 0 || Math.abs(axes[1]) > 0) {
+      gamepadJoystickVec2.set(axes[0], -axes[1]);
+      gamepadJoystickDis = Math.min(
+        Math.sqrt(
+          Math.pow(gamepadJoystickVec2.x, 2) +
+            Math.pow(gamepadJoystickVec2.y, 2)
+        ),
+        1
+      );
+      gamepadJoystickAngle = gamepadJoystickVec2.angle();
+      const runState = gamepadJoystickDis > 0.7;
+      dispatch(
+        onJoystick({
+          dis: gamepadJoystickDis,
+          angle: gamepadJoystickAngle,
+          isRun: runState,
+        })
+      );
+    } else {
+      dispatch(resetJoystick());
+    }
+    // Gamepad second joystick trigger useFollowCam event to move the camera
+    if (Math.abs(axes[2]) > 0 || Math.abs(axes[3]) > 0) {
+      joystickCamMove(axes[2], axes[3]);
+    }
+  };
+
+  // can jump setup
+  let canJump = false;
+  let isFalling = false;
+  const initialGravity = useMemo(
+    () => props.gravityScale || 1,
+    [props.gravityScale]
+  );
+
+  // on moving object state
+  let massRatio = 1;
+  let isOnMovingObject = false;
+  const standingForcePoint = useMemo(() => new Vector3(), []);
+  const movingObjectDragForce = useMemo(() => new Vector3(), []);
+  const movingObjectVelocity = useMemo(() => new Vector3(), []);
+  const movingObjectVelocityInCharacterDir = useMemo(() => new Vector3(), []);
+  const distanceFromCharacterToObject = useMemo(() => new Vector3(), []);
+  const objectAngelToLinvel = useMemo(() => new Vector3(), []);
+  const velocityDiff = useMemo(() => new Vector3(), []);
+
+  // Initial light setup
+  const [dirLight, setDirLight] = useState<DirectionalLight>();
+
+  // Follow camera initial setups from props
+  const cameraSetups = {
+    disableFollowCam,
+    disableFollowCamPos,
+    disableFollowCamTarget,
+    camInitDis,
+    camMaxDis,
+    camMinDis,
+    camInitDir,
+    camMoveSpeed,
+    camZoomSpeed,
+    camCollisionOffset,
+  };
+  // Load camera pivot and character move preset
+  const { pivot, cameraCollisionDetect, joystickCamMove } =
+    useFollowCam(cameraSetups);
+  const pivotPosition = useMemo(() => new Vector3(), []);
+  const modelEuler = useMemo(() => new Euler(), []);
+  const modelQuat = useMemo(() => new Quaternion(), []);
+  const moveImpulse = useMemo(() => new Vector3(), []);
+  const movingDirection = useMemo(() => new Vector3(), []);
+  const moveAccNeeded = useMemo(() => new Vector3(), []);
+  const jumpVelocityVec = useMemo(() => new Vector3(), []);
+  const jumpDirection = useMemo(() => new Vector3(), []);
+  const currentVel = useMemo(() => new Vector3(), []);
+  const currentPos = useMemo(() => new Vector3(), []);
+  const dragForce = useMemo(() => new Vector3(), []);
+  const dragAndForce = useMemo(() => new Vector3(), []);
+  const wantToMoveVel = useMemo(() => new Vector3(), []);
+  const rejectVel = useMemo(() => new Vector3(), []);
+
+  // Floating Ray setup
+  let floatingForce = null;
+  const springDirVec = useMemo(() => new Vector3(), []);
+  const characterMassForce = useMemo(() => new Vector3(), []);
+  const rayOrigin = useMemo(() => new Vector3(), []);
+  const rayCast = new rapier.Ray(rayOrigin, rayDir);
+  let rayHit: RayColliderToi | null = null;
+
+  // Test shape ray
+  // const shape = new rapier.Capsule(0.2, 0.1)
+
+  // Slope detection ray setup
+  let slopeAngle = 0;
+  let actualSlopeNormal: Vector | null = null;
+  let actualSlopeAngle = 0;
+  const actualSlopeNormalVec = useMemo(() => new Vector3(), []);
+  const slopeRayOriginRef = useRef<Mesh>(null!);
+  const slopeRayOrigin = useMemo(() => new Vector3(), []);
+  const slopeRayCast = new rapier.Ray(slopeRayOrigin, slopeRayDir);
+  let slopeRayHit: RayColliderToi | null = null;
+
+  // Point to move setup
+  let isBodyHitWall = false;
+  let isPointMoving = false;
+  const crossVector = useMemo(() => new Vector3(), []);
+  const pointToPoint = useMemo(() => new Vector3(), []);
+  const gameMoveToPoint = useAppSelector(
+    (state) => state.gameStateReducer.moveToPoint
+  );
+  const bodySensorRef = useRef<Collider>();
+  const handleOnIntersectionEnter = () => {
+    isBodyHitWall = true;
+  };
+  const handleOnIntersectionExit = () => {
+    isBodyHitWall = false;
+  };
+
+  // Character moving function
+  let characterRotated = true;
+  const moveCharacter = (
+    _: number,
+    run: boolean,
+    slopeAngle: number,
+    movingObjectVelocity: Vector3
+  ) => {
+    // Setup moving direction
+    // Only apply slope angle to moving direction
+    // when slope angle is between 0.2rad and slopeMaxAngle
+    // and actualSlopeAngle < slopeMaxAngle
+    if (
+      actualSlopeAngle < slopeMaxAngle &&
+      Math.abs(slopeAngle) > 0.2 &&
+      Math.abs(slopeAngle) < slopeMaxAngle
+    ) {
+      movingDirection.set(0, Math.sin(slopeAngle), Math.cos(slopeAngle));
+    }
+    // If on a slopeMaxAngle sloep, only apply small a mount of forward direction
+    else if (actualSlopeAngle >= slopeMaxAngle) {
+      movingDirection.set(
+        0,
+        Math.sin(slopeAngle) > 0 ? 0 : Math.sin(slopeAngle),
+        Math.sin(slopeAngle) > 0 ? 0.1 : 1
+      );
+    } else {
+      movingDirection.set(0, 0, 1);
+    }
+
+    // Apply character quaternion to moving direction
+    movingDirection.applyQuaternion(characterModelIndicator.quaternion);
+    // Moving object conditions
+    // Calculate moving object velocity direction according to character moving direction
+    movingObjectVelocityInCharacterDir
+      .copy(movingObjectVelocity)
+      .projectOnVector(movingDirection)
+      .multiply(movingDirection);
+    // Calculate angle between moving object velocity direction and character moving direction
+    const angleBetweenCharacterDirAndObjectDir =
+      movingObjectVelocity.angleTo(movingDirection);
+
+    // Setup rejection velocity, (currently only work on ground)
+    const wantToMoveMeg = currentVel.dot(movingDirection);
+    wantToMoveVel.set(
+      movingDirection.x * wantToMoveMeg,
+      0,
+      movingDirection.z * wantToMoveMeg
+    );
+    rejectVel.copy(currentVel).sub(wantToMoveVel);
+
+    /*
+     * Calculate required acceleration and force: a = Δv/Δt
+     * If it's on a moving/rotating platform, apply platform to Δv accordingly
+     * Also, apply reject velocity when character is moving oppsite of it's direction
+     */
+    moveAccNeeded.set(
+      (movingDirection.x *
+        (maxVelLimit &
+          ((run ? sprintMult : 1) + movingObjectVelocityInCharacterDir.x)) -
+        (currentVel.x -
+          movingObjectVelocity.x *
+            Math.sin(angleBetweenCharacterDirAndObjectDir) +
+          rejectVel.x * (isOnMovingObject ? 0 : rejectVelMult))) /
+        accDeltaTime,
+      0,
+      (movingDirection.z *
+        (maxVelLimit &
+          ((run ? sprintMult : 1) + movingObjectVelocityInCharacterDir.z)) -
+        (currentVel.z -
+          movingObjectVelocity.z *
+            Math.sin(angleBetweenCharacterDirAndObjectDir) +
+          rejectVel.z * (isOnMovingObject ? 0 : rejectVelMult))) /
+        accDeltaTime
+    );
+
+    // Wanted to move force function: F = ma
+    const moveForceNeeded = moveAccNeeded.multiplyScalar(
+      characterRef.current?.mass()
+    );
+
+    /**
+     * Check if character complete turned to the wanted direction
+     */
+    characterRotated =
+      Math.sin(characterModelIndicator.rotation.y).toFixed(3) ===
+      Math.sin(modelEuler.y).toFixed(3);
+
+    // If character hasn't complete turning, change the impulse quaternion follow chacaterModelIndicator quaternion
+    if (!characterRotated) {
+      moveImpulse.set(
+        moveForceNeeded.x *
+          turnVelMultiplier *
+          (canJump ? 1 : airDragMultiplier), // if it's in the air, give it less control
+        slopeAngle === null || slopeAngle === 0 // if it's on a slope, apply extra up/down force to the body
+          ? 0
+          : movingDirection.y *
+              turnVelMultiplier *
+              (movingDirection.y > 0 // check if is on a slope up or slope down)
+                ? slopeUpExtraForce
+                : slopeDownExtraForce) *
+              (run ? sprintMult : 1),
+        moveForceNeeded.z *
+          turnVelMultiplier *
+          (canJump ? 1 : airDragMultiplier) // if it's in the air, give it less control
+      );
+    } else {
+      moveImpulse.set(
+        moveForceNeeded.x * (canJump ? 1 : airDragMultiplier),
+        slopeAngle === null || slopeAngle === 0 // if it's on a slope, apply extra up/down force to the body
+          ? 0
+          : movingDirection.y *
+              (movingDirection.y > 0 // check if is on a slope up or slope down)
+                ? slopeUpExtraForce
+                : slopeDownExtraForce) *
+              (run ? sprintMult : 1),
+        moveForceNeeded.z * (canJump ? 1 : airDragMultiplier)
+      );
+    }
+
+    // Move character at proper direction and impulse
+    characterRef.current.applyImpulseAtPoint(
+      moveImpulse,
+      {
+        x: currentPos.x,
+        y: currentPos.y + moveImpulsePointY,
+        z: currentPos.z,
+      },
+      true
+    );
+  };
+
+  /**
+   * Character auto balance function
+   */
+  const autoBalanceCharacter = () => {
+    // Match body component to character model rotation on Y
+    bodyFacingVec
+      .set(0, 0, 1)
+      .applyQuaternion(quat(characterRef.current.rotation()));
+    bodyBalanceVec
+      .set(0, 1, 0)
+      .applyQuaternion(quat(characterRef.current.rotation()));
+
+    bodyBalanceVecOnX.set(0, bodyBalanceVec.y, bodyBalanceVec.z);
+    bodyFacingVecOnY.set(bodyFacingVec.x, 0, bodyFacingVec.z);
+    bodyBalanceVecOnZ.set(bodyBalanceVec.x, bodyBalanceVec.y, 0);
+    // Check if is camera based movement
+    if (isCameraBased) {
+      modelEuler.y = pivot.rotation.y;
+      pivot.getWorldPosition(modelFacingVec);
+      // Update slopeRayOrigin to new position
+      slopeRayOriginUpdatePosition.set(movingDirection.x, 0, movingDirection.z);
+      camBasedMoveCrossVecOnY
+        .copy(slopeRayOriginUpdatePosition)
+        .cross(modelFacingVec);
+      slopeRayOriginRef.current.position.x =
+        slopeRayOriginOffset *
+        Math.sin(
+          slopeRayOriginUpdatePosition.angleTo(modelFacingVec) *
+            (camBasedMoveCrossVecOnY.y < 0 ? 1 : -1)
+        );
+      slopeRayOriginRef.current.position.z =
+        slopeRayOriginOffset *
+        Math.cos(
+          slopeRayOriginUpdatePosition.angleTo(modelFacingVec) *
+            (camBasedMoveCrossVecOnY.y < 0 ? 1 : -1)
+        );
+    } else {
+      characterModelIndicator.getWorldPosition(modelFacingVec);
+    }
+    crossVecOnX.copy(vectorY).cross(bodyBalanceVecOnX);
+    crossVecOnY.copy(modelFacingVec).cross(bodyFacingVecOnY);
+    crossVecOnZ.copy(vectorY).cross(bodyBalanceVecOnZ);
+    dragAndForce.set(
+      (crossVecOnX.x < 0 ? 1 : -1) *
+        autoBalanceSpringK *
+        bodyBalanceVecOnX.angleTo(vectorY) -
+        characterRef.current.angvel().x * autoBalanceDampingC,
+      (crossVecOnY.y < 0 ? 1 : -1) *
+        autoBalanceSpringOnY *
+        modelFacingVec.angleTo(bodyFacingVecOnY) -
+        characterRef.current.angvel().y * autoBalanceDampingOnY,
+      (crossVecOnZ.z < 0 ? 1 : -1) *
+        autoBalanceSpringK *
+        bodyBalanceVecOnZ.angleTo(vectorY) -
+        characterRef.current.angvel().z * autoBalanceDampingC
+    );
+
+    // Applya balance torque impulse
+    characterRef.current.applyTorqueImpulse(dragAndForce, true);
+  };
+
+  /**
+   * Character sleep function
+   */
+  const sleepCharacter = useCallback(() => {
+    if (characterRef.current) {
+      if (document.visibilityState === "hidden") {
+        characterRef.current.sleep();
+      } else {
+        setTimeout(() => {
+          characterRef.current.wakeUp();
+        }, wakeUpDealay);
+      }
+    }
+  }, [wakeUpDealay]);
+
+  /**
+   * Point-to-move function
+   */
+  const pointToMove = (
+    delta: number,
+    slopeAngle: number,
+    movingObjectVelocity: Vector3
+  ) => {
+    const moveToPoint = gameMoveToPoint;
+    if (moveToPoint) {
+      pointToPoint.set(
+        moveToPoint.x - currentPos.x,
+        0,
+        moveToPoint.z - currentPos.z
+      );
+      crossVector.crossVectors(pointToPoint, vectorZ);
+      // Rotate character to  moving direction
+      modelEuler.y =
+        (crossVector.y < 0 ? 1 : -1) * pointToPoint.angleTo(vectorZ);
+      // Once character close to the target point (distance < 0.3)
+      // Or character close to the wall (bodySensor intersects)
+      // stop moving
+      if (characterRef.current) {
+        if (pointToPoint.length() > 0.3 && !isBodyHitWall) {
+          moveCharacter(delta, false, slopeAngle, movingObjectVelocity);
+          isPointMoving = true;
+        } else {
+          isPointMoving = false;
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Initialize directional light
+    if (followLight) {
+      setDirLight(
+        characterModelRef.current.parent?.parent?.children.find((item) => {
+          return item.name === "followLight";
+        }) as DirectionalLight
+      );
+    }
+  }, [followLight]);
+
+  /**
+   * Keyboard controls setup
+   */
+  // If insdie keyboardcontrols, active keyboard controls
+
+  useEffect(() => {
+    // Initialize character facing direction
+    modelEuler.y = characterInitDir;
+    window.addEventListener("visibilitychange", sleepCharacter);
+    window.addEventListener("gamepadconnected", gamepadConnect);
+    window.addEventListener("gamepaddisconnected", gamepadDisconnect);
+    return () => {
+      window.removeEventListener("visibilitychange", sleepCharacter);
+      window.removeEventListener("gamepadconnected", gamepadConnect);
+      window.removeEventListener("gamepaddisconnected", gamepadDisconnect);
+    };
+  }, [
+    characterInitDir,
+    sleepCharacter,
+    gamepadConnect,
+    gamepadDisconnect,
+    modelEuler,
+  ]);
+
+  useFrame((state, delta) => {
+    if (delta > 1) delta %= 1;
+    // Character current position/velocity
+    if (characterRef.current) {
+      currentPos.copy(characterRef.current.translation());
+      currentVel.copy(characterRef.current.linvel());
+      // Assign userDate properties
+      const characterUserData = characterRef.current.userData as userDataType;
+      characterUserData.canJump = canJump;
+      characterUserData.slopeAngle = slopeAngle;
+      characterUserData.characterRotated = characterRotated;
+      characterUserData.isOnMovingObject = isOnMovingObject;
+    }
+
+    /**
+     * Apply character position to directional light
+     */
+    if (followLight && dirLight) {
+      dirLight.position.x = currentPos.x + followLightPos.x;
+      dirLight.position.y = currentPos.y + followLightPos.y;
+      dirLight.position.z = currentPos.z + followLightPos.z;
+      dirLight.target = characterModelRef.current;
+    }
+
+    /**
+     * Getting all gamepad control values
+     */
+    if (controllerIndex !== null) {
+      const gamepad = navigator.getGamepads()[controllerIndex];
+      if (gamepad) {
+        handleButtons(gamepad.buttons);
+        handleSticks(gamepad.axes);
+        // Getting moving directions (IIFE)
+        modelEuler.y = ((movingDirection) =>
+          movingDirection === null ? modelEuler.y : movingDirection)(
+          getMovingDirection(
+            gamepadKeys.forward,
+            gamepadKeys.backward,
+            gamepadKeys.leftward,
+            gamepadKeys.rightward,
+            pivot
+          )
+        );
+      }
+
+      /**
+       * Getting all joystick control values
+       */
+      // Move character to the moving direction (joystick controls)
+      if (joystickDis > 0) {
+        // Apply camera rotation to character model
+        modelEuler.y = pivot.rotation.y + (joystickAng - Math.PI / 2);
+        moveCharacter(delta, joystickState, slopeAngle, movingObjectVelocity);
+      }
+
+      /**
+       * Getting all the useful keys form useKeyboardControls
+       */
+      const { backward, forward, leftward, rightward, jump, run } =
+        isInsideKeyboardControls ? getKeys() : presetKeys;
+      // Getting moving directions (IIFE)
+      modelEuler.y = ((movingDirection) =>
+        movingDirection === null ? modelEuler.y : movingDirection)(
+        getMovingDirection(forward, backward, leftward, rightward, pivot)
+      );
+
+      // Move character to the moving direction
+      if (
+        forward ||
+        backward ||
+        leftward ||
+        rightward ||
+        gamepadKeys.backward ||
+        gamepadKeys.forward ||
+        gamepadKeys.leftward ||
+        gamepadKeys.rightward
+      ) {
+        moveCharacter(delta, run, slopeAngle, movingObjectVelocity);
+      }
+
+      // Jump impulse
+      if ((jump || pressedButton1) && canJump) {
+        jumpVelocityVec.set(
+          currentVel.x,
+          run ? sprintJumpMult * jumpVel : jumpVel,
+          currentVel.z
+        );
+        characterRef.current.setLinvel(
+          jumpDirection.set(
+            0,
+            (run ? sprintJumpMult * jumpVel : jumpVel) * slopJumpMult,
+            0
+          ),
+          true
+        );
+        // Apply jump force downward to the standing platform
+        characterMassForce.y *= jumpForceToGroundMult;
+        rayHit?.collider
+          .parent()
+          ?.applyImpulseAtPoint(characterMassForce, standingForcePoint, true);
+      }
+
+      // Rotate character Indicitor
+      modelQuat.setFromEuler(modelEuler);
+      characterModelIndicator.quaternion.rotateTowards(
+        modelQuat,
+        delta * turnSpeed
+      );
+
+      // If autobalance is off, rotate chracter model itself
+      if (!autoBalance) {
+        if (isCameraBased) {
+          characterModelRef.current.quaternion.copy(pivot.quaternion);
+        } else {
+          characterModelRef.current.quaternion.copy(
+            characterModelIndicator.quaternion
+          );
+        }
+      }
+
+      /**
+       * Camera movement
+       */
+      pivotPosition.set(
+        currentPos.x + camTargetPos.x,
+        currentPos.y +
+          (camTargetPos.y || capsuleHalfHeight + capsuleRadius / 2),
+        currentPos.z + camTargetPos.z
+      );
+      pivot.position.lerp(pivotPosition, 1 - Math.exp(-camFollowMult * delta));
+      !disableFollowCam && state.camera.lookAt(pivot.position);
+      /**
+       * Rac casting detect if on ground
+       */
+      rayOrigin.addVectors(currentPos, rayOriginOffset);
+      rayHit = world.castRay(
+        rayCast,
+        rayLength,
+        true,
+        // this exclude sensor
+        16,
+        undefined,
+        undefined,
+        characterRef.current,
+        // this exclude any collider with userData: excludeContollerRay
+        (collider: Collider) => {
+          const is =
+            collider.parent()?.userData &&
+            !(collider.parent()?.userData as userDataType).excludeControllerRay;
+          return false;
+        }
+      );
+      /** Test shape ray */
+      /*  rayHit = world.castShape(
+        currentPos,
+        {w: 0, x: 0, y: 0, z: 0},
+        {x: 0, y: -1, z: 0},
+        shape,
+        rayLength,
+        true,
+        null,
+        null,
+        characterRef.current
+      ) */
+
+      if (rayHit && rayHit.toi < floatingDis + rayHitForgiveness) {
+        if (slopeRayHit && actualSlopeAngle < slopeMaxAngle) {
+          canJump = true;
+        }
+      } else {
+        canJump = false;
+      }
+    }
+  });
   return <></>;
 };
 

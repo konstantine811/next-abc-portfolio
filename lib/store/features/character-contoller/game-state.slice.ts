@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Vector3 } from "three";
 // models
 import { AnimationSet } from "@/components/three-scenes/characterController/controllers/models";
-import { act } from "@react-three/fiber";
 
 type GameState = {
   moveToPoint: Vector3;
@@ -22,9 +21,6 @@ export const GameState = createSlice({
   name: "game-state",
   initialState,
   reducers: {
-    /* onFilteredBlogPost: (state, action: PayloadAction<GameEntity>) => {
-      state.value.filteredBlogPost = action.payload;
-    }, */
     initialAnimationSet: (state, action: PayloadAction<AnimationSet>) => {
       if (Object.keys(state.animationSet).length === 0) {
         state.animationSet = action.payload;

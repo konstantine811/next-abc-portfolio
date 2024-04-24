@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import uiStateReducer from "@/lib/store/features/ui-state.slice";
 import blogPostStateReducer from "@/lib/store/features/blog-post-state.slice";
 import gameStateReducer from "@/lib/store/features/character-contoller/game-state.slice";
+import joystickControllsReducer from "@/lib/store/features/character-contoller/joystick-controlls-state";
 
 export const makeStore = () => {
   return configureStore({
@@ -10,6 +11,7 @@ export const makeStore = () => {
       uiStateReducer,
       blogPostStateReducer,
       gameStateReducer,
+      joystickControllsReducer,
     },
   });
 };
