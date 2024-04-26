@@ -23,7 +23,7 @@ import {
 } from "three";
 // storeage
 import { useAppSelector } from "@/lib/store/hooks";
-import { setCameraBased } from "@/lib/store/features/character-contoller/game-state.slice";
+import { onCameraBased } from "@/lib/store/features/character-contoller/game-state.slice";
 import { useDispatch } from "react-redux";
 import { useControls } from "leva";
 import {
@@ -164,7 +164,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
       isModePointMove = true;
     }
     if (mode === "CameraBasedMovement") {
-      dispatch(setCameraBased(true));
+      dispatch(onCameraBased(true));
     }
   }
   //   Body collider setup
@@ -957,12 +957,9 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
         undefined,
         characterRef.current,
         // this exclude any collider with userData: excludeContollerRay
-        (collider: Collider) => {
-          const is =
-            collider.parent()?.userData &&
-            !(collider.parent()?.userData as userDataType).excludeControllerRay;
-          return false;
-        }
+        (collider: Collider) =>
+          (collider.parent()?.userData as userDataType) &&
+          !(collider.parent()?.userData as userDataType).excludeControllerRay
       );
       /** Test shape ray */
       /*  rayHit = world.castShape(
@@ -983,6 +980,128 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
         }
       } else {
         canJump = false;
+      }
+      /**
+       * Ray detect if on rigid body or dynamic platform, then apply the linear velocity and angular velocity to character
+       */
+      if (rayHit && canJump) {
+        if (rayHit.collider.parent()) {
+          // Getting the standing force apply point
+          standingForcePoint.set(
+            rayOrigin.x,
+            rayOrigin.y - rayHit.toi,
+            rayOrigin.z
+          );
+          const rayHitObjectBodyType = rayHit.collider.parent()?.bodyType();
+          const rayHitObjectBodyMass = rayHit.collider.parent()?.mass();
+          if (rayHitObjectBodyMass) {
+            massRatio = characterRef.current.mass() / rayHitObjectBodyMass;
+            // Body type 0 is rigid body, body type 1 is fixed body, body type 2 is kinematic body
+            if (rayHitObjectBodyType === 0 || rayHitObjectBodyType === 2) {
+              isOnMovingObject = true;
+              // Calculate distance between character and moving object
+              distanceFromCharacterToObject
+                .copy(currentPos)
+                .sub(rayHit.collider.parent()?.translation() as Vector3);
+              // Moving object linear velocity
+              const movingObjectLinvel = rayHit.collider
+                .parent()
+                ?.linvel() as Vector3;
+              // Moving object angular velocity
+              const movingObjectAngvel = rayHit.collider
+                .parent()
+                ?.angvel() as Vector3;
+              // Combine object linear velocity and angular velocity to movingObjectVelocity
+              movingObjectVelocity
+                .set(
+                  movingObjectLinvel.x +
+                    objectAngelToLinvel.crossVectors(
+                      movingObjectAngvel,
+                      distanceFromCharacterToObject
+                    ).x,
+                  movingObjectLinvel.y,
+                  movingObjectLinvel.z +
+                    objectAngelToLinvel.crossVectors(
+                      movingObjectAngvel,
+                      distanceFromCharacterToObject
+                    ).z
+                )
+                .multiplyScalar(Math.min(1, 1 / massRatio));
+              // If the velocity diff is too high (> 30), ignore movingObjectVelocity
+              velocityDiff.subVectors(movingObjectVelocity, currentVel);
+              if (velocityDiff.length() > 30) {
+                movingObjectVelocity.multiplyScalar(1 / velocityDiff.length());
+              }
+
+              // Apply opposite drage force to the stading rigid body, body type 0
+              // Character moving and unmoving should provide different drage force to the platform
+              if (rayHitObjectBodyType === 0) {
+                if (
+                  !forward &&
+                  !backward &&
+                  !leftward &&
+                  !rightward &&
+                  canJump &&
+                  joystickDis === 0 &&
+                  !isPointMoving &&
+                  !gamepadKeys.forward &&
+                  !gamepadKeys.backward &&
+                  !gamepadKeys.leftward &&
+                  !gamepadKeys.rightward
+                ) {
+                  movingObjectDragForce
+                    .copy(bodyContactForce)
+                    .multiplyScalar(delta)
+                    .multiplyScalar(Math.min(1, 1 / massRatio)) // Scale up/down base on different masses ratio
+                    .negate();
+                  bodyContactForce.set(0, 0, 0);
+                } else {
+                  movingObjectDragForce
+                    .copy(moveImpulse)
+                    .multiplyScalar(Math.min(1, 1 / massRatio))
+                    .negate();
+                }
+                rayHit.collider
+                  .parent()
+                  ?.applyImpulseAtPoint(
+                    movingObjectDragForce,
+                    standingForcePoint,
+                    true
+                  );
+              }
+            } else {
+              // on fixed body
+              massRatio = 1;
+              isOnMovingObject = false;
+              bodyContactForce.set(0, 0, 0);
+              movingObjectVelocity.set(0, 0, 0);
+            }
+          }
+        } else {
+          //  in the air
+          massRatio = 1;
+          isOnMovingObject = false;
+          bodyContactForce.set(0, 0, 0);
+          movingObjectVelocity.set(0, 0, 0);
+        }
+
+        /**
+         * Slope ray casting detect if on slope
+         */
+        slopeRayOriginRef.current.getWorldPosition(slopeRayOrigin);
+        slopeRayOrigin.y = rayOrigin.y;
+        slopeRayHit = world.castRay(
+          slopeRayCast,
+          slopeRayLength,
+          true,
+          16,
+          undefined,
+          undefined,
+          characterRef.current,
+          (collider: Collider) =>
+            (collider.parent()?.userData as userDataType) &&
+            !(collider.parent()?.userData as userDataType).excludeControllerRay
+        );
       }
     }
   });

@@ -6,6 +6,10 @@
       "title": "Практика з 3d Web",
       "first-scene": "Перша сцена",
       "second-scene": "Друга сцена"
+    },
+    "maps": {
+      "title": "Карти",
+      "leko": "Леко"
     }
   },
   "Blog": {
@@ -18,5 +22,31 @@
   },
   "LocaleLayout": {
     "title": "ЛЕКО"
+  },
+  "Portfolio": {
+    "skills": {
+      "develop": {
+        "title": "Навички розробки",
+        "js": "Javascript, Typescript",
+        "angular": "Angular",
+        "react": "React",
+        "vue": "Vue.js",
+        "styles": "CSS, SCSS, Tailwind, Material, Bootstrap",
+        "tools": "Webpack, Vite",
+        "backend": "Node.js, Next.js, Express.js, Rest API",
+        "database": "Firebase, MongoDB, Sql",
+        "maps": "Mapbox, Arcgis",
+        "webGl": "Three.js, React-3d-fiber, shaders",
+        "3d": "Blender",
+        "design": "Figma, Adobe XD, Illustrator, Photoshop",
+        "animation": "GSAP, Anime.js, Frame-motion",
+        "canvas": "Canvas, SVG"
+      },
+      "languages": {
+        "title": "Знання мов",
+        "uk": "Українська",
+        "en": "Англійська"
+      }
+    }
   }
 }

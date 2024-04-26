@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 const Logo = () => {
   const t = useTranslations("LocaleLayout");
+
   return (
     <div className={cn("flex items-center")}>
       <SvgLogo />

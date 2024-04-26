@@ -1,9 +1,6 @@
 "use client";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three";
+import { Canvas } from "@react-three/fiber";
 import { useRef } from "react";
-import { useScroll, useSpring } from "framer-motion";
-import { motion } from "framer-motion-3d";
 import EarthGlobe from "./earthGlobe";
 
 interface Props {

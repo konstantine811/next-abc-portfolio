@@ -12,6 +12,8 @@ export enum PATH_ROUTE_NAME {
   threeTrain = "/three-train",
   firstScene = "/first-scene",
   secondScene = "/second-scene",
+  maps = "/maps",
+  leko = "/leko",
 }
 
 const NavigationConfig = (): INaviagationConfig[] => {
@@ -36,6 +38,16 @@ const NavigationConfig = (): INaviagationConfig[] => {
         {
           title: t("nav.three-train.second-scene"),
           href: PATH_ROUTE_NAME.secondScene,
+        },
+      ],
+    },
+    {
+      title: t("nav.maps.title"),
+      href: PATH_ROUTE_NAME.maps,
+      children: [
+        {
+          title: t("nav.maps.leko"),
+          href: PATH_ROUTE_NAME.leko,
         },
       ],
     },

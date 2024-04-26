@@ -4,14 +4,14 @@ import { Vector3 } from "three";
 import { AnimationSet } from "@/components/three-scenes/characterController/controllers/models";
 
 type GameState = {
-  moveToPoint: Vector3;
+  moveToPoint: { x: number; y: number; z: number };
   isCameraBased: boolean;
   curAnimation: string | null;
   animationSet: AnimationSet;
 };
 
 const initialState: GameState = {
-  moveToPoint: new Vector3(),
+  moveToPoint: { x: 0, y: 0, z: 0 },
   isCameraBased: false,
   curAnimation: null,
   animationSet: {},
@@ -84,10 +84,10 @@ export const GameState = createSlice({
         state.curAnimation = action.payload;
       }
     },
-    setMovePoing: (state, action: PayloadAction<Vector3>) => {
+    onMovePoint: (state, action: PayloadAction<Vector3>) => {
       state.moveToPoint = action.payload;
     },
-    setCameraBased: (state, action: PayloadAction<boolean>) => {
+    onCameraBased: (state, action: PayloadAction<boolean>) => {
       state.isCameraBased = action.payload;
     },
   },
@@ -103,8 +103,8 @@ export const {
   jumpIdle,
   fall,
   jumpLand,
-  setCameraBased,
-  setMovePoing,
+  onCameraBased,
+  onMovePoint,
   action,
   action4,
 } = GameState.actions;
