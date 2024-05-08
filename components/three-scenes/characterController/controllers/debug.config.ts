@@ -142,7 +142,7 @@ export class FloatingRayDebug {
         y: -1,
         z: 0,
       },
-      floatDis: {
+      floatingDis: {
         value: capsuleRadius + floatHeight,
         min: 0,
         max: capsuleRadius + 2,

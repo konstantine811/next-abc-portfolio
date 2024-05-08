@@ -1,4 +1,15 @@
-import { Color, ShaderMaterial, TextureLoader, Uniform, Vector2 } from "three";
+"use client";
+
+import {
+  BufferGeometry,
+  Color,
+  Float32BufferAttribute,
+  MathUtils,
+  ShaderMaterial,
+  TextureLoader,
+  Uniform,
+  Vector2,
+} from "three";
 import { useMemo, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 // shaders
@@ -9,32 +20,34 @@ const fragment =
 
 const ParticleAnimImage = () => {
   const shaderRef = useRef<ShaderMaterial>(null!);
-  const [image] = useLoader(TextureLoader, ["/assets/images/profilePhoto.png"]);
+  const [image] = useLoader(TextureLoader, ["/assets/images/picture-1.png"]);
 
-  const count = 100;
-  const sep = 3;
+  const size = 1000;
+  const divisions = 500;
 
   // Generate our positions attributes array
-  const particlesPosition = useMemo(() => {
-    const positions = [];
-    for (let x = 0; x < count; x++) {
-      for (let y = 0; y < count; y++) {
-        positions.push((x / sep) * 2, (y / sep) * 2, 0);
+  const points = useMemo(() => {
+    const vertices = [];
+    for (let y = 0; y <= divisions; y++) {
+      for (let x = 0; x <= divisions; x++) {
+        vertices.push(x, y, 0);
       }
     }
-
-    return new Float32Array(positions);
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+    return geometry;
   }, []);
+
   return (
-    <points position={[-10, -35, -40]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particlesPosition.length / 3}
-          array={particlesPosition}
-          itemSize={3}
-        />
-      </bufferGeometry>
+    <points>
+      <bufferGeometry attach="geometry" {...points} />
+      {/* <pointsMaterial
+        attach="material"
+        size={5}
+        sizeAttenuation
+        color="white"
+        map={image}
+      /> */}
       <shaderMaterial
         uniforms={{
           uResolution: new Uniform(

@@ -1,9 +1,15 @@
-import { RapierRigidBody, quat, useRapier } from "@react-three/rapier";
+import {
+  CapsuleCollider,
+  CylinderCollider,
+  RapierRigidBody,
+  RigidBody,
+  quat,
+  useRapier,
+} from "@react-three/rapier";
 import {
   ForwardRefRenderFunction,
   RefObject,
   forwardRef,
-  use,
   useCallback,
   useEffect,
   useMemo,
@@ -23,7 +29,15 @@ import {
 } from "three";
 // storeage
 import { useAppSelector } from "@/lib/store/hooks";
-import { onCameraBased } from "@/lib/store/features/character-contoller/game-state.slice";
+import {
+  onCameraBased,
+  idleAnimation,
+  jumpAnimation,
+  runAnimation,
+  walkAnimation,
+  jumpIdleAnimation,
+  fallAnimation,
+} from "@/lib/store/features/character-contoller/game-state.slice";
 import { useDispatch } from "react-redux";
 import { useControls } from "leva";
 import {
@@ -46,7 +60,8 @@ import {
 import useFollowCam from "../hooks/useFollowCam";
 import { Collider, RayColliderToi, Vector } from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { dir } from "console";
+import { getMovingDirection } from "./utils";
+import { m } from "framer-motion";
 
 const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   {
@@ -155,13 +170,13 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   );
 
   //   Mode setups
-  let isModePointMove = false;
+  let isModePointToMove = false;
   const isCameraBased = useAppSelector(
     (state) => state.gameStateReducer.isCameraBased
   );
   if (mode) {
     if (mode === "PointMove") {
-      isModePointMove = true;
+      isModePointToMove = true;
     }
     if (mode === "CameraBasedMovement") {
       dispatch(onCameraBased(true));
@@ -184,46 +199,9 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   const camBasedMoveCrossVecOnY = useMemo(() => new Vector3(), []);
 
   // Animation change functions
-  const idle = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.idle
+  const animationSet = useAppSelector(
+    (state) => state.gameStateReducer.animationSet
   );
-  const walk = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.walk
-  );
-  const run = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.run
-  );
-  const jump = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.jump
-  );
-  const jumpIdle = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.jumpIdle
-  );
-  const fall = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.fall
-  );
-  const action1 = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.action1
-  );
-  const action2 = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.action2
-  );
-  const action3 = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.action3
-  );
-  const action4 = useAppSelector(
-    (state) => state.gameStateReducer.animationSet.action4
-  );
-  const idleAnimation = !animated ? null : idle;
-  const walkAnimation = !animated ? null : walk;
-  const runAnimation = !animated ? null : run;
-  const jumpAnimation = !animated ? null : jump;
-  const jumpIdleAnimation = !animated ? null : jumpIdle;
-  const fallAnimation = !animated ? null : fall;
-  const action1Animation = !animated ? null : action1;
-  const action2Animation = !animated ? null : action2;
-  const action3Animation = !animated ? null : action3;
-  const action4Animation = !animated ? null : action4;
 
   // Debug settings
   let characterControlsDebug = null;
@@ -252,20 +230,20 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     { collapsed: true }
   ) as any;
   // Apply debug values
-  maxVelLimit = characterControlsDebug.maxVelLimit.value;
-  turnVelMultiplier = characterControlsDebug.turnVelMultiplier.value;
-  turnSpeed = characterControlsDebug.turnSpeed.value;
-  sprintMult = characterControlsDebug.sprintMult.value;
-  jumpVel = characterControlsDebug.jumpVel.value;
-  jumpForceToGroundMult = characterControlsDebug.jumpForceToGroundMult.value;
-  slopJumpMult = characterControlsDebug.slopJumpMult.value;
-  sprintJumpMult = characterControlsDebug.sprintJumpMult.value;
-  airDragMultiplier = characterControlsDebug.airDragMultiplier.value;
-  dragDampingC = characterControlsDebug.dragDampingC.value;
-  accDeltaTime = characterControlsDebug.accDeltaTime.value;
-  rejectVelMult = characterControlsDebug.rejectVelMult.value;
-  moveImpulsePointY = characterControlsDebug.moveImpulsePointY.value;
-  camFollowMult = characterControlsDebug.camFollowMult.value;
+  maxVelLimit = characterControlsDebug.maxVelLimit;
+  turnVelMultiplier = characterControlsDebug.turnVelMultiplier;
+  turnSpeed = characterControlsDebug.turnSpeed;
+  sprintMult = characterControlsDebug.sprintMult;
+  jumpVel = characterControlsDebug.jumpVel;
+  jumpForceToGroundMult = characterControlsDebug.jumpForceToGroundMult;
+  slopJumpMult = characterControlsDebug.slopJumpMult;
+  sprintJumpMult = characterControlsDebug.sprintJumpMult;
+  airDragMultiplier = characterControlsDebug.airDragMultiplier;
+  dragDampingC = characterControlsDebug.dragDampingC;
+  accDeltaTime = characterControlsDebug.accDeltaTime;
+  rejectVelMult = characterControlsDebug.rejectVelMult;
+  moveImpulsePointY = characterControlsDebug.moveImpulsePointY;
+  camFollowMult = characterControlsDebug.camFollowMult;
 
   // Floating Ray
   floatingRayDebug = useControls(
@@ -281,13 +259,13 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     { collapsed: true }
   ) as any;
   // Apply debug values
-  rayOriginOffset = floatingRayDebug.rayOriginOffset.value;
-  rayHitForgiveness = floatingRayDebug.rayHitForgiveness.value;
-  rayLength = floatingRayDebug.rayLength.value;
-  rayDir = floatingRayDebug.rayDir.value;
-  floatingDis = floatingRayDebug.floatingDis.value;
-  springK = floatingRayDebug.springK.value;
-  dampingC = floatingRayDebug.dampingC.value;
+  rayOriginOffset = floatingRayDebug.rayOriginOffset;
+  rayHitForgiveness = floatingRayDebug.rayHitForgiveness;
+  rayLength = floatingRayDebug.rayLength;
+  rayDir = floatingRayDebug.rayDir;
+  floatingDis = floatingRayDebug.floatingDis;
+  springK = floatingRayDebug.springK;
+  dampingC = floatingRayDebug.dampingC;
 
   // Slope Ray
   slopeRayDebug = useControls(
@@ -301,12 +279,12 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     { collapsed: true }
   ) as any;
   // Apply debug values
-  showSlopeRayOrigin = slopeRayDebug.showSlopeRayOrigin.value;
-  slopeMaxAngle = slopeRayDebug.slopeMaxAngle.value;
-  slopeRayLength = slopeRayDebug.slopeRayLength.value;
-  slopeRayDir = slopeRayDebug.slopeRayDir.value;
-  slopeUpExtraForce = slopeRayDebug.slopeUpExtraForce.value;
-  slopeDownExtraForce = slopeRayDebug.slopeDownExtraForce.value;
+  showSlopeRayOrigin = slopeRayDebug.showSlopeRayOrigin;
+  slopeMaxAngle = slopeRayDebug.slopeMaxAngle;
+  slopeRayLength = slopeRayDebug.slopeRayLength;
+  slopeRayDir = slopeRayDebug.slopeRayDir;
+  slopeUpExtraForce = slopeRayDebug.slopeUpExtraForce;
+  slopeDownExtraForce = slopeRayDebug.slopeDownExtraForce;
 
   // Auto Balance Force
   autoBalanceForceDebug = useControls(
@@ -320,11 +298,11 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     { collapsed: true }
   ) as any;
   // Apply debug values
-  autoBalance = autoBalanceForceDebug.autoBalance.value;
-  autoBalanceSpringK = autoBalanceForceDebug.autoBalanceSpringK.value;
-  autoBalanceDampingC = autoBalanceForceDebug.autoBalanceDampingC.value;
-  autoBalanceSpringOnY = autoBalanceForceDebug.autoBalanceSpringOnY.value;
-  autoBalanceDampingOnY = autoBalanceForceDebug.autoBalanceDampingOnY.value;
+  autoBalance = autoBalanceForceDebug.autoBalance;
+  autoBalanceSpringK = autoBalanceForceDebug.autoBalanceSpringK;
+  autoBalanceDampingC = autoBalanceForceDebug.autoBalanceDampingC;
+  autoBalanceSpringOnY = autoBalanceForceDebug.autoBalanceSpringOnY;
+  autoBalanceDampingOnY = autoBalanceForceDebug.autoBalanceDampingOnY;
 
   // Check if inside keyboardcontrols
   function useIsInsideKeyboardControls() {
@@ -356,6 +334,9 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     (state) => state.joystickControllsReducer.curJoystickAngle
   );
   const joystickState = useAppSelector(
+    (state) => state.joystickControllsReducer.curRunState
+  );
+  const curRunState = useAppSelector(
     (state) => state.joystickControllsReducer.curRunState
   );
   const pressedButton1 = useAppSelector(
@@ -449,7 +430,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   // can jump setup
   let canJump = false;
   let isFalling = false;
-  const initialGravity = useMemo(
+  const initialGravityScale = useMemo(
     () => props.gravityScale || 1,
     [props.gravityScale]
   );
@@ -511,10 +492,11 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   // const shape = new rapier.Capsule(0.2, 0.1)
 
   // Slope detection ray setup
-  let slopeAngle = 0;
-  let actualSlopeNormal: Vector | null = null;
+  let slopeAngle: number = 0;
+  let actualSlopeNormal: Vector | undefined = undefined;
   let actualSlopeAngle = 0;
   const actualSlopeNormalVec = useMemo(() => new Vector3(), []);
+  const floorNormal = useMemo(() => new Vector3(0, 1, 0), []);
   const slopeRayOriginRef = useRef<Mesh>(null!);
   const slopeRayOrigin = useMemo(() => new Vector3(), []);
   const slopeRayCast = new rapier.Ray(slopeRayOrigin, slopeRayDir);
@@ -528,7 +510,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   const gameMoveToPoint = useAppSelector(
     (state) => state.gameStateReducer.moveToPoint
   );
-  const bodySensorRef = useRef<Collider>();
+  const bodySensorRef = useRef<Collider>(null!);
   const handleOnIntersectionEnter = () => {
     isBodyHitWall = true;
   };
@@ -594,8 +576,8 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
      */
     moveAccNeeded.set(
       (movingDirection.x *
-        (maxVelLimit &
-          ((run ? sprintMult : 1) + movingObjectVelocityInCharacterDir.x)) -
+        (maxVelLimit * (run ? sprintMult : 1) +
+          movingObjectVelocityInCharacterDir.x) -
         (currentVel.x -
           movingObjectVelocity.x *
             Math.sin(angleBetweenCharacterDirAndObjectDir) +
@@ -603,8 +585,8 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
         accDeltaTime,
       0,
       (movingDirection.z *
-        (maxVelLimit &
-          ((run ? sprintMult : 1) + movingObjectVelocityInCharacterDir.z)) -
+        (maxVelLimit * (run ? sprintMult : 1) +
+          movingObjectVelocityInCharacterDir.z) -
         (currentVel.z -
           movingObjectVelocity.z *
             Math.sin(angleBetweenCharacterDirAndObjectDir) +
@@ -614,27 +596,27 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
 
     // Wanted to move force function: F = ma
     const moveForceNeeded = moveAccNeeded.multiplyScalar(
-      characterRef.current?.mass()
+      characterRef.current.mass()
     );
 
     /**
      * Check if character complete turned to the wanted direction
      */
     characterRotated =
-      Math.sin(characterModelIndicator.rotation.y).toFixed(3) ===
+      Math.sin(characterModelIndicator.rotation.y).toFixed(3) ==
       Math.sin(modelEuler.y).toFixed(3);
 
-    // If character hasn't complete turning, change the impulse quaternion follow chacaterModelIndicator quaternion
+    // If character hasn't complete turning, change the impulse quaternion follow characterModelIndicator quaternion
     if (!characterRotated) {
       moveImpulse.set(
         moveForceNeeded.x *
           turnVelMultiplier *
           (canJump ? 1 : airDragMultiplier), // if it's in the air, give it less control
-        slopeAngle === null || slopeAngle === 0 // if it's on a slope, apply extra up/down force to the body
+        slopeAngle === null || slopeAngle == 0 // if it's on a slope, apply extra up/down force to the body
           ? 0
           : movingDirection.y *
               turnVelMultiplier *
-              (movingDirection.y > 0 // check if is on a slope up or slope down)
+              (movingDirection.y > 0 // check it is on slope up or slope down
                 ? slopeUpExtraForce
                 : slopeDownExtraForce) *
               (run ? sprintMult : 1),
@@ -645,10 +627,10 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     } else {
       moveImpulse.set(
         moveForceNeeded.x * (canJump ? 1 : airDragMultiplier),
-        slopeAngle === null || slopeAngle === 0 // if it's on a slope, apply extra up/down force to the body
+        slopeAngle === null || slopeAngle == 0 // if it's on a slope, apply extra up/down force to the body
           ? 0
           : movingDirection.y *
-              (movingDirection.y > 0 // check if is on a slope up or slope down)
+              (movingDirection.y > 0 // check it is on slope up or slope down
                 ? slopeUpExtraForce
                 : slopeDownExtraForce) *
               (run ? sprintMult : 1),
@@ -686,12 +668,13 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     // Check if is camera based movement
     if (isCameraBased) {
       modelEuler.y = pivot.rotation.y;
-      pivot.getWorldPosition(modelFacingVec);
+      pivot.getWorldDirection(modelFacingVec);
       // Update slopeRayOrigin to new position
       slopeRayOriginUpdatePosition.set(movingDirection.x, 0, movingDirection.z);
       camBasedMoveCrossVecOnY
         .copy(slopeRayOriginUpdatePosition)
         .cross(modelFacingVec);
+
       slopeRayOriginRef.current.position.x =
         slopeRayOriginOffset *
         Math.sin(
@@ -705,7 +688,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
             (camBasedMoveCrossVecOnY.y < 0 ? 1 : -1)
         );
     } else {
-      characterModelIndicator.getWorldPosition(modelFacingVec);
+      characterModelIndicator.getWorldDirection(modelFacingVec);
     }
     crossVecOnX.copy(vectorY).cross(bodyBalanceVecOnX);
     crossVecOnY.copy(modelFacingVec).cross(bodyFacingVecOnY);
@@ -835,7 +818,6 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
       dirLight.position.z = currentPos.z + followLightPos.z;
       dirLight.target = characterModelRef.current;
     }
-
     /**
      * Getting all gamepad control values
      */
@@ -856,256 +838,473 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
           )
         );
       }
+    }
 
-      /**
-       * Getting all joystick control values
-       */
-      // Move character to the moving direction (joystick controls)
-      if (joystickDis > 0) {
-        // Apply camera rotation to character model
-        modelEuler.y = pivot.rotation.y + (joystickAng - Math.PI / 2);
-        moveCharacter(delta, joystickState, slopeAngle, movingObjectVelocity);
-      }
+    /**
+     * Getting all joystick control values
+     */
+    // Move character to the moving direction (joystick controls)
+    if (joystickDis > 0) {
+      // Apply camera rotation to character model
+      modelEuler.y = pivot.rotation.y + (joystickAng - Math.PI / 2);
+      moveCharacter(delta, joystickState, slopeAngle, movingObjectVelocity);
+    }
 
-      /**
-       * Getting all the useful keys form useKeyboardControls
-       */
-      const { backward, forward, leftward, rightward, jump, run } =
-        isInsideKeyboardControls ? getKeys() : presetKeys;
-      // Getting moving directions (IIFE)
-      modelEuler.y = ((movingDirection) =>
-        movingDirection === null ? modelEuler.y : movingDirection)(
-        getMovingDirection(forward, backward, leftward, rightward, pivot)
+    /**
+     * Getting all the useful keys form useKeyboardControls
+     */
+    const { backward, forward, leftward, rightward, jump, run } =
+      isInsideKeyboardControls ? getKeys() : presetKeys;
+    // Getting moving directions (IIFE)
+    modelEuler.y = ((movingDirection) =>
+      movingDirection === null ? modelEuler.y : movingDirection)(
+      getMovingDirection(forward, backward, leftward, rightward, pivot)
+    );
+
+    // Move character to the moving direction
+    if (
+      forward ||
+      backward ||
+      leftward ||
+      rightward ||
+      gamepadKeys.backward ||
+      gamepadKeys.forward ||
+      gamepadKeys.leftward ||
+      gamepadKeys.rightward
+    ) {
+      moveCharacter(delta, run, slopeAngle, movingObjectVelocity);
+    }
+
+    // Jump impulse
+    if ((jump || pressedButton1) && canJump) {
+      jumpVelocityVec.set(
+        currentVel.x,
+        run ? sprintJumpMult * jumpVel : jumpVel,
+        currentVel.z
       );
-
-      // Move character to the moving direction
-      if (
-        forward ||
-        backward ||
-        leftward ||
-        rightward ||
-        gamepadKeys.backward ||
-        gamepadKeys.forward ||
-        gamepadKeys.leftward ||
-        gamepadKeys.rightward
-      ) {
-        moveCharacter(delta, run, slopeAngle, movingObjectVelocity);
-      }
-
-      // Jump impulse
-      if ((jump || pressedButton1) && canJump) {
-        jumpVelocityVec.set(
-          currentVel.x,
-          run ? sprintJumpMult * jumpVel : jumpVel,
-          currentVel.z
-        );
-        characterRef.current.setLinvel(
-          jumpDirection.set(
-            0,
-            (run ? sprintJumpMult * jumpVel : jumpVel) * slopJumpMult,
-            0
-          ),
-          true
-        );
-        // Apply jump force downward to the standing platform
-        characterMassForce.y *= jumpForceToGroundMult;
-        rayHit?.collider
-          .parent()
-          ?.applyImpulseAtPoint(characterMassForce, standingForcePoint, true);
-      }
-
-      // Rotate character Indicitor
-      modelQuat.setFromEuler(modelEuler);
-      characterModelIndicator.quaternion.rotateTowards(
-        modelQuat,
-        delta * turnSpeed
+      characterRef.current.setLinvel(
+        jumpDirection.set(
+          0,
+          (run ? sprintJumpMult * jumpVel : jumpVel) * slopJumpMult,
+          0
+        ),
+        true
       );
+      // Apply jump force downward to the standing platform
+      characterMassForce.y *= jumpForceToGroundMult;
+      rayHit?.collider
+        .parent()
+        ?.applyImpulseAtPoint(characterMassForce, standingForcePoint, true);
+    }
 
-      // If autobalance is off, rotate chracter model itself
-      if (!autoBalance) {
-        if (isCameraBased) {
-          characterModelRef.current.quaternion.copy(pivot.quaternion);
-        } else {
-          characterModelRef.current.quaternion.copy(
-            characterModelIndicator.quaternion
-          );
-        }
-      }
+    // Rotate character Indicitor
+    modelQuat.setFromEuler(modelEuler);
+    characterModelIndicator.quaternion.rotateTowards(
+      modelQuat,
+      delta * turnSpeed
+    );
 
-      /**
-       * Camera movement
-       */
-      pivotPosition.set(
-        currentPos.x + camTargetPos.x,
-        currentPos.y +
-          (camTargetPos.y || capsuleHalfHeight + capsuleRadius / 2),
-        currentPos.z + camTargetPos.z
-      );
-      pivot.position.lerp(pivotPosition, 1 - Math.exp(-camFollowMult * delta));
-      !disableFollowCam && state.camera.lookAt(pivot.position);
-      /**
-       * Rac casting detect if on ground
-       */
-      rayOrigin.addVectors(currentPos, rayOriginOffset);
-      rayHit = world.castRay(
-        rayCast,
-        rayLength,
-        true,
-        // this exclude sensor
-        16,
-        undefined,
-        undefined,
-        characterRef.current,
-        // this exclude any collider with userData: excludeContollerRay
-        (collider: Collider) =>
-          (collider.parent()?.userData as userDataType) &&
-          !(collider.parent()?.userData as userDataType).excludeControllerRay
-      );
-      /** Test shape ray */
-      /*  rayHit = world.castShape(
-        currentPos,
-        {w: 0, x: 0, y: 0, z: 0},
-        {x: 0, y: -1, z: 0},
-        shape,
-        rayLength,
-        true,
-        null,
-        null,
-        characterRef.current
-      ) */
-
-      if (rayHit && rayHit.toi < floatingDis + rayHitForgiveness) {
-        if (slopeRayHit && actualSlopeAngle < slopeMaxAngle) {
-          canJump = true;
-        }
+    // If autobalance is off, rotate chracter model itself
+    if (!autoBalance) {
+      if (isCameraBased) {
+        characterModelRef.current.quaternion.copy(pivot.quaternion);
       } else {
-        canJump = false;
-      }
-      /**
-       * Ray detect if on rigid body or dynamic platform, then apply the linear velocity and angular velocity to character
-       */
-      if (rayHit && canJump) {
-        if (rayHit.collider.parent()) {
-          // Getting the standing force apply point
-          standingForcePoint.set(
-            rayOrigin.x,
-            rayOrigin.y - rayHit.toi,
-            rayOrigin.z
-          );
-          const rayHitObjectBodyType = rayHit.collider.parent()?.bodyType();
-          const rayHitObjectBodyMass = rayHit.collider.parent()?.mass();
-          if (rayHitObjectBodyMass) {
-            massRatio = characterRef.current.mass() / rayHitObjectBodyMass;
-            // Body type 0 is rigid body, body type 1 is fixed body, body type 2 is kinematic body
-            if (rayHitObjectBodyType === 0 || rayHitObjectBodyType === 2) {
-              isOnMovingObject = true;
-              // Calculate distance between character and moving object
-              distanceFromCharacterToObject
-                .copy(currentPos)
-                .sub(rayHit.collider.parent()?.translation() as Vector3);
-              // Moving object linear velocity
-              const movingObjectLinvel = rayHit.collider
-                .parent()
-                ?.linvel() as Vector3;
-              // Moving object angular velocity
-              const movingObjectAngvel = rayHit.collider
-                .parent()
-                ?.angvel() as Vector3;
-              // Combine object linear velocity and angular velocity to movingObjectVelocity
-              movingObjectVelocity
-                .set(
-                  movingObjectLinvel.x +
-                    objectAngelToLinvel.crossVectors(
-                      movingObjectAngvel,
-                      distanceFromCharacterToObject
-                    ).x,
-                  movingObjectLinvel.y,
-                  movingObjectLinvel.z +
-                    objectAngelToLinvel.crossVectors(
-                      movingObjectAngvel,
-                      distanceFromCharacterToObject
-                    ).z
-                )
-                .multiplyScalar(Math.min(1, 1 / massRatio));
-              // If the velocity diff is too high (> 30), ignore movingObjectVelocity
-              velocityDiff.subVectors(movingObjectVelocity, currentVel);
-              if (velocityDiff.length() > 30) {
-                movingObjectVelocity.multiplyScalar(1 / velocityDiff.length());
-              }
-
-              // Apply opposite drage force to the stading rigid body, body type 0
-              // Character moving and unmoving should provide different drage force to the platform
-              if (rayHitObjectBodyType === 0) {
-                if (
-                  !forward &&
-                  !backward &&
-                  !leftward &&
-                  !rightward &&
-                  canJump &&
-                  joystickDis === 0 &&
-                  !isPointMoving &&
-                  !gamepadKeys.forward &&
-                  !gamepadKeys.backward &&
-                  !gamepadKeys.leftward &&
-                  !gamepadKeys.rightward
-                ) {
-                  movingObjectDragForce
-                    .copy(bodyContactForce)
-                    .multiplyScalar(delta)
-                    .multiplyScalar(Math.min(1, 1 / massRatio)) // Scale up/down base on different masses ratio
-                    .negate();
-                  bodyContactForce.set(0, 0, 0);
-                } else {
-                  movingObjectDragForce
-                    .copy(moveImpulse)
-                    .multiplyScalar(Math.min(1, 1 / massRatio))
-                    .negate();
-                }
-                rayHit.collider
-                  .parent()
-                  ?.applyImpulseAtPoint(
-                    movingObjectDragForce,
-                    standingForcePoint,
-                    true
-                  );
-              }
-            } else {
-              // on fixed body
-              massRatio = 1;
-              isOnMovingObject = false;
-              bodyContactForce.set(0, 0, 0);
-              movingObjectVelocity.set(0, 0, 0);
-            }
-          }
-        } else {
-          //  in the air
-          massRatio = 1;
-          isOnMovingObject = false;
-          bodyContactForce.set(0, 0, 0);
-          movingObjectVelocity.set(0, 0, 0);
-        }
-
-        /**
-         * Slope ray casting detect if on slope
-         */
-        slopeRayOriginRef.current.getWorldPosition(slopeRayOrigin);
-        slopeRayOrigin.y = rayOrigin.y;
-        slopeRayHit = world.castRay(
-          slopeRayCast,
-          slopeRayLength,
-          true,
-          16,
-          undefined,
-          undefined,
-          characterRef.current,
-          (collider: Collider) =>
-            (collider.parent()?.userData as userDataType) &&
-            !(collider.parent()?.userData as userDataType).excludeControllerRay
+        characterModelRef.current.quaternion.copy(
+          characterModelIndicator.quaternion
         );
       }
     }
+
+    /**
+     * Camera movement
+     */
+    pivotPosition.set(
+      currentPos.x + camTargetPos.x,
+      currentPos.y + (camTargetPos.y || capsuleHalfHeight + capsuleRadius / 2),
+      currentPos.z + camTargetPos.z
+    );
+    pivot.position.lerp(pivotPosition, 1 - Math.exp(-camFollowMult * delta));
+    !disableFollowCam && state.camera.lookAt(pivot.position);
+    /**
+     * Rac casting detect if on ground
+     */
+    rayOrigin.addVectors(currentPos, rayOriginOffset);
+    rayHit = world.castRay(
+      rayCast,
+      rayLength,
+      true,
+      // this exclude sensor
+      16,
+      undefined,
+      undefined,
+      characterRef.current,
+      // this exclude any collider with userData: excludeContollerRay
+      (collider: Collider) =>
+        (collider.parent()?.userData as userDataType) &&
+        !(collider.parent()?.userData as userDataType).excludeControllerRay
+    );
+    /** Test shape ray */
+    /*  rayHit = world.castShape(
+      currentPos,
+      { w: 0, x: 0, y: 0, z: 0 },
+      { x: 0, y: -1, z: 0 },
+      shape,
+      rayLength,
+      true,
+      null,
+      null,
+      characterRef.current
+    ); */
+
+    if (rayHit && rayHit.toi < floatingDis + rayHitForgiveness) {
+      if (slopeRayHit && actualSlopeAngle < slopeMaxAngle) {
+        canJump = true;
+      }
+    } else {
+      canJump = false;
+    }
+    /**
+     * Ray detect if on rigid body or dynamic platform, then apply the linear velocity and angular velocity to character
+     */
+    if (rayHit && canJump) {
+      if (rayHit.collider.parent()) {
+        // Getting the standing force apply point
+        standingForcePoint.set(
+          rayOrigin.x,
+          rayOrigin.y - rayHit.toi,
+          rayOrigin.z
+        );
+        const rayHitObjectBodyType = rayHit.collider.parent()?.bodyType();
+        const rayHitObjectBodyMass = rayHit.collider.parent()?.mass();
+        if (rayHitObjectBodyMass) {
+          massRatio = characterRef.current.mass() / rayHitObjectBodyMass;
+          // Body type 0 is rigid body, body type 1 is fixed body, body type 2 is kinematic body
+          if (rayHitObjectBodyType === 0 || rayHitObjectBodyType === 2) {
+            isOnMovingObject = true;
+            // Calculate distance between character and moving object
+            distanceFromCharacterToObject
+              .copy(currentPos)
+              .sub(rayHit.collider.parent()?.translation() as Vector3);
+            // Moving object linear velocity
+            const movingObjectLinvel = rayHit.collider
+              .parent()
+              ?.linvel() as Vector3;
+            // Moving object angular velocity
+            const movingObjectAngvel = rayHit.collider
+              .parent()
+              ?.angvel() as Vector3;
+            // Combine object linear velocity and angular velocity to movingObjectVelocity
+            movingObjectVelocity
+              .set(
+                movingObjectLinvel.x +
+                  objectAngelToLinvel.crossVectors(
+                    movingObjectAngvel,
+                    distanceFromCharacterToObject
+                  ).x,
+                movingObjectLinvel.y,
+                movingObjectLinvel.z +
+                  objectAngelToLinvel.crossVectors(
+                    movingObjectAngvel,
+                    distanceFromCharacterToObject
+                  ).z
+              )
+              .multiplyScalar(Math.min(1, 1 / massRatio));
+            // If the velocity diff is too high (> 30), ignore movingObjectVelocity
+            velocityDiff.subVectors(movingObjectVelocity, currentVel);
+            if (velocityDiff.length() > 30) {
+              movingObjectVelocity.multiplyScalar(1 / velocityDiff.length());
+            }
+
+            // Apply opposite drage force to the stading rigid body, body type 0
+            // Character moving and unmoving should provide different drage force to the platform
+            if (rayHitObjectBodyType === 0) {
+              if (
+                !forward &&
+                !backward &&
+                !leftward &&
+                !rightward &&
+                canJump &&
+                joystickDis === 0 &&
+                !isPointMoving &&
+                !gamepadKeys.forward &&
+                !gamepadKeys.backward &&
+                !gamepadKeys.leftward &&
+                !gamepadKeys.rightward
+              ) {
+                movingObjectDragForce
+                  .copy(bodyContactForce)
+                  .multiplyScalar(delta)
+                  .multiplyScalar(Math.min(1, 1 / massRatio)) // Scale up/down base on different masses ratio
+                  .negate();
+                bodyContactForce.set(0, 0, 0);
+              } else {
+                movingObjectDragForce
+                  .copy(moveImpulse)
+                  .multiplyScalar(Math.min(1, 1 / massRatio))
+                  .negate();
+              }
+              rayHit.collider
+                .parent()
+                ?.applyImpulseAtPoint(
+                  movingObjectDragForce,
+                  standingForcePoint,
+                  true
+                );
+            }
+          } else {
+            // on fixed body
+            massRatio = 1;
+            isOnMovingObject = false;
+            bodyContactForce.set(0, 0, 0);
+            movingObjectVelocity.set(0, 0, 0);
+          }
+        }
+      } else {
+        //  in the air
+        massRatio = 1;
+        isOnMovingObject = false;
+        bodyContactForce.set(0, 0, 0);
+        movingObjectVelocity.set(0, 0, 0);
+      }
+    }
+    /**
+     * Slope ray casting detect if on slope
+     */
+    slopeRayOriginRef.current.getWorldPosition(slopeRayOrigin);
+    slopeRayOrigin.y = rayOrigin.y;
+    slopeRayHit = world.castRay(
+      slopeRayCast,
+      slopeRayLength,
+      true,
+      16,
+      undefined,
+      undefined,
+      characterRef.current,
+      (collider: Collider) =>
+        (collider.parent()?.userData as userDataType) &&
+        !(collider.parent()?.userData as userDataType).excludeControllerRay
+    );
+    // Calculate slope angle
+    if (slopeRayHit) {
+      actualSlopeNormal = slopeRayHit.collider.castRayAndGetNormal(
+        slopeRayCast,
+        slopeRayLength,
+        false
+      )?.normal;
+      if (actualSlopeNormal) {
+        const { x, y, z } = actualSlopeNormal;
+        actualSlopeNormalVec?.set(x, y, z);
+        actualSlopeAngle = actualSlopeNormalVec?.angleTo(floorNormal);
+      }
+    }
+    if (slopeRayHit && rayHit && slopeRayHit.toi < floatingDis + 0.5) {
+      if (canJump) {
+        // Round the slope angle to 2 decimal
+        slopeAngle = Number(
+          (
+            Math.atan(rayHit.toi - slopeRayHit.toi) / slopeRayOriginOffset
+          ).toFixed(2)
+        );
+      } else {
+        slopeAngle = 0;
+      }
+    } else {
+      slopeAngle = 0;
+    }
+
+    /**
+     * Applay floating force
+     */
+    if (rayHit != null) {
+      if (canJump && rayHit.collider.parent()) {
+        floatingForce =
+          springK * (floatingDis - rayHit.toi) -
+          characterRef.current.linvel().y * dampingC;
+        characterRef.current.applyImpulse(
+          springDirVec.set(0, floatingForce, 0),
+          false
+        );
+        // Apply opposite force to standing object (gravity g in rapier is 0.11 ?_?)
+        characterMassForce.set(0, floatingForce > 0 ? -floatingForce : 0, 0);
+        rayHit.collider
+          .parent()
+          ?.applyImpulseAtPoint(characterMassForce, standingForcePoint, true);
+      }
+    }
+
+    /**
+     * Apply drag force if it's not moving
+     */
+    if (
+      !forward &&
+      !backward &&
+      !leftward &&
+      !rightward &&
+      canJump &&
+      joystickDis === 0 &&
+      !isPointMoving &&
+      !gamepadKeys.forward &&
+      !gamepadKeys.backward &&
+      !gamepadKeys.leftward &&
+      !gamepadKeys.rightward
+    ) {
+      // not on a moving object
+      if (!isOnMovingObject) {
+        dragForce.set(
+          -currentVel.x * dragDampingC,
+          0,
+          -currentVel.z * dragDampingC
+        );
+        characterRef.current?.applyImpulse(dragForce, false);
+      }
+    } else {
+      // on a moving object
+      dragForce.set(
+        (movingObjectVelocity.x - currentVel.x) * dragDampingC,
+        0,
+        (movingObjectVelocity.z - currentVel.z) * dragDampingC
+      );
+      characterRef.current?.applyImpulse(dragForce, true);
+    }
+    /**
+     * Detect character falling state
+     */
+    isFalling = currentVel.y < 0 && !canJump ? true : false;
+    /**
+     * Setup max falling speed && extra falling gravity
+     * Remove gravity is falling speed higher than fallingMaxVel (negetive number so use "<")
+     */
+    if (characterRef.current) {
+      if (currentVel.y < fallingMaxVel) {
+        if (characterRef.current.gravityScale() !== 0) {
+          characterRef.current.setGravityScale(0, true);
+        }
+      } else {
+        if (
+          !isFalling &&
+          characterRef.current.gravityScale() !== initialGravityScale
+        ) {
+          // Apply initial gravity after landed
+          characterRef.current.setGravityScale(initialGravityScale, true);
+        } else if (
+          isFalling &&
+          characterRef.current.gravityScale() !== fallingGravityScale
+        ) {
+          // Apply larger gravity when falling (if initialGravityScale === fallingGravityScale, won't trigger this)
+          characterRef.current.setGravityScale(fallingGravityScale, true);
+        }
+      }
+    }
+
+    /**
+     * Apply auto balance force to the character
+     */
+    if (autoBalance && characterRef.current) autoBalanceCharacter();
+
+    /**
+     * Camera collision detect
+     */
+    camCollision && cameraCollisionDetect(delta);
+
+    /**
+     * Point-to-move feature
+     */
+    isModePointToMove && pointToMove(delta, slopeAngle, movingObjectVelocity);
+
+    /**
+     * Apply all the animations
+     */
+    if (animated) {
+      if (
+        !forward &&
+        !backward &&
+        !leftward &&
+        !rightward &&
+        !jump &&
+        !pressedButton1 &&
+        joystickDis === 0 &&
+        !isPointMoving &&
+        !gamepadKeys.forward &&
+        !gamepadKeys.backward &&
+        !gamepadKeys.leftward &&
+        !gamepadKeys.rightward &&
+        canJump
+      ) {
+        dispatch(idleAnimation(animationSet.idle));
+      } else if ((jump || pressedButton1) && canJump) {
+        dispatch(jumpAnimation(animationSet.jump));
+      } else if (
+        canJump &&
+        (forward ||
+          backward ||
+          leftward ||
+          rightward ||
+          joystickDis > 0 ||
+          isPointMoving ||
+          gamepadKeys.forward ||
+          gamepadKeys.backward ||
+          gamepadKeys.leftward ||
+          gamepadKeys.rightward)
+      ) {
+        run || curRunState
+          ? dispatch(runAnimation(animationSet.run))
+          : dispatch(walkAnimation(animationSet.walk));
+      } else if (!canJump) {
+        dispatch(jumpIdleAnimation(animationSet.jumpIdle));
+      }
+      // On high sky plya falling animation
+      if (rayHit === null && isFalling) {
+        dispatch(fallAnimation(animationSet.fall));
+      }
+    }
   });
-  return <></>;
+  return (
+    <RigidBody
+      colliders={false}
+      ref={characterRef}
+      position={props.position || [0, 5, 0]}
+      friction={props.friction || 0.5}
+      onContactForce={(e) =>
+        bodyContactForce.set(e.totalForce.x, e.totalForce.y, e.totalForce.z)
+      }
+      onCollisionExit={() => bodyContactForce.set(0, 0, 0)}
+      userData={{ canJump: false }}
+      {...props}
+    >
+      <CapsuleCollider
+        name="character-capsule-collider"
+        args={[capsuleHalfHeight, capsuleRadius]}
+      />
+      {/* Body collide sensor (only for point to move mode) */}
+      {isModePointToMove && (
+        <CylinderCollider
+          ref={bodySensorRef}
+          sensor
+          args={[capsuleHalfHeight / 2, capsuleRadius]}
+          position={[0, 0, capsuleRadius / 2]}
+          onIntersectionEnter={handleOnIntersectionEnter}
+          onIntersectionExit={handleOnIntersectionExit}
+        />
+      )}
+      <group ref={characterModelRef} userData={{ camExcludeCollision: true }}>
+        {/* this mesh is used for positioning the slope ray origin */}
+        <mesh
+          position={[
+            rayOriginOffset.x,
+            rayOriginOffset.y,
+            rayOriginOffset.z + slopeRayOriginOffset,
+          ]}
+          ref={slopeRayOriginRef}
+          visible={showSlopeRayOrigin}
+          userData={{ camExcludeCollision: true }} // this won't be detected by camera collision
+        >
+          <boxGeometry args={[0.15, 0.15, 0.15]} />
+        </mesh>
+        {/* Character model */}
+        {children}
+      </group>
+    </RigidBody>
+  );
 };
 
 export default forwardRef(Controller);

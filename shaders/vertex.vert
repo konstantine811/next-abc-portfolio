@@ -1,6 +1,6 @@
 precision mediump float;
-#define AMP 1.2
-#define FREQ 0.05
+#define AMP 0.2
+#define FREQ 10.0
 #define PI 3.14159265359
 varying vec2 vUv;
 varying float vWave;

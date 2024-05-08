@@ -110,3 +110,18 @@ export type AnimationSet = {
   action3?: string;
   action4?: string;
 };
+
+export enum AnimationSetProps {
+  idle = "idle",
+  walk = "walk",
+  run = "run",
+  jump = "jump",
+  jumpIdle = "jumpIdle",
+  jumpLand = "jumpLand",
+  fall = "fall",
+  // Currently support four additional animations
+  action1 = "action1",
+  action2 = "action2",
+  action3 = "action3",
+  action4 = "action4",
+}

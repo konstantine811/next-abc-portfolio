@@ -5,7 +5,8 @@
     "three-train": {
       "title": "ThreeJs train",
       "first-scene": "First scene",
-      "second-scene": "Second scene"
+      "second-scene": "Second scene",
+      "third-scene": "Third scene"
     },
     "maps": {
       "title": "Maps",

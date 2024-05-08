@@ -5,7 +5,8 @@
     "three-train": {
       "title": "Практика з 3d Web",
       "first-scene": "Перша сцена",
-      "second-scene": "Друга сцена"
+      "second-scene": "Друга сцена",
+      "third-scene": "Третя сцена"
     },
     "maps": {
       "title": "Карти",

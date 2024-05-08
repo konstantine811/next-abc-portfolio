@@ -1,5 +1,5 @@
 // Retrieve current moving direction of the character
-const getMovingDirection = (
+export const getMovingDirection = (
   forward: boolean,
   backward: boolean,
   leftward: boolean,

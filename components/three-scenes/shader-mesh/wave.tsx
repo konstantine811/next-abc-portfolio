@@ -14,8 +14,8 @@ const Wave = () => {
   return (
     <mesh
       onPointerMove={(e) => {
-        shaderRef.current.uniforms.uMouseMove.value.x = e.pageX / 200;
-        shaderRef.current.uniforms.uMouseMove.value.y = e.pageY / 200;
+        shaderRef.current.uniforms.uMouseMove.value.x = e.pageX / 100;
+        shaderRef.current.uniforms.uMouseMove.value.y = e.pageY / 100;
       }}
       position={[0.5, 0, 0]}
     >

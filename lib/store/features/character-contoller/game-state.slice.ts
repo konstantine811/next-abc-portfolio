@@ -1,12 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Vector3 } from "three";
 // models
-import { AnimationSet } from "@/components/three-scenes/characterController/controllers/models";
+import {
+  AnimationSet,
+  AnimationSetProps,
+} from "@/components/three-scenes/characterController/controllers/models";
 
 type GameState = {
   moveToPoint: { x: number; y: number; z: number };
   isCameraBased: boolean;
-  curAnimation: string | null;
+  curAnimation: string | undefined | null;
   animationSet: AnimationSet;
 };
 
@@ -27,10 +30,10 @@ export const GameState = createSlice({
       }
       state.animationSet = {};
     },
-    reset: (state, action: PayloadAction<string>) => {
-      state.curAnimation = action.payload;
+    resetAnimation: (state) => {
+      state.curAnimation = state.animationSet.idle;
     },
-    idle: (state, action: PayloadAction<string>) => {
+    idleAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation === state.animationSet.jumpIdle) {
         state.curAnimation = state.animationSet.jumpLand
           ? state.animationSet.jumpLand
@@ -44,38 +47,38 @@ export const GameState = createSlice({
         state.curAnimation = action.payload;
       }
     },
-    walk: (state, action: PayloadAction<string>) => {
+    walkAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation !== state.animationSet.action4) {
         state.curAnimation = action.payload;
       }
     },
-    run: (state, action: PayloadAction<string>) => {
+    runAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation !== state.animationSet.action4) {
         state.curAnimation = action.payload;
       }
     },
-    jump: (state, action: PayloadAction<string>) => {
+    jumpAnimation: (state, action: PayloadAction<string | undefined>) => {
       state.curAnimation = action.payload;
     },
-    jumpIdle: (state, action: PayloadAction<string>) => {
+    jumpIdleAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation === state.animationSet.jump) {
         state.curAnimation = action.payload;
       }
     },
-    jumpLand: (state, action: PayloadAction<string>) => {
+    jumpLandAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation === state.animationSet.jumpIdle) {
         state.curAnimation = action.payload;
       }
     },
-    fall: (state, action: PayloadAction<string>) => {
+    fallAnimation: (state, action: PayloadAction<string | undefined>) => {
       state.curAnimation = action.payload;
     },
-    action: (state, action: PayloadAction<string>) => {
+    actionAnimation: (state, action: PayloadAction<string | undefined>) => {
       if (state.curAnimation === state.animationSet.idle) {
         state.curAnimation = action.payload;
       }
     },
-    action4: (state, action: PayloadAction<string>) => {
+    action4: (state, action: PayloadAction<string | undefined>) => {
       if (
         state.curAnimation === state.animationSet.idle ||
         state.curAnimation === state.animationSet.walk ||
@@ -95,17 +98,17 @@ export const GameState = createSlice({
 
 export const {
   initialAnimationSet,
-  reset,
-  idle,
-  walk,
-  run,
-  jump,
-  jumpIdle,
-  fall,
-  jumpLand,
+  resetAnimation,
+  idleAnimation,
+  walkAnimation,
+  runAnimation,
+  jumpAnimation,
+  jumpIdleAnimation,
+  fallAnimation,
+  jumpLandAnimation,
   onCameraBased,
   onMovePoint,
-  action,
+  actionAnimation,
   action4,
 } = GameState.actions;
 export default GameState.reducer;
