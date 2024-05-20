@@ -86,6 +86,7 @@ const Expirience = () => {
             followLight
             springK={2}
             dampingC={0.2}
+            maxVelLimit={5}
             autoBalanceSpringK={1.2}
             autoBalanceDampingC={0.04}
             autoBalanceSpringOnY={0.7}
