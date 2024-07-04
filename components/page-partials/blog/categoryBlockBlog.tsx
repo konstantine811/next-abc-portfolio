@@ -29,7 +29,7 @@ const CategoryBlockBlog = ({}: Prop) => {
           <div className={cn("w-full flex flex-col gap-3")} key={key}>
             <h3 className={cn("text-3xl")}>{key}</h3>
             <Separator />
-            <div className={cn("flex gap-3")}>
+            <div className={cn("grid grid-cols-3 gap-4")}>
               {posts.map((post: BlogPost, i) => {
                 return <BlogCard key={i} data={post} />;
               })}

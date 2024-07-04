@@ -32,15 +32,16 @@ const CategoryTabs = ({
         <ToggleGroup
           defaultValue={defaultSelected ? defaultSelected : categories[0]}
           className={cn(
-            "py-4 bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30 flex flex-wrap justify-start"
+            "py-3 bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30 flex flex-wrap justify-start"
           )}
           type="single"
-          variant={"default"}
+          variant={"outline"}
           onValueChange={(value) => (onValueChange ? onValueChange(value) : "")}
         >
           {categories.map((category) => {
             return (
               <ToggleGroupItem
+                className="px-3 py-1 rounded-2xl leading-none h-auto"
                 key={category}
                 value={category}
                 aria-label={category}

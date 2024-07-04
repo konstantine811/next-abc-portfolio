@@ -461,7 +461,6 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     camZoomSpeed,
     camCollisionOffset,
   };
-  console.log(cameraSetups);
   // Load camera pivot and character move preset
   const { pivot, cameraCollisionDetect, joystickCamMove } =
     useFollowCam(cameraSetups);
@@ -740,7 +739,6 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
     slopeAngle: number,
     movingObjectVelocity: Vector3
   ) => {
-    console.log("point move");
     const moveToPoint = gameMoveToPoint;
     if (moveToPoint) {
       pointToPoint.set(
@@ -883,7 +881,6 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
 
     // Jump impulse
     if ((jump || pressedButton1) && canJump) {
-      console.log("on jump");
       jumpVelocityVec.set(
         currentVel.x,
         run ? sprintJumpMult * jumpVel : jumpVel,

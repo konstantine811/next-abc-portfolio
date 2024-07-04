@@ -81,7 +81,7 @@ const AsidePanel = ({ className, data }: Prop) => {
                         className={cn(
                           `${
                             pathname === getPathName(post.id)
-                              ? "!text-foreground"
+                              ? "!text-foreground underline"
                               : ""
                           } whitespace-normal mb-1 last:mb-0 text-muted-foreground`
                         )}

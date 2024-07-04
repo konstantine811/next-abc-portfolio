@@ -40,7 +40,9 @@ const PostBlog = ({ data: { page, post } }: Props) => {
         >
           <ChevronsLeftIcon className="h-4 w-4" />
         </Button>
-        <h1 className="grow text-center text-4xl px-10">{page?.title}</h1>
+        <h1 className="grow text-center text-5xl font-bold px-10 py-5">
+          {page?.title}
+        </h1>
       </div>
       <NotionSwitchParse post={post} />
     </>

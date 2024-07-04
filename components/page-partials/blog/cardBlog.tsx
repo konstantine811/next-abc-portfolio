@@ -20,10 +20,11 @@ type Prop = {
 };
 
 const BlogCard = ({ data }: Prop) => {
-  console.log("data", data);
   return (
     <Link href={getPathName(data.id)}>
-      <Card className={cn("flex flex-col justify-center overflow-hidden")}>
+      <Card
+        className={cn("flex flex-col justify-center overflow-hidden w-full")}
+      >
         <CardHeader
           className={cn(`mb-3 p-0 relative ${data.cover ? "min-h-32" : ""}`)}
         >
