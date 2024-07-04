@@ -25,6 +25,10 @@ const PostBlog = ({ data: { page, post } }: Props) => {
             className="object-cover"
             src={page.cover}
             alt={page.title}
+            sizes="(max-width: 768px) 100vw, 
+            (max-width: 1200px) 50vw, 
+            33vw"
+            priority
           />
         </div>
       ) : (
@@ -33,14 +37,14 @@ const PostBlog = ({ data: { page, post } }: Props) => {
 
       <div className={cn("flex gap-4 items-center w-full grow relative")}>
         <Button
-          className={cn("absolute left-0")}
+          className={cn("absolute left-0 max-md:-top-5")}
           onClick={() => router.back()}
           variant="outline"
           size="icon"
         >
           <ChevronsLeftIcon className="h-4 w-4" />
         </Button>
-        <h1 className="grow text-center text-5xl font-bold px-10 py-5">
+        <h1 className="grow text-center text-5xl font-bold md:px-10 px-0 py-5">
           {page?.title}
         </h1>
       </div>

@@ -22,7 +22,7 @@ const BlogLayout = async ({ children, params: { locale } }: Props) => {
     console.error(e);
   }
   return (
-    <MainContainer className="grid grid-cols-12 gap-6">
+    <MainContainer className="grid grid-cols-12 gap-6 justify-center">
       <ContentBlog data={categoryPosts}>{children}</ContentBlog>
     </MainContainer>
   );

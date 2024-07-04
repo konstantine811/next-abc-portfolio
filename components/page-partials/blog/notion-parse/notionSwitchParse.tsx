@@ -2,10 +2,17 @@
 
 // compoents
 import NotionBulletListItem from "./notionBulletListItem";
-import { BlockObjectChildResponse } from "@/@types/schema.notion";
+import {
+  BlockObjectChild,
+  BlockObjectChildResponse,
+} from "@/@types/schema.notion";
 import NotionRichText from "./notionRichText";
 import NotionQuote from "./notionQuote";
 import NotionCode from "./notionCode";
+import NotionImage from "./notionImage";
+import NotionTable from "./notionTable";
+import NotionParseItem from "./notionNumberList";
+import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -13,9 +20,11 @@ interface Prop {
 }
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
+  const numberCacheList: (NumberedListItemBlockObjectResponse &
+    BlockObjectChild)[] = [];
   return (
-    <>
-      {post?.map((item: BlockObjectChildResponse) => {
+    <div className="pb-20">
+      {post?.map((item: BlockObjectChildResponse, index) => {
         switch (item.type) {
           case "bulleted_list_item":
             return (
@@ -28,7 +37,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                 as={"p"}
                 rich_text={item.paragraph.rich_text}
                 color={item.paragraph.color}
-                className="text-lg"
+                className="text-lg py-2"
               />
             );
           case "heading_1":
@@ -65,9 +74,26 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
             return <NotionQuote key={item.id} item={item} />;
           case "code":
             return <NotionCode key={item.id} item={item} />;
+          case "image":
+            return <NotionImage key={item.id} item={item} />;
+          case "table":
+            return <NotionTable key={item.id} item={item} />;
+          case "numbered_list_item":
+            if (post[index + 1]?.type === "numbered_list_item") {
+              numberCacheList.push(item);
+              return null;
+            } else {
+              numberCacheList.push(item);
+              return <NotionParseItem key={item.id} items={numberCacheList} />;
+            }
+          case "divider":
+            return <hr key={item.id} className="border-t border-gray-600" />;
+          default:
+            console.log("NotionSwitchParse: Unknown type", item);
+            return null;
         }
       })}
-    </>
+    </div>
   );
 };
 

@@ -7,7 +7,12 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["www.notion.so"],
+    domains: [
+      "www.notion.so",
+      "i.imgur.com",
+      "media.giphy.com",
+      "prod-files-secure.s3.us-west-2.amazonaws.com",
+    ],
   },
   sassOptions: {
     includePaths: [path.join(path.dirname("styles"))],

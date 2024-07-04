@@ -15,7 +15,7 @@ const ContentBlog = ({ data, children }: Props) => {
   return (
     <>
       <AsidePanel data={data} className="col-span-2" />
-      <div className="col-span-8 mt-8">
+      <div className="xl:col-span-8 col-span-12 xl:col-start-3 col-start-0 mt-8">
         <MainContent className="flex flex-col gap-2">{children}</MainContent>
       </div>
     </>
