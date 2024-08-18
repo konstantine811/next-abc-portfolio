@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 // models
 import { BlockObjectChild } from "@/@types/schema.notion";
-import { IMetadata } from "@/@types/server-data/metadata";
+import { IMetadata } from "@/models/server-data/metadata";
 // configs
 import { API_PATH } from "@/configs/api";
 import { BookmarkBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
