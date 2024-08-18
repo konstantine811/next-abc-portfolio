@@ -1,4 +1,4 @@
-import { Sofia_Sans as FontSans } from "next/font/google";
+import { Quicksand as FontSans } from "next/font/google";
 // components
 import Header from "@/components/header";
 // theme providers
@@ -10,9 +10,12 @@ import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
 import NavigationConfig from "@/configs/navigation";
 import ReduxProvider from "@/lib/store/StoreProvider";
 import { NextIntlClientProvider, useMessages } from "next-intl";
+import { Toaster } from "@/components/ui/toaster";
 
 export const fontSans = FontSans({
-  subsets: ["latin"],
+  subsets: ["latin"], // You can specify which subsets to include
+  weight: ["400", "500", "600", "700"], // Specify the weights you need
+  display: "swap", // Optional, helps with loading performance
   variable: "--font-sans",
 });
 
@@ -43,6 +46,7 @@ export default function RootLayout({ children, params: { locale } }: Props) {
   unstable_setRequestLocale(locale);
   const navConfig = NavigationConfig();
   const messages = useMessages();
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
@@ -59,6 +63,7 @@ export default function RootLayout({ children, params: { locale } }: Props) {
             >
               <Header navConfig={navConfig} />
               {children}
+              <Toaster />
             </ThemeProvider>
           </ReduxProvider>
         </NextIntlClientProvider>

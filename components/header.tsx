@@ -10,15 +10,37 @@ import LocaleSwitcherSelect from "./locale-swither/localeSwitcherSelect";
 import { NavigationHeaderMenu } from "./navigation-menu/navMenu";
 import { INaviagationConfig } from "@/configs/navigation";
 // storeage
-import { onHeaderHeight } from "@/lib/store/features/ui-state.slice";
+import {
+  onHeaderHeight,
+  onScreenSize,
+} from "@/lib/store/features/ui-state.slice";
 import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/lib/store/hooks";
+import { RootState } from "@/lib/store/store";
+import { DEVICE_SIZES } from "@/configs/responsive";
+import MobileMenu from "./navigation-menu/mobileMenu";
 
 const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
   const refHeader = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
+  const { screenWidth } = useAppSelector(
+    (state: RootState) => state.uiStateReducer
+  );
   useEffect(() => {
     const headerHeight = refHeader.current?.getBoundingClientRect().height;
     dispatch(onHeaderHeight(headerHeight ? headerHeight : 0));
+  });
+
+  useEffect(() => {
+    const handleReisize = () => {
+      dispatch(
+        onScreenSize({ width: window.innerWidth, height: window.innerHeight })
+      );
+    };
+    window.addEventListener("resize", handleReisize);
+    return () => {
+      window.removeEventListener("resize", handleReisize);
+    };
   });
   return (
     <header
@@ -35,9 +57,11 @@ const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
         <Link className={cn("select-none")} href="/">
           <Logo />
         </Link>
-        <nav className={cn("hidden md:flex  md:items-center")}>
-          <NavigationHeaderMenu navConfig={navConfig} />
-        </nav>
+        {screenWidth >= DEVICE_SIZES.DESKTOP && (
+          <nav className={cn("flex items-center")}>
+            <NavigationHeaderMenu navConfig={navConfig} />
+          </nav>
+        )}
         <div
           className={cn(
             "flex items-center justify-between space-x-2 md:justify-end gap-2"
@@ -45,6 +69,9 @@ const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
         >
           <ThemeToggler />
           <LocaleSwitcherSelect />
+          {screenWidth < DEVICE_SIZES.DESKTOP && (
+            <MobileMenu navConfig={navConfig} />
+          )}
         </div>
       </div>
     </header>

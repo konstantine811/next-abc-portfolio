@@ -5,7 +5,7 @@ import styles from "./styles.module.scss";
 
 const Preloader = () => {
   const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.value.headerHeight
+    (state) => state.uiStateReducer.headerHeight
   );
   return (
     <div

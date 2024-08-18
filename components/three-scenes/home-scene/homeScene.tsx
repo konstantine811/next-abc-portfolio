@@ -11,7 +11,7 @@ import Experience from "./experience";
 
 const HomeScene = () => {
   const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.value.headerHeight
+    (state) => state.uiStateReducer.headerHeight
   );
   const { skillsConfig } = ConfigHook();
   return (

@@ -2,6 +2,7 @@ import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import TextWrapper from "@/components/wrapper/text-wrapper";
 import { ElementType } from "react";
 import { NotionTextColor } from "@/@types/schema.notion";
+import Link from "next/link";
 
 interface NotionRichTextProps {
   rich_text: RichTextItemResponse[];
@@ -61,7 +62,20 @@ const NotionRichText = ({
   return (
     <TextWrapper className={className} as={as}>
       {rich_text.map((item, index) => {
-        return (
+        return item.href ? (
+          <Link
+            className={`${
+              item.annotations.bold ? "font-bold" : ""
+            } ${getColorByType(
+              item.annotations.color
+            )} underline underline-offset-4`}
+            key={index}
+            href={item.href}
+          >
+            {" "}
+            {item.plain_text}
+          </Link>
+        ) : (
           <span
             className={`${
               item.annotations.bold ? "font-bold" : ""

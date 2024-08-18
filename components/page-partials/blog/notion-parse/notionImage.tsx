@@ -10,9 +10,9 @@ interface Props {
 const NotionImage = ({ item }: Props) => {
   const captionTitle = item.image.caption.map((i) => i.plain_text).join(" ");
   return (
-    <div className="m-auto w-full relative h-72 max-w-lg">
+    <div className="m-auto w-full relative md:h-72 h-32  my-3">
       {captionTitle && (
-        <div className="relative">
+        <div className="relative mt-10 flex justify-center">
           <Badge
             className="absolute shadow-gray-600 -top-5 shadow-sm"
             variant="outline"
@@ -29,10 +29,8 @@ const NotionImage = ({ item }: Props) => {
                 fill
                 src={item.image.external.url}
                 alt={captionTitle}
-                className="rounded-sm object-cover"
-                sizes="(max-width: 768px) 100vw, 
-                (max-width: 1200px) 50vw, 
-                33vw"
+                className="rounded-2xl object-contain border overflow-hidden"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority
               />
             );
@@ -42,10 +40,8 @@ const NotionImage = ({ item }: Props) => {
                 fill
                 src={item.image.file.url}
                 alt={captionTitle}
-                className="rounded-sm object-cover"
-                sizes="(max-width: 768px) 100vw, 
-                (max-width: 1200px) 50vw, 
-                33vw"
+                className="rounded-2xl object-contain border overflow-hidden"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority
               />
             );

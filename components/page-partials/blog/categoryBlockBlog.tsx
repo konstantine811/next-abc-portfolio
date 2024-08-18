@@ -15,7 +15,7 @@ interface Prop {}
 const CategoryBlockBlog = ({}: Prop) => {
   const [mounted, setMounted] = useState(false);
   const data = useAppSelector(
-    (state) => state.blogPostStateReducer.value.filteredBlogPost
+    (state) => state.blogPostStateReducer.filteredBlogPost
   );
   useEffect(() => {
     setMounted(true);
@@ -29,7 +29,11 @@ const CategoryBlockBlog = ({}: Prop) => {
           <div className={cn("w-full flex flex-col gap-3")} key={key}>
             <h3 className={cn("text-3xl")}>{key}</h3>
             <Separator />
-            <div className={cn("grid grid-cols-3 gap-4")}>
+            <div
+              className={cn(
+                "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              )}
+            >
               {posts.map((post: BlogPost, i) => {
                 return <BlogCard key={i} data={post} />;
               })}

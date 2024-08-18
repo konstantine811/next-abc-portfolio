@@ -12,6 +12,9 @@ const nextConfig = {
       "i.imgur.com",
       "media.giphy.com",
       "prod-files-secure.s3.us-west-2.amazonaws.com",
+      "nextjs.org",
+      "www.0xkishan.com",
+      "lucide.dev",
     ],
   },
   sassOptions: {

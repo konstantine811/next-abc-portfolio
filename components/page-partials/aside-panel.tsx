@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import { usePathname } from "@/lib/navigation";
 import Link from "next/link";
 // components
@@ -21,20 +21,20 @@ import { BlogPostEntity } from "@/@types/schema.notion";
 import { getPathName } from "@/utils/blog-path";
 import CategoryTabWrap from "./blog/categoryTabWrap";
 import { onFilteredBlogPost } from "@/lib/store/features/blog-post-state.slice";
-import useIsMobile from "@/hooks/isMobileHook";
+import { DEVICE_SIZES } from "@/configs/responsive";
 
 type Prop = {
   className?: string;
   data: BlogPostEntity;
+  style: CSSProperties;
 };
 
-const AsidePanel = ({ className, data }: Prop) => {
+const AsidePanel = ({ className, data, style }: Prop) => {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.value.headerHeight
+  const { headerHeight, screenWidth } = useAppSelector(
+    (state) => state.uiStateReducer
   );
-  const isDesktopLess = useIsMobile({});
   const [selectedPost, setSelectedPost] = useState<BlogPostEntity>({});
 
   const dispatch = useAppDispatch();
@@ -52,8 +52,8 @@ const AsidePanel = ({ className, data }: Prop) => {
 
   return (
     <>
-      {!isDesktopLess && (
-        <div className={cn(`${className}`)}>
+      {screenWidth >= DEVICE_SIZES.DESKTOP && (
+        <div style={style} className={cn(`${className}`)}>
           <div
             style={{
               top: `${headerHeight}px`,

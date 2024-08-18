@@ -13,6 +13,7 @@ import NotionImage from "./notionImage";
 import NotionTable from "./notionTable";
 import NotionParseItem from "./notionNumberList";
 import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import NotionBookmark from "./notionBookmark";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -47,7 +48,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                 as={"h2"}
                 rich_text={item.heading_1.rich_text}
                 color={item.heading_1.color}
-                className="text-4xl font-bold mb-2 mt-20"
+                className="text-4xl font-bold mb-2 md:mt-20 mt-5"
               />
             );
           case "heading_2":
@@ -56,7 +57,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                 key={item.id}
                 as={"h3"}
                 rich_text={item.heading_2.rich_text}
-                className="text-3xl font-bold mb-2 mt-20"
+                className="text-3xl font-bold mb-2 md:mt-20 mt-5"
                 color={item.heading_2.color}
               />
             );
@@ -67,7 +68,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                 as={"h4"}
                 rich_text={item.heading_3.rich_text}
                 color={item.heading_3.color}
-                className="text-xl font-bold mb-2 mt-20"
+                className="text-xl font-bold mb-2 md:mt-20 mt-5"
               />
             );
           case "quote":
@@ -88,6 +89,8 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
             }
           case "divider":
             return <hr key={item.id} className="border-t border-gray-600" />;
+          case "bookmark":
+            return <NotionBookmark key={item.id} item={item} />;
           default:
             console.log("NotionSwitchParse: Unknown type", item);
             return null;

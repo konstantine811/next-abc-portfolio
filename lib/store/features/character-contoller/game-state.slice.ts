@@ -6,12 +6,12 @@ import {
   AnimationSetProps,
 } from "@/components/three-scenes/characterController/controllers/models";
 
-type GameState = {
+interface GameState {
   moveToPoint: { x: number; y: number; z: number };
   isCameraBased: boolean;
   curAnimation: string | undefined | null;
   animationSet: AnimationSet;
-};
+}
 
 const initialState: GameState = {
   moveToPoint: { x: 0, y: 0, z: 0 },

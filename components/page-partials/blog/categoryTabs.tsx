@@ -18,7 +18,7 @@ const CategoryTabs = ({
 }: Props) => {
   const [mounted, setMounted] = useState(false);
   const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.value.headerHeight
+    (state) => state.uiStateReducer.headerHeight
   );
 
   useEffect(() => {

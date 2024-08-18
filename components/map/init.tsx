@@ -45,7 +45,7 @@ const InitMap = () => {
   }, [map, isMapLoaded, data]);
   console.log("geo data", data);
   const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.value.headerHeight
+    (state) => state.uiStateReducer.headerHeight
   );
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const InitMap = () => {
         style={{ width: "100%", height: "100vh" }}
         minZoom={2}
         projection={{ name: "globe" }}
-        mapStyle="mapbox://styles/konstantine811/clbgrp235006a14o0pebuoyuo"
+        mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={TOKEN}
       >
         <div className="absolute w-full z-[10000]  left-0 bottom-2 pointer-events-none flex justify-center">
