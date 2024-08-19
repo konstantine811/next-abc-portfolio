@@ -32,7 +32,7 @@ const CategoryTabs = ({
         <ToggleGroup
           defaultValue={defaultSelected ? defaultSelected : categories[0]}
           className={cn(
-            "py-3 bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30 flex flex-wrap justify-start"
+            "py-3 bg-background/10 rounded backdrop-blur supports-[backdrop-filter]:bg-background/6 z-30 flex flex-wrap justify-start px-5"
           )}
           type="single"
           variant={"outline"}

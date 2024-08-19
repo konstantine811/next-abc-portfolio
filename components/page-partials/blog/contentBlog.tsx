@@ -21,7 +21,7 @@ const ContentBlog = ({ data, children }: Props) => {
     <>
       <AsidePanel
         data={data}
-        className="col-span-2 fixed"
+        className="col-span-2 fixed z-50"
         style={{ top: `${headerHeight}px` }}
       />
       <div className="xl:col-span-8 col-span-12 xl:col-start-3 col-start-0 mt-8">

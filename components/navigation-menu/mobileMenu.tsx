@@ -1,35 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { usePathname } from "@/lib/navigation";
 // utils
 import { cn } from "@/lib/utils";
+import { navigationMenuTriggerStyle } from "../ui/navigation-menu";
 // components libs
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
 // components
 import Logo from "../own-brand/logo";
 import BurgerMenu from "@/components/partials/burgerMenu";
+// configs
 import { INaviagationConfig } from "@/configs/navigation";
-import { useParams } from "next/navigation";
-import { usePathname } from "@/lib/navigation";
-import {
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "../ui/navigation-menu";
-import { Accordion, AccordionContent, AccordionTrigger } from "../ui/accordion";
-import { AccordionItem } from "@radix-ui/react-accordion";
 
 interface Props {
   navConfig: INaviagationConfig[];
@@ -84,11 +81,7 @@ const MobileMenu = ({ navConfig }: Props) => {
             {navConfig.map((item, index) => {
               if (item.children && item.children.length) {
                 return (
-                  <AccordionItem
-                    className="border-b"
-                    key={index}
-                    value={item.title}
-                  >
+                  <AccordionItem key={index} value={item.title}>
                     <AccordionTrigger>{item.title}</AccordionTrigger>
                     <AccordionContent className="flex flex-col">
                       {item.children.map((itemCh) => {
