@@ -5,6 +5,7 @@ import { usePathname } from "@/lib/navigation";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 // components
+import { ArrowBigLeft } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -15,13 +16,12 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 // storage
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { onFilteredBlogPost } from "@/lib/store/features/blog-post-state.slice";
 // models
 import { BlogPostEntity } from "@/@types/schema.notion";
 // configs
 import { getPathName } from "@/utils/blog-path";
 import CategoryTabWrap from "./blog/categoryTabWrap";
-import { onFilteredBlogPost } from "@/lib/store/features/blog-post-state.slice";
-import { ArrowBigLeft } from "lucide-react";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import { EASING_ANIMATION } from "@/configs/animations";
 
