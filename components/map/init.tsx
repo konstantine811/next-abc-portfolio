@@ -4,9 +4,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { useRef, useCallback, use, useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/store/hooks";
-import CustomOverlay from "./custom-overlay";
-import Earth from "../three-scenes/earth";
-import { AnimatePresence, motion } from "framer-motion";
 import useSWR from "swr";
 import fetcher from "@/services/http/httpClient.helper";
 
