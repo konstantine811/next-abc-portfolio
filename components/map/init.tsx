@@ -30,7 +30,6 @@ const InitMap = () => {
 
   useEffect(() => {
     if (isMapLoaded && map && data) {
-      console.log("data", data);
       map.fitBounds([
         [
           (data as any).features[0].envelope.xmin,
@@ -43,7 +42,6 @@ const InitMap = () => {
       ]);
     }
   }, [map, isMapLoaded, data]);
-  console.log("geo data", data);
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.headerHeight
   );
@@ -89,14 +87,7 @@ const InitMap = () => {
       >
         <div className="absolute w-full z-[10000]  left-0 bottom-2 pointer-events-none flex justify-center">
           <div className="pointer-events-auto">
-            <button
-              className=" bg-black px-4 py-2"
-              onClick={() => {
-                console.log("hello");
-              }}
-            >
-              click
-            </button>
+            <button className=" bg-black px-4 py-2">click</button>
           </div>
         </div>
       </Map>

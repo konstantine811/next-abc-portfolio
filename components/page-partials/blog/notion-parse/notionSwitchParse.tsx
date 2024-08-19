@@ -92,7 +92,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
           case "bookmark":
             return <NotionBookmark key={item.id} item={item} />;
           default:
-            console.log("NotionSwitchParse: Unknown type", item);
+            console.warn("NotionSwitchParse: Unknown type", item);
             return null;
         }
       })}
