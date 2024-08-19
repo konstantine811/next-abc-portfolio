@@ -57,7 +57,7 @@ const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
         <Link className={cn("select-none")} href="/">
           <Logo />
         </Link>
-        {screenWidth >= DEVICE_SIZES.DESKTOP && (
+        {screenWidth >= DEVICE_SIZES.TABLET && (
           <nav className={cn("flex items-center")}>
             <NavigationHeaderMenu navConfig={navConfig} />
           </nav>
@@ -69,7 +69,7 @@ const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
         >
           <ThemeToggler />
           <LocaleSwitcherSelect />
-          {screenWidth < DEVICE_SIZES.DESKTOP && (
+          {screenWidth < DEVICE_SIZES.TABLET && (
             <MobileMenu navConfig={navConfig} />
           )}
         </div>
