@@ -37,6 +37,7 @@ const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
         onScreenSize({ width: window.innerWidth, height: window.innerHeight })
       );
     };
+    handleReisize();
     window.addEventListener("resize", handleReisize);
     return () => {
       window.removeEventListener("resize", handleReisize);
