@@ -1,7 +1,8 @@
 import { Scene } from "three";
-import Experience from "@services/three-instance/Experience";
-import Resources from "@services/three-instance/utils/Resources";
-import WorldImpl from "@services/three-instance/World";
+import WorldImpl from "@/services/three-js/three-instance/World";
+import Experience from "@/services/three-js/three-instance/Experience";
+import Resources from "@/services/three-js/three-instance/utils/Resources";
+
 import Floor from "./Floor";
 import Fox from "./Fox";
 import Environment from "./Environment";
