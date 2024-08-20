@@ -81,7 +81,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
     setTimeout(() => {
       if (btnRef.current)
         setBtnWidth(btnRef.current.getBoundingClientRect().width);
-    }, 0);
+    }, 120);
   }, [btnRef]);
 
   useEffect(() => {
