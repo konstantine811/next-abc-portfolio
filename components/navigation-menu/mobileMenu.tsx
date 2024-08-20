@@ -91,8 +91,8 @@ const MobileMenu = ({ navConfig }: Props) => {
                           <Link
                             className={`${navigationMenuTriggerStyle()} ${
                               isActive
-                                ? "text-foreground"
-                                : "text-muted-foreground"
+                                ? "text-foreground focus:text-foreground"
+                                : "text-muted-foreground focus:text-muted-foreground"
                             } ${cn(
                               `hover:bg-transparent focus:bg-transparent`
                             )}`}
@@ -113,9 +113,11 @@ const MobileMenu = ({ navConfig }: Props) => {
                   <Link
                     key={index}
                     className={`${navigationMenuTriggerStyle()} ${
-                      isActive ? "text-foreground" : "text-muted-foreground"
+                      isActive
+                        ? "text-foreground focus:text-foreground"
+                        : "text-muted-foreground focus:text-muted-foreground"
                     } ${cn(
-                      `hover:bg-transparent focus:bg-transparent border-b`
+                      `hover:bg-transparent  focus:bg-transparent border-b`
                     )}`}
                     href={item.href}
                   >
