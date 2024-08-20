@@ -1,4 +1,5 @@
-import { RigidBody, World } from "@dimforge/rapier3d";
+import { RigidBody, World } from "@dimforge/rapier3d-compat";
+
 import {
   BodyTypeProps,
   ColliderTypeProps,
