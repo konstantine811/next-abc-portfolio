@@ -119,7 +119,8 @@ export default class NotionService {
       cover,
       title: page.properties.Name.title[0].plain_text,
       category: page.properties.Category.select,
-      langId: page.properties.lang.id,
+      langLink: page.properties.langLink.relation[0]?.id,
+      lang: page.properties.lang.select.name,
     };
   }
 }

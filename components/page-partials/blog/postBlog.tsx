@@ -5,10 +5,13 @@ import { ChevronsLeftIcon } from "lucide-react";
 // models
 import { BLogPostPage } from "@/@types/schema.notion";
 // util helpers
-import { useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 // componetns
 import NotionSwitchParse from "./notion-parse/notionSwitchParse";
+import { useLocale } from "next-intl";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { PATH_ROUTE_NAME } from "@/configs/navigation";
 
 interface Props {
   data: BLogPostPage;
@@ -16,6 +19,12 @@ interface Props {
 
 const PostBlog = ({ data: { page, post } }: Props) => {
   const router = useRouter();
+  const locale = useLocale();
+  useEffect(() => {
+    if (page.lang !== locale && page.langLink) {
+      router.replace(`${PATH_ROUTE_NAME.blog}/${page.langLink}`);
+    }
+  }, [page, locale, router]);
   return (
     <>
       {page?.cover ? (

@@ -31,7 +31,7 @@ type Prop = {
   style: CSSProperties;
 };
 
-const sidePanelVariants: Variants = {
+const sidePanelVariants = {
   hidden: {
     x: "-100%",
   },
@@ -73,6 +73,9 @@ const AsidePanel = ({ className, data, style }: Prop) => {
     setSelectedPost(data);
     dispatch(onFilteredBlogPost(data));
   }, [data, dispatch]);
+
+  sidePanelVariants.hidden.x =
+    screenWidth < DEVICE_SIZES.DESKTOP ? "-100%" : "0";
 
   useEffect(() => {
     setTimeout(() => {

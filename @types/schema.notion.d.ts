@@ -7,11 +7,12 @@ export interface Tag {
 }
 
 export interface BlogPost {
-  id: number;
+  id: string;
   cover: string;
   title: string;
   category: Tag;
-  langId: string;
+  lang: string;
+  langLink: string;
 }
 
 export interface PostPage {

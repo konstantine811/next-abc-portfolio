@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, memo } from "react";
+import { ReactNode, memo, useEffect } from "react";
 // components
 import MainContent from "@/components/page-partials/common/main-content";
 import AsidePanel from "@/components/page-partials/aside-panel";
