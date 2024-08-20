@@ -8,6 +8,8 @@ import {
 } from "@react-three/rapier";
 import {
   ForwardRefRenderFunction,
+  LegacyRef,
+  MutableRefObject,
   RefObject,
   forwardRef,
   useCallback,
@@ -509,7 +511,7 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
   const gameMoveToPoint = useAppSelector(
     (state) => state.gameStateReducer.moveToPoint
   );
-  const bodySensorRef = useRef<Collider>(null!);
+  const bodySensorRef = useRef<Collider | null>(null) as any;
   const handleOnIntersectionEnter = () => {
     isBodyHitWall = true;
   };
@@ -943,10 +945,11 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
       undefined,
       controllerRef.current ? controllerRef.current : characterRef.current,
       // this exclude any collider with userData: excludeContollerRay
-      (collider: Collider) =>
-        (collider.parent()?.userData as userDataType) &&
-        !(collider.parent()?.userData as userDataType).excludeControllerRay
-    );
+      (collider) =>
+        ((collider.parent()?.userData as userDataType) &&
+          !(collider.parent()?.userData as userDataType)
+            .excludeControllerRay) as boolean
+    ) as RayColliderToi | null;
     /** Test shape ray */
     /*  rayHit = world.castShape(
       currentPos,
@@ -1083,10 +1086,10 @@ const Controller: ForwardRefRenderFunction<RapierRigidBody, ControllerProps> = (
       undefined,
       undefined,
       controllerRef.current ? controllerRef.current : characterRef.current,
-      (collider: Collider) =>
+      (collider) =>
         (collider.parent()?.userData as userDataType) &&
         !(collider.parent()?.userData as userDataType).excludeControllerRay
-    );
+    ) as RayColliderToi | null;
     // Calculate slope angle
     if (slopeRayHit) {
       actualSlopeNormal = slopeRayHit.collider.castRayAndGetNormal(
