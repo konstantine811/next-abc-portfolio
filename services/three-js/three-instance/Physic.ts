@@ -1,6 +1,7 @@
 import {
   BoxGeometry,
   BufferGeometry,
+  CapsuleGeometry,
   ConeGeometry,
   CylinderGeometry,
   Euler,
@@ -50,7 +51,8 @@ export default class Physic {
     dimension: any,
     translation: Vector3,
     rotation: Vector3,
-    color: string
+    color: string,
+    wireframe = false
   ): { rigid: RigidBody; mesh: Mesh } {
     let bodyDesc: RigidBodyDesc;
     if (bodyType === BodyTypeProps.DYNAMIC) {
@@ -80,6 +82,12 @@ export default class Physic {
       collider = ColliderDesc.cone(dimension.hh, dimension.radius);
       // cone center of mass is at bottom
       collider.centerOfMass = { x: 0, y: 0, z: 0 };
+    } else if (colliderType === ColliderTypeProps.CAPSULE) {
+      // Create the capsule collider (height excludes the caps, so subtract 2*radius from the total height)
+      collider = ColliderDesc.capsule(
+        dimension.hh / 2 - dimension.radius,
+        dimension.radius
+      );
     } else {
       throw new Error("Invalid collider type");
     }
@@ -109,13 +117,19 @@ export default class Physic {
         dimension.hh * 2,
         32
       );
+    } else if (colliderType === ColliderTypeProps.CAPSULE) {
+      bufferGeometry = new CapsuleGeometry(
+        dimension.radius,
+        dimension.hh - 2 * dimension.radius
+      );
     } else {
       throw new Error("Invalid collider type for buffer geometry");
     }
     const threeMesh = new Mesh(
       bufferGeometry,
-      new MeshStandardMaterial({ color })
+      new MeshStandardMaterial({ color, wireframe })
     );
+    threeMesh.position.set(translation.x, translation.y, translation.z);
     threeMesh.castShadow = true;
     threeMesh.receiveShadow = true;
     this._scene.add(threeMesh);

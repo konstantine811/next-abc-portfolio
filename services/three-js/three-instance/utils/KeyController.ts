@@ -5,7 +5,7 @@ export default class KeyController {
   private _shiftKey: boolean = false;
   constructor() {
     window.addEventListener("keydown", (event) => {
-      const key = event.key.toLowerCase();
+      const key = event.code;
       if (event.shiftKey) {
         this._shiftKey = true;
       }
@@ -13,8 +13,8 @@ export default class KeyController {
       this._keysPressed[key] = true;
     });
     window.addEventListener("keyup", (event) => {
-      const key = event.key.toLowerCase();
-      if (key === "shift") {
+      const key = event.code;
+      if (key === "ShiftLeft") {
         this._shiftKey = false;
       }
       this._keys[key] = false;

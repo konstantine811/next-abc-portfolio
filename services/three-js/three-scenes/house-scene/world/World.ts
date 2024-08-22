@@ -29,7 +29,7 @@ export default class WorldScene implements WorldImpl {
       // Setup
       // this._floor = new Floor();
       this._house = new House();
-      this._floorTerrain = new FloorTerrain(20, new Vector3(70, 1, 70));
+      this._floorTerrain = new FloorTerrain(20, new Vector3(70.0, 1.0, 70.0));
       this._environment = new Environment();
       this._objects = new Objects();
       this._character = new Character();

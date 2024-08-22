@@ -16,12 +16,26 @@ import Time from "@/services/three-js/three-instance/utils/Time";
 import Debug from "@/services/three-js/three-instance/utils/Debug";
 import KeyController from "@/services/three-js/three-instance/utils/KeyController";
 import Camera from "@/services/three-js/three-instance/Camera";
+import { Ray, RigidBody } from "@dimforge/rapier3d-compat";
+import Physic from "@/services/three-js/three-instance/Physic";
+import {
+  BodyTypeProps,
+  ColliderTypeProps,
+} from "@/models/three-scene/rapier-physic.model";
 
 enum AnimationName {
   IDLE = "Idle",
   WALKING = "Walking",
   RUNNING = "Running",
   JUMP = "Jump",
+}
+
+enum KeyCodeDirection {
+  W = "KeyW",
+  S = "KeyS",
+  A = "KeyA",
+  D = "KeyD",
+  Space = "Space",
 }
 
 export default class Character {
@@ -35,6 +49,9 @@ export default class Character {
   private _resource: GLTF;
   private _camera: Camera;
   private _model!: Group<Object3DEventMap>;
+  private _physicWorld: Physic;
+  private _rigidBody!: RigidBody;
+  private _ray!: Ray;
   private _animation!: {
     mixer: AnimationMixer;
     actions: {
@@ -47,7 +64,12 @@ export default class Character {
     };
     play: (name: AnimationName) => void;
   };
-  private _keys = ["w", "s", "a", "d"];
+  private _keys = [
+    KeyCodeDirection.W,
+    KeyCodeDirection.S,
+    KeyCodeDirection.A,
+    KeyCodeDirection.D,
+  ];
   // character control
   private _rotationQuaternion = new Quaternion();
   private _rotateAngle = new Vector3(0, 1, 0);
@@ -62,6 +84,7 @@ export default class Character {
     this._keyController = this._experience.keyController;
     this._scene = this._experience.scene;
     this._camera = this._experience.camera;
+    this._physicWorld = this._experience.physicWorld;
     const controls = this._camera.controls;
     controls.enableDamping = false;
     controls.minDistance = 3;
@@ -79,9 +102,24 @@ export default class Character {
     }
     // Resource
     this._resource = this._resources.items.characterModel as GLTF;
-
+    this.setRigidBody();
     this.setModel();
     this.setAnimation();
+  }
+
+  setRigidBody() {
+    const { mesh, rigid } = this._physicWorld.body(
+      BodyTypeProps.DYNAMIC,
+      ColliderTypeProps.CAPSULE,
+      { hh: 1.68, radius: 0.28 },
+      { x: 0, y: 0.8, z: 0 },
+      { x: 0, y: 0, z: 0 },
+      "black",
+      true
+    );
+    rigid.lockRotations(true, true);
+    this._rigidBody = rigid;
+    this._ray = new Ray({ x: 0, y: 0, z: 0 }, { x: 0, y: -1, z: 0 });
   }
 
   setModel() {
@@ -167,7 +205,7 @@ export default class Character {
     } else {
       playMode = AnimationName.IDLE;
     }
-    if (this._keyController.isKeyDown(" ")) {
+    if (this._keyController.isKeyDown(KeyCodeDirection.Space)) {
       playMode = AnimationName.JUMP;
     }
     if (this._animation.actions.currentName !== playMode) {
@@ -229,23 +267,23 @@ export default class Character {
   private directionOffset() {
     const ks = this._keyController;
     let directionOffset = 0; // w
-    if (ks.isKeyDown("w")) {
-      if (ks.isKeyDown("a")) {
+    if (ks.isKeyDown(KeyCodeDirection.W)) {
+      if (ks.isKeyDown(KeyCodeDirection.A)) {
         directionOffset = Math.PI / 4; // w + a
-      } else if (ks.isKeyDown("d")) {
+      } else if (ks.isKeyDown(KeyCodeDirection.D)) {
         directionOffset = -Math.PI / 4; // w + d
       }
-    } else if (ks.isKeyDown("s")) {
-      if (ks.isKeyDown("a")) {
+    } else if (ks.isKeyDown(KeyCodeDirection.S)) {
+      if (ks.isKeyDown(KeyCodeDirection.A)) {
         directionOffset = (Math.PI * 3) / 4; // s + a
-      } else if (ks.isKeyDown("d")) {
+      } else if (ks.isKeyDown(KeyCodeDirection.D)) {
         directionOffset = (-Math.PI * 3) / 4; // s + d
       } else {
         directionOffset = Math.PI; // s
       }
-    } else if (ks.isKeyDown("a")) {
+    } else if (ks.isKeyDown(KeyCodeDirection.A)) {
       directionOffset = Math.PI / 2; // a
-    } else if (ks.isKeyDown("d")) {
+    } else if (ks.isKeyDown(KeyCodeDirection.D)) {
       directionOffset = -Math.PI / 2; // d
     }
     return directionOffset;

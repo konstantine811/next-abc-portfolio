@@ -72,7 +72,7 @@ export default class FloorTerrain {
     for (let i = 0; i < vertices.length; i += 3) {
       // translate into column/row indices
       let row = Math.floor(Math.abs(vertices[i] + scale.x / 2) / dx);
-      let column = Math.floor(Math.abs(vertices[i + 1] + scale.z / 2) / dz);
+      let column = Math.floor(Math.abs(vertices[i + 1] - scale.z / 2) / dz);
       // generate height for this column & row
       const randomHeight = Math.random();
       vertices[i + 2] = scale.y * randomHeight;
@@ -95,7 +95,7 @@ export default class FloorTerrain {
       nsubdivs,
       nsubdivs,
       new Float32Array(heights),
-      { x: scale.x, y: scale.y, z: scale.z }
+      scale
     );
     this._world.createCollider(groundCollder, groundBody);
   }
