@@ -14,28 +14,18 @@ const Character = ({ scale, positionY, animation }: Props) => {
     "/3d-models/fifth-scene-models/character.glb"
   );
   const { actions } = useAnimations(animations, group);
+
   useEffect(() => {
-    // Check if all necessary objects are defined
-    if (actions && animations.length > 0 && actions[animation]) {
+    if (actions && actions[animation]) {
       const currentAction = actions[animation];
+      currentAction?.reset()?.fadeIn(0.24)?.play();
 
-      if (currentAction) {
-        currentAction.reset();
-        currentAction.fadeIn(0.24);
-        currentAction.play();
-      }
+      return () => {
+        currentAction?.fadeOut(0.24);
+      };
     }
+  }, [actions, animation]);
 
-    // Cleanup function to safely handle fading out
-    return () => {
-      if (actions && actions[animation]) {
-        const currentAction = actions[animation];
-        if (currentAction) {
-          currentAction.fadeOut(0.24);
-        }
-      }
-    };
-  }, [actions, animations, animation]);
   const getSkinnedMesh = (prop: string) => {
     return nodes[prop] as SkinnedMesh;
   };

@@ -28,7 +28,7 @@ export function NavigationHeaderMenu({
     <NavigationMenu>
       <NavigationMenuList>
         {navConfig.map((item) => {
-          if (item.isDev && process.env.NODE_ENV === "development") {
+          if (item.isDev && process.env.NODE_ENV !== "development") {
             return null;
           }
           if (item.children && item.children.length) {

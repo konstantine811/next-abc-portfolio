@@ -11,13 +11,15 @@ const CharacterLoaderAnimation = ({ model, animation }: Props) => {
   const { actions } = useAnimations(animations, scene);
 
   useEffect(() => {
-    if (actions && animations.length && actions[animation]) {
-      actions[animation].reset().fadeIn(0.24).play();
+    if (actions && actions[animation]) {
+      const currentAction = actions[animation];
+      currentAction?.reset()?.fadeIn(0.24)?.play();
+
       return () => {
-        actions[animation]?.fadeOut(0.24);
+        currentAction?.fadeOut(0.24);
       };
     }
-  }, [actions, animations, animation]);
+  }, [actions, animation]);
 
   return <primitive object={scene} />;
 };
