@@ -6,7 +6,6 @@ import { Physics } from "@react-three/rapier";
 import { useControls } from "leva";
 import { useEffect, useState } from "react";
 import RoughPlane from "./scene-parts/roughPlane";
-import Controllers from "./controllers/controllers";
 import CharacterModel from "./scene-parts/characterModel";
 import Floor from "./scene-parts/floor";
 
@@ -79,7 +78,7 @@ const Expirience = () => {
       <Lights />
       <Physics debug={physics} timeStep="vary" paused={pausedPhysics}>
         {/* Keyboard preset */}
-        <KeyboardControls map={keyboardMap}>
+        {/* <KeyboardControls map={keyboardMap}>
           <Controllers
             debug
             animated
@@ -95,7 +94,7 @@ const Expirience = () => {
           >
             <CharacterModel />
           </Controllers>
-        </KeyboardControls>
+        </KeyboardControls> */}
         <RoughPlane />
         <Floor />
       </Physics>

@@ -13,7 +13,7 @@ const JoystickControl = () => {
     }
   }, []);
 
-  return <>{isTouchScreen && <Joystick buttonNumber={5} />}</>;
+  return <>{isTouchScreen && <Joystick />}</>;
 };
 
 export default JoystickControl;

@@ -1,11 +1,9 @@
 "use client";
 
-interface Props {
-  buttonNumber: number;
-}
+interface Props {}
 
-const Joystick = ({ buttonNumber }: Props) => {
-  return <>{buttonNumber}</>;
+const Joystick = ({}: Props) => {
+  return <>5</>;
 };
 
 export default Joystick;

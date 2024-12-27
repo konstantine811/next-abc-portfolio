@@ -28,6 +28,9 @@ export function NavigationHeaderMenu({
     <NavigationMenu>
       <NavigationMenuList>
         {navConfig.map((item) => {
+          if (item.isDev && process.env.NODE_ENV === "development") {
+            return null;
+          }
           if (item.children && item.children.length) {
             const isActive = pathname.startsWith(item.href);
             return (
@@ -35,7 +38,7 @@ export function NavigationHeaderMenu({
                 <NavigationMenuTrigger
                   className={`${
                     isActive ? "text-foreground" : "text-muted-foreground"
-                  }`}
+                  } bg-transparent rounded-md`}
                 >
                   {item.title}
                 </NavigationMenuTrigger>
@@ -70,7 +73,7 @@ export function NavigationHeaderMenu({
               <NavigationMenuItem key={item.title}>
                 <Link href={item.href} legacyBehavior passHref>
                   <NavigationMenuLink
-                    className={`${navigationMenuTriggerStyle()} ${
+                    className={`${navigationMenuTriggerStyle()} bg-transparent ${
                       isActive ? "text-foreground" : "text-muted-foreground"
                     } ${cn(`hover:bg-transparent focus:bg-transparent`)}`}
                   >
@@ -94,7 +97,7 @@ const ListItem = forwardRef<ElementRef<"a">, ComponentPropsWithoutRef<"a">>(
           <Link
             ref={ref}
             className={cn(
-              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-transparent",
               className
             )}
             href={href ? href : "/"}

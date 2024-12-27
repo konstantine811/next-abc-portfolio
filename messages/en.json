@@ -7,7 +7,10 @@
       "first-scene": "First scene",
       "second-scene": "Second scene",
       "third-scene": "Third scene",
-      "fourth-scene": "Fourth scene"
+      "fourth-scene": "Fourth scene",
+      "fifth-scene": "Fifth scene",
+      "sixth-scene": "Sixth scene",
+      "seventh-scene": "Seventh scene"
     },
     "maps": {
       "title": "Maps",
@@ -23,7 +26,7 @@
     "title": "Hell from Home page"
   },
   "LocaleLayout": {
-    "title": "LEKO"
+    "title": "C.A."
   },
   "Portfolio": {
     "skills": {

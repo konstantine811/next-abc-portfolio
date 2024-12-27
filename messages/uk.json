@@ -7,7 +7,10 @@
       "first-scene": "Перша сцена",
       "second-scene": "Друга сцена",
       "third-scene": "Третя сцена",
-      "fourth-scene": "Четверта сцена"
+      "fourth-scene": "Четверта сцена",
+      "fifth-scene": "П'ята сцена",
+      "sixth-scene": "Шоста сцена",
+      "seventh-scene": "Сьома сцена"
     },
     "maps": {
       "title": "Карти",
@@ -23,7 +26,7 @@
     "title": "Привіт з домашньої сторінки"
   },
   "LocaleLayout": {
-    "title": "ЛЕКО"
+    "title": "K.A."
   },
   "Portfolio": {
     "skills": {
