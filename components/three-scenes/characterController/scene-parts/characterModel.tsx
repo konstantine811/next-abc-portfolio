@@ -1,5 +1,5 @@
 import {
-  initialAnimationSet,
+  initializeAnimationSet,
   resetAnimation,
 } from "@/lib/store/features/character-contoller/game-state.slice";
 import { useAppSelector } from "@/lib/store/hooks";
@@ -128,7 +128,7 @@ const CharacterModel = (props: CharacterModelProps) => {
 
   useEffect(() => {
     // Initialize animation set
-    dispatch(initialAnimationSet(animationSet));
+    dispatch(initializeAnimationSet(animationSet));
   });
 
   useEffect(() => {

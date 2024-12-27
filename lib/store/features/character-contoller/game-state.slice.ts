@@ -35,7 +35,7 @@ export const gameSlice = createSlice({
         state.animationSet = action.payload;
       }
     },
-    reset: (state) => {
+    resetAnimation: (state) => {
       state.curAnimation = state.animationSet.idle || null;
     },
     idle: (state) => {
@@ -108,7 +108,7 @@ export const gameSlice = createSlice({
 
 export const {
   initializeAnimationSet,
-  reset,
+  resetAnimation,
   idle,
   walk,
   run,

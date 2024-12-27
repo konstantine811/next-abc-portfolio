@@ -15,14 +15,27 @@ const Character = ({ scale, positionY, animation }: Props) => {
   );
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
-    if (actions && animations.length && actions[animation]) {
-      actions[animation].reset().fadeIn(0.24).play();
-      return () => {
-        actions[animation]?.fadeOut(0.24);
-      };
-    }
-  }, [actions, animations, animation]);
+    // Check if all necessary objects are defined
+    if (actions && animations.length > 0 && actions[animation]) {
+      const currentAction = actions[animation];
 
+      if (currentAction) {
+        currentAction.reset();
+        currentAction.fadeIn(0.24);
+        currentAction.play();
+      }
+    }
+
+    // Cleanup function to safely handle fading out
+    return () => {
+      if (actions && actions[animation]) {
+        const currentAction = actions[animation];
+        if (currentAction) {
+          currentAction.fadeOut(0.24);
+        }
+      }
+    };
+  }, [actions, animations, animation]);
   const getSkinnedMesh = (prop: string) => {
     return nodes[prop] as SkinnedMesh;
   };
