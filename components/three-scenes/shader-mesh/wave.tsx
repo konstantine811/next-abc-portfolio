@@ -1,21 +1,25 @@
-import { Color, ShaderMaterial, TextureLoader, Vector2 } from "three";
-import { useEffect, useRef, useState } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
+import { Color, ShaderMaterial, Vector2 } from "three";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 // shaders
 const vertex = require("@/shaders/vertex.vert").default;
 const fragment = require("@/shaders/fragment.frag").default;
 
 const Wave = () => {
   const shaderRef = useRef<ShaderMaterial>(null!);
-  const [image] = useLoader(TextureLoader, ["/assets/images/profilePhoto.png"]);
+  const [image] = useTexture(["/assets/images/profilePhoto.png"]);
   useFrame(({ clock }) => {
     shaderRef.current.uniforms.uTime.value = clock.getElapsedTime();
   });
   return (
     <mesh
       onPointerMove={(e) => {
-        shaderRef.current.uniforms.uMouseMove.value.x = e.pageX / 100;
-        shaderRef.current.uniforms.uMouseMove.value.y = e.pageY / 100;
+        if (shaderRef.current) {
+          const { pageX, pageY } = e.nativeEvent;
+          shaderRef.current.uniforms.uMouseMove.value.x = pageX / 100;
+          shaderRef.current.uniforms.uMouseMove.value.y = pageY / 100;
+        }
       }}
       position={[0.5, 0, 0]}
     >

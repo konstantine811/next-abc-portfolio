@@ -1,7 +1,7 @@
-import { MeshProps, useFrame, useLoader } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 import { useScroll, useSpring } from "framer-motion";
 import { RefObject, useRef } from "react";
-import { TextureLoader } from "three";
+import { Mesh } from "three";
 
 interface Props {
   canvasRef: RefObject<HTMLCanvasElement>;
@@ -10,12 +10,12 @@ interface Props {
 
 const EarthGlobe = ({ canvasRef }: Props) => {
   const texturePath = (name: string) => `/assets/textures/earth/${name}`;
-  const earthRef = useRef<MeshProps>(null);
-  const [color, normal, aoMap] = useLoader(TextureLoader, [
-    texturePath("color.jpg"),
-    texturePath("normal.png"),
-    texturePath("occlusion.jpg"),
-  ]);
+  const earthRef = useRef<Mesh>(null);
+  const { color, normal, aoMap } = useTexture({
+    color: texturePath("color.jpg"),
+    normal: texturePath("normal.png"),
+    aoMap: texturePath("occlusion.jpg"),
+  });
 
   const { scrollYProgress } = useScroll({
     target: canvasRef,

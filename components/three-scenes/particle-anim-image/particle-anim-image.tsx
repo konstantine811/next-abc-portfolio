@@ -12,6 +12,7 @@ import {
 } from "three";
 import { useMemo, useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 // shaders
 const vertex =
   require("@/shaders/particle-anim-image/particle-vertex.vert").default;
@@ -20,7 +21,7 @@ const fragment =
 
 const ParticleAnimImage = () => {
   const shaderRef = useRef<ShaderMaterial>(null!);
-  const [image] = useLoader(TextureLoader, ["/assets/images/picture-1.png"]);
+  const [image] = useTexture(["/assets/images/earth.jpg"]);
 
   const size = 1000;
   const divisions = 500;

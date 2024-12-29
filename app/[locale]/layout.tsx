@@ -1,4 +1,4 @@
-import { Quicksand as FontSans } from "next/font/google";
+import { Quicksand } from "next/font/google";
 // components
 import Header from "@/components/header";
 // theme providers
@@ -16,7 +16,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 
-export const fontSans = FontSans({
+export const fontSans = Quicksand({
   subsets: ["latin"], // You can specify which subsets to include
   weight: ["400", "500", "600", "700"], // Specify the weights you need
   display: "swap", // Optional, helps with loading performance
