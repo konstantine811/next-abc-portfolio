@@ -15,6 +15,7 @@ const nextConfig = {
       "nextjs.org",
       "www.0xkishan.com",
       "lucide.dev",
+      "repository-images.githubusercontent.com",
     ],
   },
   sassOptions: {

@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.code-highlighter {
+  pre {
+    background: transparent !important;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

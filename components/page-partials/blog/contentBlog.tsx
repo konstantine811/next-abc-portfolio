@@ -21,10 +21,10 @@ const ContentBlog = ({ data, children }: Props) => {
     <>
       <AsidePanel
         data={data}
-        className="col-span-2 fixed z-50"
+        className="col-span-2 z-50"
         style={{ top: `${headerHeight}px` }}
       />
-      <div className="xl:col-span-8 col-span-12 xl:col-start-3 col-start-0 mt-8">
+      <div className="xl:col-span-7 col-span-12 xl:col-start-4 col-start-0 mt-8">
         <MainContent className="flex flex-col gap-2">{children}</MainContent>
       </div>
     </>

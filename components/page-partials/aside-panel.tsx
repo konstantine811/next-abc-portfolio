@@ -99,7 +99,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
           height: `calc(100vh - ${headerHeight}px)`,
         }}
         className={cn(
-          "bg-background/55 backdrop-blur-sm min-w-[300px] xl:min-w-full fixed left-0 xl:sticky py-8  xl:overflow-auto border-r"
+          "bg-background/55 backdrop-blur-sm max-w-[300px] xl:min-w-full fixed left-0 xl:sticky py-8  xl:overflow-auto border-r"
         )}
         initial="hidden"
         animate={isOpen ? "visible" : "hidden"}

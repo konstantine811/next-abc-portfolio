@@ -1,85 +1,70 @@
-import { CSSProperties, useEffect, useState } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { CodeBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 // types
 import { BlockObjectChild } from "@/@types/schema.notion";
-import { THEME_TYPES } from "@/@types/theme";
-import { useTheme } from "next-themes";
 import { Badge } from "@/components/ui/badge";
-import {
-  customDarkTheme,
-  customLightTheme,
-} from "@/configs/code-highlight-theme";
-import { useToast } from "@/components/ui/use-toast";
-import { Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+import NoiseGrid from "@/components/page-partials/common/noise-grid";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import dark from "react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark";
 
 interface Prop {
   item: CodeBlockObjectResponse & BlockObjectChild;
+  onCopy: () => void;
+  isCopied: boolean;
 }
 
-const NotionCode = ({ item }: Prop) => {
-  const { toast } = useToast();
+const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
   const codeString = item.code.rich_text
     .map((item) => item.plain_text)
     .join("");
-  const { theme } = useTheme();
-  const [codeTheme, setCodeTheme] = useState<{
-    [key: string]: CSSProperties;
-  }>();
-  useEffect(() => {
-    switch (theme) {
-      case THEME_TYPES.light:
-        setCodeTheme(customLightTheme);
-        break;
-      case THEME_TYPES.dark:
-        setCodeTheme(customDarkTheme);
-        break;
-      default:
-        setCodeTheme(customDarkTheme);
-        break;
-    }
-  }, [theme]);
 
-  const copyToClipboard = () => {
+  useEffect(() => {
+    console.log("is copied", isCopied);
+  }, [isCopied]);
+
+  // UseCallback to memoize the copy logic
+  const copyToClipboard = useCallback(() => {
     navigator.clipboard
       .writeText(codeString)
       .then(() => {
-        console.log("on save");
-        toast({
-          title: "Code copied to clipboard!p",
-        });
+        onCopy();
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
       });
-  };
+  }, [codeString, onCopy]);
 
   return (
-    <div className="rounded-xl border overflow-hidden relative">
-      <div className="relative h-4">
-        <Badge className="absolute shadow-gray-600 shadow-sm" variant="outline">
-          {item.code.language}
-        </Badge>
-      </div>
+    <NoiseGrid opacity={0.133333}>
+      <div className="w-full border overflow-hidden relative">
+        <div className="relative h-4">
+          <Badge
+            className="absolute shadow-gray-600 shadow-sm"
+            variant="outline"
+          >
+            {item.code.language}
+          </Badge>
+        </div>
+        <div className="code-highlighter p-8">
+          <SyntaxHighlighter lang={item.code.language} style={dark}>
+            {codeString}
+          </SyntaxHighlighter>
+        </div>
 
-      <SyntaxHighlighter
-        language={item.code.language}
-        style={codeTheme}
-        showLineNumbers
-        showInlineLineNumbers
-      >
-        {codeString}
-      </SyntaxHighlighter>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={copyToClipboard}
-        className="absolute right-2 cursor-pointer top-8 h-auto w-7 px-2"
-      >
-        <Copy />
-      </Button>
-    </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={copyToClipboard}
+          type="button"
+          className="absolute right-2 cursor-pointer top-8 h-auto w-7 px-2"
+        >
+          {isCopied ? <Check /> : <Copy />}
+        </Button>
+      </div>
+    </NoiseGrid>
   );
 };
 

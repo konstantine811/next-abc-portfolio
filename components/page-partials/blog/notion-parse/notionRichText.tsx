@@ -1,14 +1,19 @@
+"use client";
+
 import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import TextWrapper from "@/components/wrapper/text-wrapper";
 import { ElementType } from "react";
 import { NotionTextColor } from "@/@types/schema.notion";
 import Link from "next/link";
+import { TextShimmer } from "@/components/ui/text-shimmer";
+import { TextScramble } from "@/components/ui/text-scramble";
 
 interface NotionRichTextProps {
   rich_text: RichTextItemResponse[];
   color: string;
   as: ElementType;
   className?: string;
+  typeAnimation?: "shimmer" | "scramble";
 }
 
 const NotionRichText = ({
@@ -16,6 +21,7 @@ const NotionRichText = ({
   color,
   as,
   className,
+  typeAnimation,
 }: NotionRichTextProps) => {
   function getColorByType(color: NotionTextColor) {
     switch (color) {
@@ -82,7 +88,28 @@ const NotionRichText = ({
             } ${getColorByType(item.annotations.color)}`}
             key={index}
           >
-            {item.plain_text}
+            {(() => {
+              switch (typeAnimation) {
+                case "shimmer":
+                  return (
+                    <TextShimmer spread={3} duration={3}>
+                      {item.plain_text}
+                    </TextShimmer>
+                  );
+                case "scramble":
+                  return (
+                    <TextScramble
+                      className="font-mono text-sm"
+                      duration={2.2}
+                      characterSet=". "
+                    >
+                      {item.plain_text}
+                    </TextScramble>
+                  );
+                default:
+                  return item.plain_text;
+              }
+            })()}
           </span>
         );
       })}

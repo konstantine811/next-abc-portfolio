@@ -4,7 +4,7 @@ import { memo, useEffect, useState } from "react";
 // utils
 import { cn } from "@/lib/utils";
 // models
-import { BlogPost, BlogPostEntity } from "@/@types/schema.notion";
+import { BlogPost } from "@/@types/schema.notion";
 // components
 import { Separator } from "@/components/ui/separator";
 import BlogCard from "./cardBlog";
