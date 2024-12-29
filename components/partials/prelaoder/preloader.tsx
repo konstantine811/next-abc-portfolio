@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 const Preloader = () => {
   const t = useTranslations("Common");
   const [play, { stop }] = useSound("/sounds/pulse.wav", {
-    volume: 0.5,
+    volume: 0.3,
     loop: true,
   });
   const headerHeight = useAppSelector(

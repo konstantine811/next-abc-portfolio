@@ -21,7 +21,7 @@ const fragment =
 
 const ParticleAnimImage = () => {
   const shaderRef = useRef<ShaderMaterial>(null!);
-  const [image] = useTexture(["/assets/images/earth.jpg"]);
+  const [image] = useTexture(["/assets/images/main.png"]);
 
   const size = 1000;
   const divisions = 500;
