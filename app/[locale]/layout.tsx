@@ -12,6 +12,10 @@ import ReduxProvider from "@/lib/store/StoreProvider";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Toaster } from "@/components/ui/toaster";
 
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+
 export const fontSans = FontSans({
   subsets: ["latin"], // You can specify which subsets to include
   weight: ["400", "500", "600", "700"], // Specify the weights you need
@@ -28,9 +32,8 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({
-  params: { locale },
-}: Omit<Props, "children">) {
+export async function generateMetadata({ params }: Omit<Props, "children">) {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "LocaleLayout" });
 
   return {
@@ -41,11 +44,17 @@ export async function generateMetadata({
   };
 }
 
-export default function RootLayout({ children, params: { locale } }: Props) {
+export default async function RootLayout({ children, params }: Props) {
+  const { locale } = await params;
   // Enable static rendering
-  unstable_setRequestLocale(locale);
-  const navConfig = NavigationConfig();
-  const messages = useMessages();
+  // Ensure that the incoming `locale` is valid
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Providing all messages to the client
+  // side is the easiest way to get started
+  const messages = await getMessages();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -61,7 +70,7 @@ export default function RootLayout({ children, params: { locale } }: Props) {
             <ThemeProvider
               props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
             >
-              <Header navConfig={navConfig} />
+              <Header />
               {children}
               <Toaster />
             </ThemeProvider>

@@ -1,4 +1,4 @@
-import { Pathnames } from "next-intl/navigation";
+import { Pathnames } from "next-intl/routing";
 
 export enum LocaleType {
   en = "en",
@@ -8,6 +8,6 @@ export enum LocaleType {
 export const LOCALES = [LocaleType.en, LocaleType.uk] as const;
 
 export const pathnames = {
-  "/": "/",
-  "/blog": "/blog",
+  "/": { en: "/", uk: "/" },
+  "/blog": { en: "/blog", uk: "/blog" },
 } satisfies Pathnames<typeof LOCALES>;

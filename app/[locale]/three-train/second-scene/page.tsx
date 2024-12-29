@@ -1,3 +1,5 @@
+"use client";
+
 import MainWrapper from "@/components/wrapper/main-wrapper";
 import dynamic from "next/dynamic";
 

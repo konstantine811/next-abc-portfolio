@@ -10,8 +10,9 @@ interface Props {
   params: { locale: string };
 }
 
-const BlogLayout = async ({ children, params: { locale } }: Props) => {
+const BlogLayout = async ({ children, params }: Props) => {
   // Enable static rendering
+  const { locale } = await params;
   let categoryPosts: BlogPostEntity = {};
   try {
     const notionService = new NotionService();

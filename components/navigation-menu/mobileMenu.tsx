@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { usePathname } from "@/lib/navigation";
+import { useParams, usePathname } from "next/navigation";
 // utils
 import { cn } from "@/lib/utils";
 import { navigationMenuTriggerStyle } from "../ui/navigation-menu";

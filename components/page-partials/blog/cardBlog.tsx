@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
+
 // utils
 import { getPathName } from "@/utils/blog-path";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "@/i18n/routing";
 
 type Prop = {
   data: BlogPost;

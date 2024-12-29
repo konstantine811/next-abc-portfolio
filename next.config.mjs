@@ -23,6 +23,8 @@ const nextConfig = {
   },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Додаємо glslify-loader для обробки GLSL файлів
+    config.externals = config.externals || {};
+    config.externals["undici"] = "commonjs undici";
     config.module.rules.push({
       test: /\.(glsl|frag|vert)$/,
       exclude: /node_modules/,

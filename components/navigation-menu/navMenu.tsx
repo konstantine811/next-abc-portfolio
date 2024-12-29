@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import {
@@ -14,8 +13,9 @@ import {
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from "react";
 // models
 import { INaviagationConfig } from "@/configs/navigation";
-import { usePathname } from "@/lib/navigation";
+
 import { useParams } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 
 export function NavigationHeaderMenu({
   navConfig,
@@ -70,15 +70,14 @@ export function NavigationHeaderMenu({
             const isActive =
               pathname === item.href || pathname === `${item.href}/${slug}`;
             return (
-              <NavigationMenuItem key={item.title}>
-                <Link href={item.href} legacyBehavior passHref>
-                  <NavigationMenuLink
-                    className={`${navigationMenuTriggerStyle()} bg-transparent ${
-                      isActive ? "text-foreground" : "text-muted-foreground"
-                    } ${cn(`hover:bg-transparent focus:bg-transparent`)}`}
-                  >
-                    {item.title}
-                  </NavigationMenuLink>
+              <NavigationMenuItem key={item.title} asChild>
+                <Link
+                  href={{ pathname: item.href }}
+                  className={`${navigationMenuTriggerStyle()} bg-transparent ${
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  } ${cn(`hover:bg-transparent focus:bg-transparent`)}`}
+                >
+                  {item.title}
                 </Link>
               </NavigationMenuItem>
             );

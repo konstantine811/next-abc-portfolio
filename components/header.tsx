@@ -8,7 +8,7 @@ import Logo from "./own-brand/logo";
 import Link from "next/link";
 import LocaleSwitcherSelect from "./locale-swither/localeSwitcherSelect";
 import { NavigationHeaderMenu } from "./navigation-menu/navMenu";
-import { INaviagationConfig } from "@/configs/navigation";
+import NavigationConfig, { INaviagationConfig } from "@/configs/navigation";
 // storeage
 import {
   onHeaderHeight,
@@ -20,8 +20,9 @@ import { RootState } from "@/lib/store/store";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import MobileMenu from "./navigation-menu/mobileMenu";
 
-const Header = ({ navConfig }: { navConfig: INaviagationConfig[] }) => {
+const Header = () => {
   const refHeader = useRef<HTMLDivElement>(null);
+  const navConfig = NavigationConfig();
   const dispatch = useDispatch();
   const { screenWidth } = useAppSelector(
     (state: RootState) => state.uiStateReducer
