@@ -1,6 +1,5 @@
 import { MeshProps, useFrame, useLoader } from "@react-three/fiber";
 import { useScroll, useSpring } from "framer-motion";
-import { motion } from "framer-motion-3d";
 import { RefObject, useRef } from "react";
 import { TextureLoader } from "three";
 
@@ -24,10 +23,10 @@ const EarthGlobe = ({ canvasRef }: Props) => {
   });
   const smoothRotation = useSpring(scrollYProgress, { damping: 20 });
   return (
-    <motion.mesh ref={earthRef} scale={3.0} rotation-y={smoothRotation}>
+    <mesh ref={earthRef} scale={3.0}>
       <sphereGeometry args={[1, 64, 64]} />
       <meshStandardMaterial map={color} normalMap={normal} aoMap={aoMap} />
-    </motion.mesh>
+    </mesh>
   );
 };
 
