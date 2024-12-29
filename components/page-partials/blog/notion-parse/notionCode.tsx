@@ -19,7 +19,7 @@ interface Prop {
 
 const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
   const [play] = useSound("/assets/sounds/event-click.wav", {
-    volume: 0.008,
+    volume: 0.8,
     playbackRate: 1,
     sprite: {
       first: [0, 1700],
