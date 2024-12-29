@@ -9,11 +9,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LOCALES } from "@/configs/locale";
-import { useRouter } from "@/i18n/routing";
+import { usePathname, useRouter } from "@/i18n/routing";
 
 import { cn } from "@/lib/utils";
 import { useLocale } from "next-intl";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
 const LocaleSwitcherSelect = () => {

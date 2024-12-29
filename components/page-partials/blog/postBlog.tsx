@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 // componetns
 import NotionSwitchParse from "./notion-parse/notionSwitchParse";
 import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+
 import { useEffect } from "react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
+import { useRouter } from "@/i18n/routing";
 
 interface Props {
   data: BLogPostPage;
