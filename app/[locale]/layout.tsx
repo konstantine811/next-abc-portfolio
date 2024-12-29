@@ -15,6 +15,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import Loading from "./loading";
+import { Suspense } from "react";
 
 export const fontSans = Quicksand({
   subsets: ["latin"], // You can specify which subsets to include
@@ -71,7 +73,7 @@ export default async function RootLayout({ children, params }: Props) {
               props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
             >
               <Header />
-              {children}
+              <Suspense fallback={<Loading />}>{children}</Suspense>
               <Toaster />
             </ThemeProvider>
           </ReduxProvider>
