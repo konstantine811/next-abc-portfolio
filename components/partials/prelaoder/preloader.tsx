@@ -6,23 +6,40 @@ import { motion } from "framer-motion";
 
 import Ripple from "@/components/ui/ripple";
 import useSound from "use-sound";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 const Preloader = () => {
   const t = useTranslations("Common");
-  const [play, { stop }] = useSound("/sounds/pulse.wav", {
-    volume: 0.3,
+  const [play, { stop, sound }] = useSound("/sounds/pulse.wav", {
+    volume: 0.4,
     loop: true,
   });
+  const [isPlaying, setIsPlaying] = useState(false);
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.headerHeight
   );
 
+  const stopWithFade = () => {
+    if (sound) {
+      let currentVolume = sound.volume();
+      const fadeOutInterval = setInterval(() => {
+        if (currentVolume > 0.05) {
+          currentVolume -= 0.05;
+          sound.volume(currentVolume); // Зменшуємо гучність
+        } else {
+          clearInterval(fadeOutInterval);
+          stop(); // Зупиняємо звук
+          setIsPlaying(false);
+        }
+      }, 100); // Затримка для плавності (100 мс)
+    }
+  };
+
   useEffect(() => {
     play();
-    return () => stop();
-  }, [play, stop]);
+    return () => stopWithFade();
+  }, [play, stopWithFade]);
 
   return (
     <motion.div
@@ -30,8 +47,11 @@ const Preloader = () => {
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       exit={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
       transition={{ duration: 0.9, ease: "easeInOut" }}
-      style={{ height: `calc(100vh - ${headerHeight}px)` }}
-      className="relative flex w-full flex-col items-center justify-center overflow-hidden"
+      style={{
+        height: `calc(100vh - ${headerHeight}px)`,
+        top: `${headerHeight}px`,
+      }}
+      className="fixed flex w-full backdrop-blur-sm  z-[1000000] left-0 flex-col items-center justify-center overflow-hidden"
     >
       <p className="z-10 whitespace-pre-wrap text-center text-md font-medium tracking-tighter text-white">
         {t("loading")}

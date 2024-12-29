@@ -25,7 +25,7 @@ interface Prop {
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
   const [play] = useSound("/sounds/whoosh2.wav", {
-    volume: 0.02,
+    volume: 0.005,
     playbackRate: 1,
     sprite: {
       first: [0, 15000],
