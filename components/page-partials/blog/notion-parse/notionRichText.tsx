@@ -4,7 +4,7 @@ import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import TextWrapper from "@/components/wrapper/text-wrapper";
 import { ElementType } from "react";
 import { NotionTextColor } from "@/@types/schema.notion";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextScramble } from "@/components/ui/text-scramble";
 

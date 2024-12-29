@@ -2,7 +2,6 @@
 import { cn } from "@/lib/utils";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
-import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 // components
 import { ArrowBigLeft } from "lucide-react";
@@ -24,7 +23,7 @@ import { getPathName } from "@/utils/blog-path";
 import CategoryTabWrap from "./blog/categoryTabWrap";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import { EASING_ANIMATION } from "@/configs/animations";
-import { usePathname } from "@/i18n/routing";
+import { usePathname, Link } from "@/i18n/routing";
 
 type Prop = {
   className?: string;

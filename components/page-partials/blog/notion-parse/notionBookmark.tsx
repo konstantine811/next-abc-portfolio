@@ -1,5 +1,5 @@
 import axios from "axios";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 // models
 import { BlockObjectChild } from "@/@types/schema.notion";

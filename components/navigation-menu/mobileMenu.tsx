@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useParams, usePathname } from "next/navigation";
 // utils
 import { cn } from "@/lib/utils";

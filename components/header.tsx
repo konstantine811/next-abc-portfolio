@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 // compontns
 import ThemeToggler from "./theme/themeToggler";
 import Logo from "./own-brand/logo";
-import Link from "next/link";
 import LocaleSwitcherSelect from "./locale-swither/localeSwitcherSelect";
 import { NavigationHeaderMenu } from "./navigation-menu/navMenu";
 import NavigationConfig, { INaviagationConfig } from "@/configs/navigation";
@@ -19,6 +18,7 @@ import { useAppSelector } from "@/lib/store/hooks";
 import { RootState } from "@/lib/store/store";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import MobileMenu from "./navigation-menu/mobileMenu";
+import { Link } from "@/i18n/routing";
 
 const Header = () => {
   const refHeader = useRef<HTMLDivElement>(null);

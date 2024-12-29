@@ -3,7 +3,7 @@
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { cn } from "@/lib/utils";
 import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useParams } from "next/navigation";
 
 interface Prop {
