@@ -75,8 +75,5 @@
     "sass": "^1.71.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  },
-  "resolutions": {
-    "@react-three/fiber": "8.17.10"
   }
 }
