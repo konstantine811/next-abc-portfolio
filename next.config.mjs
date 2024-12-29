@@ -25,11 +25,24 @@ const nextConfig = {
     // Додаємо glslify-loader для обробки GLSL файлів
     config.externals = config.externals || {};
     config.externals["undici"] = "commonjs undici";
-    config.module.rules.push({
-      test: /\.(glsl|frag|vert)$/,
-      exclude: /node_modules/,
-      use: ["raw-loader", "glslify-loader"],
-    });
+    config.module.rules.push(
+      {
+        test: /\.(glsl|frag|vert)$/,
+        exclude: /node_modules/,
+        use: ["raw-loader", "glslify-loader"],
+      },
+      {
+        test: /\.(wav|mp3|ogg)$/,
+        use: {
+          loader: "file-loader",
+          options: {
+            name: "[name].[ext]",
+            outputPath: "static/media/",
+            publicPath: "/_next/static/media/",
+          },
+        },
+      }
+    );
     return config;
   },
 };

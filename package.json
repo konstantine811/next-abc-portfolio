@@ -59,6 +59,7 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.161.0",
+    "use-sound": "^4.0.3",
     "vaul": "^0.9.1"
   },
   "devDependencies": {

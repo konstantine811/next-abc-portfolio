@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import NoiseGrid from "@/components/page-partials/common/noise-grid";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import dark from "react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark";
+import useSound from "use-sound";
 
 interface Prop {
   item: CodeBlockObjectResponse & BlockObjectChild;
@@ -17,13 +18,24 @@ interface Prop {
 }
 
 const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
+  const [play] = useSound("/assets/sounds/event-click.wav", {
+    volume: 0.008,
+    playbackRate: 1,
+    sprite: {
+      first: [0, 1700],
+      second: [2250, 3000],
+    },
+  });
+
   const codeString = item.code.rich_text
     .map((item) => item.plain_text)
     .join("");
 
   useEffect(() => {
-    console.log("is copied", isCopied);
-  }, [isCopied]);
+    if (isCopied) {
+      play({ id: "first" });
+    }
+  }, [isCopied, play]);
 
   // UseCallback to memoize the copy logic
   const copyToClipboard = useCallback(() => {
@@ -55,11 +67,15 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
         </div>
 
         <Button
-          variant="ghost"
+          variant="secondary"
           size="icon"
           onClick={copyToClipboard}
           type="button"
-          className="absolute right-2 cursor-pointer top-8 h-auto w-7 px-2"
+          className={`absolute right-2 cursor-pointer top-8 h-auto w-7 px-2 transition-all duration-300 ${
+            isCopied
+              ? "bg-green-400/60 hover:bg-green-400/60 shadow-green-300 shadow-2xl"
+              : ""
+          }`}
         >
           {isCopied ? <Check /> : <Copy />}
         </Button>

@@ -15,7 +15,8 @@ import NotionParseItem from "./notionNumberList";
 import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import NotionBookmark from "./notionBookmark";
 import { useState } from "react";
-import { InView } from "@/components/ui/in-view";
+import { motion } from "framer-motion";
+import useSound from "use-sound";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -23,6 +24,15 @@ interface Prop {
 }
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
+  const [play, { sound }] = useSound("/assets/sounds/whoosh2.wav", {
+    volume: 0.3,
+    playbackRate: 1,
+    sprite: {
+      first: [0, 15000],
+    },
+    forceSoundEnabled: true,
+  });
+  const [isPlayed, setIsPlayed] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
   const numberCacheList: (NumberedListItemBlockObjectResponse &
     BlockObjectChild)[] = [];
@@ -30,14 +40,21 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
     <div className="pb-20">
       {post?.map((item: BlockObjectChildResponse, index) => {
         return (
-          <InView
+          <motion.div
             key={index}
-            variants={{
-              hidden: { opacity: 0.3, y: -20, filter: "blur(3px)" },
-              visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+            initial={{ opacity: 0.79, y: -3, filter: "blur(1.3px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.9, ease: "easeInOut" }}
+            viewport={{ margin: "-50px 0px -50px 0px" }}
+            onViewportEnter={() => {
+              if (!isPlayed) {
+                play({ id: "first" });
+              }
+              setIsPlayed(true);
+              setTimeout(() => {
+                setIsPlayed(false);
+              }, 3333);
             }}
-            viewOptions={{ margin: "-50px 0px -50px 0px" }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
           >
             {(() => {
               switch (item.type) {
@@ -125,7 +142,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                   return null;
               }
             })()}
-          </InView>
+          </motion.div>
         );
       })}
     </div>
