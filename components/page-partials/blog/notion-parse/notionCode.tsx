@@ -18,12 +18,13 @@ interface Prop {
 }
 
 const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
-  const [play] = useSound("/assets/sounds/event-click.wav", {
+  const [play] = useSound("/assets/sounds/event-click2.wav", {
     volume: 0.3,
     playbackRate: 1,
     sprite: {
-      first: [0, 1700],
-      second: [2250, 3000],
+      first: [0, 500],
+      second: [400, 500],
+      third: [800, 1700],
     },
   });
 
@@ -33,7 +34,7 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
 
   useEffect(() => {
     if (isCopied) {
-      play({ id: "first" });
+      play({ id: "second" });
     }
   }, [isCopied, play]);
 

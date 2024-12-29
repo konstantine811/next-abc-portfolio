@@ -24,8 +24,8 @@ interface Prop {
 }
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
-  const [play, { sound }] = useSound("/assets/sounds/whoosh2.wav", {
-    volume: 0.06,
+  const [play] = useSound("/assets/sounds/whoosh2.wav", {
+    volume: 0.07,
     playbackRate: 1,
     sprite: {
       first: [0, 15000],
@@ -42,7 +42,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
         return (
           <motion.div
             key={index}
-            initial={{ opacity: 0.79, y: -3, filter: "blur(1.3px)" }}
+            initial={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.9, ease: "easeInOut" }}
             viewport={{ margin: "-50px 0px -50px 0px" }}
@@ -53,7 +53,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
               setIsPlayed(true);
               setTimeout(() => {
                 setIsPlayed(false);
-              }, 3333);
+              }, 1333);
             }}
           >
             {(() => {
@@ -113,8 +113,8 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                     <NotionCode
                       onCopy={() => setCopiedCode(item.id)}
                       isCopied={item.id === copiedCode}
-                      key={item.id}
                       item={item}
+                      key={item.id}
                     />
                   );
                 case "image":
