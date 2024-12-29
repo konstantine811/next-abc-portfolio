@@ -2,6 +2,8 @@
 
 import { useAppSelector } from "@/lib/store/hooks";
 
+import { motion } from "framer-motion";
+
 import Ripple from "@/components/ui/ripple";
 import useSound from "use-sound";
 import { useEffect } from "react";
@@ -23,7 +25,11 @@ const Preloader = () => {
   }, [play, stop]);
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      exit={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
+      transition={{ duration: 0.9, ease: "easeInOut" }}
       style={{ height: `calc(100vh - ${headerHeight}px)` }}
       className="relative flex w-full flex-col items-center justify-center overflow-hidden"
     >
@@ -31,7 +37,7 @@ const Preloader = () => {
         {t("loading")}
       </p>
       <Ripple />
-    </div>
+    </motion.div>
   );
 };
 
