@@ -42,10 +42,10 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
         return (
           <motion.div
             key={index}
-            initial={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
+            initial={{ opacity: 0.39, y: -5, filter: "blur(0.13px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.9, ease: "easeInOut" }}
-            viewport={{ margin: "-50px 0px -50px 0px" }}
+            viewport={{ margin: "-100px 0px 100px 0px" }}
             onViewportEnter={() => {
               if (!isPlayed) {
                 play({ id: "first" });

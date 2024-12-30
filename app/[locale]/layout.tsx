@@ -1,22 +1,23 @@
 import { Quicksand } from "next/font/google";
 // components
 import Header from "@/components/header";
-// theme providers
-import ThemeProvider from "@/components/theme/themeProvider";
-import { THEME_TYPES } from "@/@types/theme";
+
 import { cn } from "@/lib/utils";
 import { LOCALES } from "@/configs/locale";
-import { getTranslations, unstable_setRequestLocale } from "next-intl/server";
-import NavigationConfig from "@/configs/navigation";
+import { getTranslations } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { routing } from "@/i18n/routing";
+import { notFound } from "next/navigation";
+import ThemeProvider from "@/components/theme/themeProvider";
+import { THEME_TYPES } from "@/@types/theme";
+
 import ReduxProvider from "@/lib/store/StoreProvider";
-import { NextIntlClientProvider, useMessages } from "next-intl";
+
 import { Toaster } from "@/components/ui/toaster";
 
-import { getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import Loading from "./loading";
 import { Suspense } from "react";
+import Loading from "./loading";
 
 export const fontSans = Quicksand({
   subsets: ["latin"], // You can specify which subsets to include
@@ -48,6 +49,7 @@ export async function generateMetadata({ params }: Omit<Props, "children">) {
 
 export default async function RootLayout({ children, params }: Props) {
   const { locale } = await params;
+
   // Enable static rendering
   // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
@@ -67,17 +69,18 @@ export default async function RootLayout({ children, params }: Props) {
           fontSans.variable
         )}
       >
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ReduxProvider>
-            <ThemeProvider
-              props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
-            >
+        <ReduxProvider>
+          <ThemeProvider
+            props={{ defaultTheme: THEME_TYPES.dark, attribute: "class" }}
+          >
+            {" "}
+            <NextIntlClientProvider locale={locale} messages={messages}>
               <Header />
               <Suspense fallback={<Loading />}>{children}</Suspense>
               <Toaster />
-            </ThemeProvider>
-          </ReduxProvider>
-        </NextIntlClientProvider>
+            </NextIntlClientProvider>
+          </ThemeProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

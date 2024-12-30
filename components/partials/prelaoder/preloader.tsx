@@ -43,15 +43,15 @@ const Preloader = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={{ opacity: 0.59, y: -10, filter: "blur(3.3px)" }}
-      transition={{ duration: 0.9, ease: "easeInOut" }}
+      initial={{ opacity: 0, filter: "blur(3.3px)" }}
+      animate={{ opacity: 1, filter: "blur(0px)" }}
+      exit={{ opacity: 0, filter: "blur(3.3px)" }}
+      transition={{ duration: 0.6, ease: "easeInOut" }}
       style={{
         height: `calc(100vh - ${headerHeight}px)`,
         top: `${headerHeight}px`,
       }}
-      className="fixed flex w-full backdrop-blur-sm  z-[1000000] left-0 flex-col items-center justify-center overflow-hidden"
+      className="fixed pointer-events-none flex w-full backdrop-blur-sm  left-0 flex-col items-center justify-center overflow-hidden"
     >
       <p className="z-10 whitespace-pre-wrap text-center text-md font-medium tracking-tighter text-white">
         {t("loading")}
