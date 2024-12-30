@@ -2,11 +2,9 @@ import axios from "axios";
 import { Link } from "@/i18n/routing";
 import { useEffect, useState } from "react";
 // models
-import { BlockObjectChild } from "@/@types/schema.notion";
 import { IMetadata } from "@/models/server-data/metadata";
 // configs
 import { API_PATH } from "@/configs/api";
-import { BookmarkBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import {
   Card,
   CardDescription,
@@ -16,23 +14,24 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import { LucideLink } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface Prop {
-  item: BookmarkBlockObjectResponse & BlockObjectChild;
+  url: string;
 }
 
-const NotionBookmark = ({ item }: Prop) => {
+const NotionBookmark = ({ url }: Prop) => {
   const [metadata, setMetadata] = useState<IMetadata>();
-
+  const locale = useLocale();
   useEffect(() => {
-    axios<IMetadata>(API_PATH.metaData(item.bookmark.url))
+    axios<IMetadata>(API_PATH.metaData(locale, url))
       .then((data) => {
         setMetadata(data.data);
       })
       .catch((err) => {
         console.error(err);
       });
-  }, [item.bookmark.url]);
+  }, [url]);
   return (
     <>
       {metadata && (
@@ -60,6 +59,7 @@ const NotionBookmark = ({ item }: Prop) => {
                 alt={metadata.title}
                 priority
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
           </Card>

@@ -16,6 +16,8 @@ const nextConfig = {
       "www.0xkishan.com",
       "lucide.dev",
       "repository-images.githubusercontent.com",
+      "images.unsplash.com",
+      "opengraph.githubassets.com",
     ],
   },
   sassOptions: {

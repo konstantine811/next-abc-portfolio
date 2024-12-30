@@ -5,6 +5,7 @@ export async function GET(req: Request, params: any) {
   const url = new URL(req.url);
   const searchParams = new URLSearchParams(url.searchParams).get("url");
 
+  console.log("THIS");
   if (!searchParams || typeof searchParams !== "string") {
     return new Response(JSON.stringify({ error: "URL is required" }), {
       status: 400,
@@ -13,7 +14,6 @@ export async function GET(req: Request, params: any) {
   try {
     const { data: html } = await axios.get(searchParams);
     const $ = load(html);
-
     // Extract metadata
     const title =
       $('meta[property="og:title"]').attr("content") || $("title").text();
@@ -32,6 +32,7 @@ export async function GET(req: Request, params: any) {
       },
     });
   } catch (error) {
+    console.log("ERORO", error);
     return new Response(JSON.stringify({ error: "Failed to fetch metadata" }), {
       status: 500,
       headers: {

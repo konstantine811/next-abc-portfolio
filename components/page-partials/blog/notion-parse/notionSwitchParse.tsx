@@ -143,8 +143,14 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                   return (
                     <hr key={item.id} className="border-t border-gray-600" />
                   );
+                case "link_preview":
+                  return (
+                    <NotionBookmark key={item.id} url={item.link_preview.url} />
+                  );
                 case "bookmark":
-                  return <NotionBookmark key={item.id} item={item} />;
+                  return (
+                    <NotionBookmark key={item.id} url={item.bookmark.url} />
+                  );
                 default:
                   console.warn("NotionSwitchParse: Unknown type", item);
                   return null;

@@ -1,4 +1,4 @@
 export const API_PATH = {
-  metaData: (url: string) =>
-    `/api/fetchMetadata?url=${encodeURIComponent(url)}`,
+  metaData: (locale: string, url: string) =>
+    `/${locale}/api/fetchMetadata?url=${encodeURIComponent(url)}`,
 };

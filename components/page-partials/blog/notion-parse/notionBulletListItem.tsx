@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 // components
 import NotionSwitchParse from "./notionSwitchParse";
 import NotionText from "./notionText";
+import NotionRichText from "./notionRichText";
 
 interface Prop {
   data: BulletedListItemBlockObjectResponse;
@@ -37,9 +38,11 @@ const NotionBulletListItem = ({ data, level = 0 }: Prop) => {
           `before:w-[6px] before:h-[6px] before:m-[6px] before:inline-block flex items-center ${getCircleLevelClass()}`
         )}
       >
-        {data.bulleted_list_item.rich_text.map((item, index) => {
-          return <NotionText key={`${data.id}_${index}`} data={item} />;
-        })}
+        <NotionRichText
+          color={data.bulleted_list_item.color}
+          as={"p"}
+          rich_text={data.bulleted_list_item.rich_text}
+        />
       </div>
       {data.has_children ? (
         <NotionSwitchParse

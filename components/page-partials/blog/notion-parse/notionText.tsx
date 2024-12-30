@@ -9,7 +9,9 @@ interface Prop {
 
 const NotionText = ({ data }: Prop) => {
   return (
-    <>{data.href ? <NotionLink data={data} /> : <p>{data.plain_text}</p>}</>
+    <>
+      {data.href ? <NotionLink data={data} /> : <span>{data.plain_text}</span>}
+    </>
   );
 };
 

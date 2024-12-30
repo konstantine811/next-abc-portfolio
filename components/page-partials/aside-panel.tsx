@@ -93,6 +93,12 @@ const AsidePanel = ({ className, data, style }: Prop) => {
 
   return (
     <div style={style} className={cn(`${className}`)}>
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="fixed w-full h-full left-0"
+        ></div>
+      )}
       <motion.div
         style={{
           top: `${headerHeight}px`,
@@ -109,7 +115,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
           <Button
             ref={btnRef}
             variant="outline"
-            className="absolute top-5"
+            className="absolute top-5 w-8 h-16"
             style={{
               right: `-${btnWidth}px`,
             }}
@@ -120,7 +126,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
               animate={isOpen ? "open" : "close"}
               variants={buttonOpenVariants}
             >
-              <ArrowBigLeft size={24} />
+              <ArrowBigLeft size={18} />
             </motion.span>
           </Button>
         )}

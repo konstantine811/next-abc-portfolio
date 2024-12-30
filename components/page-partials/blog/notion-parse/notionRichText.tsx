@@ -45,27 +45,28 @@ const NotionRichText = ({
       case "red":
         return "text-red-500";
       case "gray_background":
-        return "bg-gray-500 text-white px-1 rounded-sm";
+        return "bg-gray-500 border border-gray-400 text-white px-1 rounded-lg p-1";
       case "brown_background":
-        return "bg-orange-950 text-white px-1 rounded-sm";
+        return "bg-red-500 border border-red-400 text-white px-1 rounded-lg p-1";
       case "orange_background":
-        return "bg-orange-500 text-white px-1 rounded-sm";
+        return "bg-ore-500 text-white px-1 rounded-lg p-1";
       case "yellow_background":
-        return "bg-yellow-500 text-white px-1 rounded-sm";
+        return "bg-yellow-500 text-white px-1 rounded-lg p-1";
       case "green_background":
-        return "bg-green-500 text-white px-1 rounded-sm";
+        return "bg-green-500 text-white px-1 rounded-lg p-1";
       case "blue_background":
-        return "bg-blue-500 text-white px-1 rounded-sm";
+        return "bg-blue-500 text-white px-1 rounded-lg p-1";
       case "purple_background":
-        return "bg-purple-500 text-white px-1 rounded-sm";
+        return "bg-purple-400 border border-purple-500 text-white px-1 rounded-lg p-1";
       case "pink_background":
-        return "bg-pink-500 text-white px-1 rounded-sm";
+        return "bg-pink-500 text-white px-1 rounded-lg p-1";
       case "red_background":
-        return "bg-red-500 text-white px-1 rounded-sm";
+        return "bg-red-500 text-white px-1 rounded-lg p-1";
       default:
         return "";
     }
   }
+  console.log("data", rich_text);
   return (
     <TextWrapper className={className} as={as}>
       {rich_text.map((item, index) => {
@@ -79,14 +80,16 @@ const NotionRichText = ({
             key={index}
             href={item.href}
           >
-            {" "}
             {item.plain_text}
           </Link>
         ) : (
           <span
             className={`${
               item.annotations.bold ? "font-bold" : ""
-            } ${getColorByType(item.annotations.color)}`}
+            } ${getColorByType(item.annotations.color)} ${
+              item.annotations.code &&
+              "bg-indigo-500 border border-indigo-700 text-white font-bold px-2 rounded-lg py-0.5"
+            }`}
             key={index}
           >
             {(() => {

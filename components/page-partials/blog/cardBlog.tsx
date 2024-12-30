@@ -29,7 +29,7 @@ const BlogCard = ({ data }: Prop) => {
         <CardHeader
           className={cn(`mb-3 p-0 relative ${data.cover ? "min-h-32" : ""}`)}
         >
-          {data.cover ? (
+          {data.cover && (
             <Image
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -37,8 +37,6 @@ const BlogCard = ({ data }: Prop) => {
               src={data.cover}
               alt={data.title}
             />
-          ) : (
-            ""
           )}
         </CardHeader>
         <CardContent>

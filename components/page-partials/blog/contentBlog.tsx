@@ -24,7 +24,7 @@ const ContentBlog = ({ data, children }: Props) => {
         className="col-span-2 z-50"
         style={{ top: `${headerHeight}px` }}
       />
-      <div className="xl:col-span-7 col-span-12 xl:col-start-4 col-start-0 mt-8">
+      <div className="xl:col-span-7 col-span-12 xl:col-start-4 col-start-0">
         <MainContent className="flex flex-col gap-2">{children}</MainContent>
       </div>
     </>

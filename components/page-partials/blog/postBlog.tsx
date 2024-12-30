@@ -105,7 +105,7 @@ const PostBlog = ({ data: { page, post } }: Props) => {
 
       <div className={cn("flex gap-4 items-center w-full grow relative")}>
         <Button
-          className={cn("absolute left-0 max-md:-top-5")}
+          className={cn("absolute left-1 z-10 top-0")}
           onClick={() => router.back()}
           variant="outline"
           size="icon"

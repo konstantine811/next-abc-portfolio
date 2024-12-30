@@ -44,7 +44,7 @@ const NotionImage = ({ item }: Props) => {
           }
           onLoad={() => setIsLoaded(true)}
           alt={captionTitle === "" ? "Notion Image" : captionTitle}
-          className="rounded-2xl h-full overflow-hidden text-white"
+          className="rounded-2xl h-full overflow-hidden text-white object-contain"
         />
       </ResizableImage>
     </div>
