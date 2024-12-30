@@ -26,7 +26,7 @@ const NotionImage = ({ item }: Props) => {
       )}
       {!isLoaded && (
         <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-          <TextScramble className="font-mono text-3xl uppercase">
+          <TextScramble className="font-mono text-sm uppercase">
             {captionTitle === "" ? "Load Notion Image" : captionTitle}
           </TextScramble>
         </div>
