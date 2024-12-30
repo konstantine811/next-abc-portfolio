@@ -1,13 +1,19 @@
+"use client";
+
 import { BlockObjectChild } from "@/@types/schema.notion";
 import { Badge } from "@/components/ui/badge";
+import { TextScramble } from "@/components/ui/text-scramble";
 import { ImageBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import Image from "next/image";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import ResizableImage from "@/components/partials/resizabelImage";
 
 interface Props {
   item: ImageBlockObjectResponse & BlockObjectChild;
 }
 
 const NotionImage = ({ item }: Props) => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const captionTitle = item.image.caption.map((i) => i.plain_text).join(" ");
   return (
     <div className="m-auto w-full relative md:h-72 h-32  my-3">
@@ -18,18 +24,29 @@ const NotionImage = ({ item }: Props) => {
           </Badge>
         </div>
       )}
-      <Image
-        fill
-        src={
-          item.image.type === "external"
-            ? item.image.external.url
-            : item.image.file.url
-        }
-        alt={captionTitle}
-        className="rounded-2xl object-contain overflow-hidden"
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        priority
-      />
+      {!isLoaded && (
+        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
+          <TextScramble className="font-mono text-3xl uppercase">
+            {captionTitle === "" ? "Load Notion Image" : captionTitle}
+          </TextScramble>
+        </div>
+      )}
+
+      <ResizableImage>
+        <motion.img
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          src={
+            item.image.type === "external"
+              ? item.image.external.url
+              : item.image.file.url
+          }
+          onLoad={() => setIsLoaded(true)}
+          alt={captionTitle === "" ? "Notion Image" : captionTitle}
+          className="rounded-2xl h-full overflow-hidden text-white"
+        />
+      </ResizableImage>
     </div>
   );
 };
