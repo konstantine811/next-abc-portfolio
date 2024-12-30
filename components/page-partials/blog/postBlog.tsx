@@ -64,15 +64,18 @@ const PostBlog = ({ data: { page, post } }: Props) => {
   const router = useRouter();
   const locale = useLocale();
   const [play, { stop }] = useSound("/sounds/whoosh3.wav", {
-    volume: 0.2,
+    volume: 0.1,
     forceSoundEnabled: true,
+    sprite: {
+      first: [100, 15000],
+    },
   });
   const { isSfxEnabled } = useAppSelector(
     (state: RootState) => state.uiStateReducer
   );
   useEffect(() => {
     if (isSfxEnabled) {
-      play();
+      play({ id: "first" });
     }
     return () => stop();
   }, [play, isSfxEnabled]);
