@@ -8,14 +8,18 @@ import Ripple from "@/components/ui/ripple";
 import useSound from "use-sound";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 const Preloader = () => {
   const t = useTranslations("Common");
+  const { isSfxEnabled } = useSelector(
+    (state: RootState) => state.uiStateReducer
+  );
   const [play, { stop, sound }] = useSound("/sounds/pulse.wav", {
     volume: 0.4,
     loop: true,
   });
-  const [isPlaying, setIsPlaying] = useState(false);
   const headerHeight = useAppSelector(
     (state) => state.uiStateReducer.headerHeight
   );
@@ -30,14 +34,15 @@ const Preloader = () => {
         } else {
           clearInterval(fadeOutInterval);
           stop(); // Зупиняємо звук
-          setIsPlaying(false);
         }
       }, 100); // Затримка для плавності (100 мс)
     }
   };
 
   useEffect(() => {
-    play();
+    if (isSfxEnabled) {
+      play();
+    }
     return () => stopWithFade();
   }, [play, stopWithFade]);
 

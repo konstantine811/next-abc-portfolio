@@ -4,12 +4,14 @@ interface InitialState {
   headerHeight: number;
   screenWidth: number;
   screenHeight: number;
+  isSfxEnabled: boolean;
 }
 
 const initialState: InitialState = {
   headerHeight: 0,
   screenWidth: 0,
   screenHeight: 0,
+  isSfxEnabled: true,
 };
 
 export const uiState = createSlice({
@@ -26,8 +28,11 @@ export const uiState = createSlice({
       state.screenWidth = action.payload.width;
       state.screenHeight = action.payload.height;
     },
+    onSfxEnabled(state, action: PayloadAction<boolean>) {
+      state.isSfxEnabled = action.payload;
+    },
   },
 });
 
-export const { onHeaderHeight, onScreenSize } = uiState.actions;
+export const { onHeaderHeight, onScreenSize, onSfxEnabled } = uiState.actions;
 export default uiState.reducer;

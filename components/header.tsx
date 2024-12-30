@@ -19,6 +19,7 @@ import { RootState } from "@/lib/store/store";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import MobileMenu from "./navigation-menu/mobileMenu";
 import { Link } from "@/i18n/routing";
+import SoundToggler from "./partials/soundToggler";
 
 const Header = () => {
   const refHeader = useRef<HTMLDivElement>(null);
@@ -70,6 +71,7 @@ const Header = () => {
             "flex items-center justify-between space-x-2 md:justify-end gap-2"
           )}
         >
+          <SoundToggler />
           <ThemeToggler />
           <LocaleSwitcherSelect />
           {screenWidth < DEVICE_SIZES.TABLET && (

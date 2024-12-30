@@ -17,6 +17,8 @@ import NotionBookmark from "./notionBookmark";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import useSound from "use-sound";
+import { RootState } from "@/lib/store/store";
+import { useAppSelector } from "@/lib/store/hooks";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -24,6 +26,9 @@ interface Prop {
 }
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
+  const { isSfxEnabled } = useAppSelector(
+    (state: RootState) => state.uiStateReducer
+  );
   const [play] = useSound("/sounds/whoosh2.wav", {
     volume: 0.005,
     playbackRate: 1,
@@ -47,13 +52,15 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
             transition={{ duration: 0.9, ease: "easeInOut" }}
             viewport={{ margin: "-100px 0px 100px 0px" }}
             onViewportEnter={() => {
-              if (!isPlayed) {
-                play({ id: "first" });
+              if (isSfxEnabled) {
+                if (!isPlayed) {
+                  play({ id: "first" });
+                }
+                setIsPlayed(true);
+                setTimeout(() => {
+                  setIsPlayed(false);
+                }, 1333);
               }
-              setIsPlayed(true);
-              setTimeout(() => {
-                setIsPlayed(false);
-              }, 1333);
             }}
           >
             {(() => {
@@ -81,6 +88,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                     <NotionRichText
                       key={item.id}
                       as={"h2"}
+                      typeAnimation="particle-bg"
                       rich_text={item.heading_1.rich_text}
                       color={item.heading_1.color}
                       className="text-4xl font-bold mb-2 md:mt-20 mt-5"

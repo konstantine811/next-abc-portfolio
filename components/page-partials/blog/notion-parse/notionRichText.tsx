@@ -7,13 +7,14 @@ import { NotionTextColor } from "@/@types/schema.notion";
 import { Link } from "@/i18n/routing";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextScramble } from "@/components/ui/text-scramble";
+import Particles from "@/components/ui/particles";
 
 interface NotionRichTextProps {
   rich_text: RichTextItemResponse[];
   color: string;
   as: ElementType;
   className?: string;
-  typeAnimation?: "shimmer" | "scramble";
+  typeAnimation?: "shimmer" | "scramble" | "particle-bg";
 }
 
 const NotionRichText = ({
@@ -106,6 +107,19 @@ const NotionRichText = ({
                       {item.plain_text}
                     </TextScramble>
                   );
+                case "particle-bg":
+                  <div className="relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl">
+                    <span className="pointer-events-none z-10 whitespace-pre-wrap text-center text-8xl font-semibold leading-none">
+                      {item.plain_text}
+                    </span>
+                    <Particles
+                      className="absolute inset-0 z-0"
+                      quantity={100}
+                      ease={80}
+                      color={color}
+                      refresh
+                    />
+                  </div>;
                 default:
                   return item.plain_text;
               }

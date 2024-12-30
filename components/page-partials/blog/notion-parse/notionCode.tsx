@@ -10,6 +10,8 @@ import NoiseGrid from "@/components/page-partials/common/noise-grid";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import dark from "react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark";
 import useSound from "use-sound";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 interface Prop {
   item: CodeBlockObjectResponse & BlockObjectChild;
@@ -18,6 +20,9 @@ interface Prop {
 }
 
 const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
+  const { isSfxEnabled } = useSelector(
+    (state: RootState) => state.uiStateReducer
+  );
   const [play] = useSound("/sounds/event-click2.wav", {
     volume: 0.1,
     sprite: {
@@ -32,7 +37,7 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
     .join("");
 
   useEffect(() => {
-    if (isCopied) {
+    if (isCopied && isSfxEnabled) {
       play({ id: "first" });
     }
   }, [isCopied, play]);
