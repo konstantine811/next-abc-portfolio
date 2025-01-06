@@ -51,7 +51,12 @@ const ResizableImage = ({ children }: { children: ReactNode }) => {
         onOpenChange={setIsOpen}
       >
         <DialogContent className="h-[calc(70vh)] w-auto bg-white p-6 dark:bg-zinc-900 focus-visible:outline-none focus:outline-none justify-center">
-          <div onClick={() => setIsOpen(false)}>{children}</div>
+          <div
+            className="flex items-center justify-center"
+            onClick={() => setIsOpen(false)}
+          >
+            {children}
+          </div>
         </DialogContent>
       </Dialog>
     </>

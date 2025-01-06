@@ -58,12 +58,18 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
     <NoiseGrid opacity={0.133333}>
       <div className="w-full border overflow-hidden relative">
         <div className="relative h-4">
-          <Badge
-            className="absolute shadow-gray-600 shadow-sm"
-            variant="outline"
-          >
-            {item.code.language}
-          </Badge>
+          <div className="absolute flex flex-wrap gap-2 left-0 top-0 items-center">
+            {item.code.caption.length > 0 && (
+              <Badge className="shadow-gray-600 shadow-sm" variant="secondary">
+                {item.code.caption.map((i) => i.plain_text).join(" ")}
+              </Badge>
+            )}
+            {item.code.caption.length === 0 && (
+              <Badge className="shadow-gray-600 shadow-sm" variant="outline">
+                {item.code.language}
+              </Badge>
+            )}
+          </div>
         </div>
         <div className="code-highlighter p-8">
           <SyntaxHighlighter lang={item.code.language} style={dark}>

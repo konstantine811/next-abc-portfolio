@@ -14,12 +14,16 @@ interface Props {
 
 const NotionImage = ({ item }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  console.log("item", item);
   const captionTitle = item.image.caption.map((i) => i.plain_text).join(" ");
   return (
-    <div className="m-auto w-full relative md:h-72 h-32  my-3">
+    <div className="m-auto w-full relative md:h-72 h-32">
       {captionTitle && (
         <div className="relative mt-10 flex justify-center">
-          <Badge className="absolute-top-5 shadow-sm" variant="destructive">
+          <Badge
+            className="absolute-top-5 shadow-sm bg-indigo-700 border border-indigo-950"
+            variant="outline"
+          >
             {captionTitle}
           </Badge>
         </div>

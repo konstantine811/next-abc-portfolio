@@ -45,6 +45,12 @@ export function NavigationHeaderMenu({
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                     {item.children.map((itemCh) => {
+                      if (
+                        itemCh.isDev &&
+                        process.env.NODE_ENV !== "development"
+                      ) {
+                        return null;
+                      }
                       const concatHref = item.href + itemCh.href;
                       const isActive = pathname.startsWith(concatHref);
                       return (

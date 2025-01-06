@@ -8,6 +8,7 @@ import { Link } from "@/i18n/routing";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextScramble } from "@/components/ui/text-scramble";
 import Particles from "@/components/ui/particles";
+import { cn } from "@/lib/utils";
 
 interface NotionRichTextProps {
   rich_text: RichTextItemResponse[];
@@ -24,6 +25,7 @@ const NotionRichText = ({
   className,
   typeAnimation,
 }: NotionRichTextProps) => {
+  const additioanlBgClass = "text-white rounded-md py-0.5 px-2";
   function getColorByType(color: NotionTextColor) {
     switch (color) {
       case "gray":
@@ -45,28 +47,27 @@ const NotionRichText = ({
       case "red":
         return "text-red-500";
       case "gray_background":
-        return "bg-gray-500 border border-gray-400 text-white px-1 rounded-lg p-1";
+        return `bg-gray-500 border border-gray-400 ${additioanlBgClass}`;
       case "brown_background":
-        return "bg-red-500 border border-red-400 text-white px-1 rounded-lg p-1";
+        return `bg-red-500 border border-red-400 ${additioanlBgClass}`;
       case "orange_background":
-        return "bg-ore-500 text-white px-1 rounded-lg p-1";
+        return `bg-orange-500 border border-orange-400 ${additioanlBgClass}`;
       case "yellow_background":
-        return "bg-yellow-500 text-white px-1 rounded-lg p-1";
+        return `bg-yellow-500 border border-yellow-400 ${additioanlBgClass}`;
       case "green_background":
-        return "bg-green-500 text-white px-1 rounded-lg p-1";
+        return `bg-green-500 border border-green-400 ${additioanlBgClass}`;
       case "blue_background":
-        return "bg-blue-500 text-white px-1 rounded-lg p-1";
+        return `bg-indigo-600 border border-indigo-400 ${additioanlBgClass}`;
       case "purple_background":
-        return "bg-purple-400 border border-purple-500 text-white px-1 rounded-lg p-1";
+        return `bg-purple-400 border border-purple-500 ${additioanlBgClass}`;
       case "pink_background":
-        return "bg-pink-500 text-white px-1 rounded-lg p-1";
+        return `bg-pink-500 border border-pink-400 ${additioanlBgClass}`;
       case "red_background":
-        return "bg-red-500 text-white px-1 rounded-lg p-1";
+        return `bg-red-500 border border-red-400 ${additioanlBgClass}`;
       default:
         return "";
     }
   }
-  console.log("data", rich_text);
   return (
     <TextWrapper className={className} as={as}>
       {rich_text.map((item, index) => {
@@ -79,17 +80,20 @@ const NotionRichText = ({
             )} underline underline-offset-4`}
             key={index}
             href={item.href}
+            target="_blank"
           >
             {item.plain_text}
           </Link>
         ) : (
           <span
-            className={`${
-              item.annotations.bold ? "font-bold" : ""
-            } ${getColorByType(item.annotations.color)} ${
-              item.annotations.code &&
-              "bg-indigo-500 border border-indigo-700 text-white font-bold px-2 rounded-lg py-0.5"
-            }`}
+            className={`${cn(
+              `${item.annotations.bold ? "font-bold" : ""} ${getColorByType(
+                item.annotations.color
+              )} ${
+                item.annotations.code &&
+                "bg-indigo-500 border border-indigo-700 text-white font-bold px-2 rounded-lg py-0.5"
+              }`
+            )}`}
             key={index}
           >
             {(() => {

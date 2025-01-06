@@ -16,9 +16,6 @@ import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/
 import NotionBookmark from "./notionBookmark";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import useSound from "use-sound";
-import { RootState } from "@/lib/store/store";
-import { useAppSelector } from "@/lib/store/hooks";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -26,18 +23,6 @@ interface Prop {
 }
 
 const NotionSwitchParse = ({ post, level }: Prop) => {
-  const { isSfxEnabled } = useAppSelector(
-    (state: RootState) => state.uiStateReducer
-  );
-  const [play] = useSound("/sounds/whoosh2.wav", {
-    volume: 0.005,
-    playbackRate: 1,
-    sprite: {
-      first: [0, 15000],
-    },
-    forceSoundEnabled: true,
-  });
-  const [isPlayed, setIsPlayed] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
   const numberCacheList: (NumberedListItemBlockObjectResponse &
     BlockObjectChild)[] = [];
@@ -51,17 +36,6 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.9, ease: "easeInOut" }}
             viewport={{ margin: "-100px 0px 100px 0px" }}
-            onViewportEnter={() => {
-              if (isSfxEnabled) {
-                if (!isPlayed) {
-                  play({ id: "first" });
-                }
-                setIsPlayed(true);
-                setTimeout(() => {
-                  setIsPlayed(false);
-                }, 1333);
-              }
-            }}
           >
             {(() => {
               switch (item.type) {

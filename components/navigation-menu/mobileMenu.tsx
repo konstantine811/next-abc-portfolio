@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Link } from "@/i18n/routing";
-import { useParams, usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 // utils
 import { cn } from "@/lib/utils";
 import { navigationMenuTriggerStyle } from "../ui/navigation-menu";
@@ -26,6 +25,7 @@ import Logo from "../own-brand/logo";
 import BurgerMenu from "@/components/partials/burgerMenu";
 // configs
 import { INaviagationConfig } from "@/configs/navigation";
+import { useParams } from "next/navigation";
 
 interface Props {
   navConfig: INaviagationConfig[];
@@ -78,12 +78,21 @@ const MobileMenu = ({ navConfig }: Props) => {
             type="single"
           >
             {navConfig.map((item, index) => {
+              if (item.isDev && process.env.NODE_ENV !== "development") {
+                return null;
+              }
               if (item.children && item.children.length) {
                 return (
                   <AccordionItem key={index} value={item.title}>
                     <AccordionTrigger>{item.title}</AccordionTrigger>
                     <AccordionContent className="flex flex-col">
                       {item.children.map((itemCh) => {
+                        if (
+                          itemCh.isDev &&
+                          process.env.NODE_ENV !== "development"
+                        ) {
+                          return null;
+                        }
                         const concatHref = item.href + itemCh.href;
                         const isActive = pathname.startsWith(concatHref);
                         return (
