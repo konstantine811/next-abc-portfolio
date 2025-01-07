@@ -16,7 +16,7 @@ const NotionImage = ({ item }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const captionTitle = item.image.caption.map((i) => i.plain_text).join(" ");
   return (
-    <div className="m-auto w-full relative md:h-72 h-32 my-10">
+    <div className="m-auto h-full w-full relative my-10">
       {captionTitle && (
         <div className="relative flex justify-center">
           <Badge
@@ -47,7 +47,7 @@ const NotionImage = ({ item }: Props) => {
           }
           onLoad={() => setIsLoaded(true)}
           alt={captionTitle === "" ? "Notion Image" : captionTitle}
-          className="rounded-2xl h-full overflow-hidden object-contain"
+          className="rounded-2xl w-full overflow-hidden object-contain"
         />
       </ResizableImage>
     </div>

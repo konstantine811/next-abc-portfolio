@@ -39,7 +39,7 @@ const ResizableImage = ({ children }: { children: ReactNode }) => {
   return (
     <>
       <div
-        className="h-full flex justify-center items-center relative z-50"
+        className="flex justify-center items-center relative z-50"
         onClick={() => setIsOpen(true)}
       >
         {children}

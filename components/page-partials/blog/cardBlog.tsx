@@ -22,7 +22,10 @@ type Prop = {
 
 const BlogCard = ({ data }: Prop) => {
   return (
-    <Link href={getPathName(data.id)}>
+    <Link
+      href={getPathName(data.id)}
+      className="hover:shadow-lg hover:shadow-foreground/10 hover:-translate-y-1 block transition-all"
+    >
       <Card
         className={cn("flex flex-col justify-center overflow-hidden w-full")}
       >
