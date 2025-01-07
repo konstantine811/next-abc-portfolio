@@ -1,14 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent } from "../ui/dialog";
 import { Transition, Variants } from "framer-motion";
 
 const customVariants: Variants = {
@@ -50,9 +43,9 @@ const ResizableImage = ({ children }: { children: ReactNode }) => {
         open={isOpen}
         onOpenChange={setIsOpen}
       >
-        <DialogContent className="h-[calc(70vh)] w-auto bg-white p-6 dark:bg-zinc-900 focus-visible:outline-none focus:outline-none justify-center">
+        <DialogContent className="h-[calc(90vh)] w-auto bg-white p-6 dark:bg-zinc-900 focus-visible:outline-none focus:outline-none justify-center">
           <div
-            className="flex items-center justify-center"
+            className="flex items-center justify-center h-full"
             onClick={() => setIsOpen(false)}
           >
             {children}

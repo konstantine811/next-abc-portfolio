@@ -24,7 +24,7 @@ const BlogCard = ({ data }: Prop) => {
   return (
     <Link
       href={getPathName(data.id)}
-      className="hover:shadow-lg hover:shadow-foreground/10 hover:-translate-y-1 block transition-all"
+      className="hover:shadow-lg hover:shadow-foreground/10 hover:scale-105 block transition-all duration-500"
     >
       <Card
         className={cn("flex flex-col justify-center overflow-hidden w-full")}
