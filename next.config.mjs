@@ -18,6 +18,7 @@ const nextConfig = {
       "repository-images.githubusercontent.com",
       "images.unsplash.com",
       "opengraph.githubassets.com",
+      "github.com",
     ],
   },
   sassOptions: {
