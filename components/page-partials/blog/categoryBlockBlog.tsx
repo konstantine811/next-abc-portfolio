@@ -10,6 +10,7 @@ import { BlogPost } from "@/@types/schema.notion";
 import { Separator } from "@/components/ui/separator";
 import BlogCard from "./cardBlog";
 import { useAppSelector } from "@/lib/store/hooks";
+import { orderBlogPost } from "@/utils/blog.utils";
 
 interface Prop {}
 
@@ -73,7 +74,7 @@ const CategoryBlockBlog = ({}: Prop) => {
               initial="hidden"
               animate="visible"
             >
-              {posts.map((post: BlogPost, i) => (
+              {orderBlogPost(posts).map((post: BlogPost, i) => (
                 <motion.div key={i} variants={itemVariants}>
                   <BlogCard data={post} />
                 </motion.div>

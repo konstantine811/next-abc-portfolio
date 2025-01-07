@@ -9,6 +9,8 @@ import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextScramble } from "@/components/ui/text-scramble";
 import Particles from "@/components/ui/particles";
 import { cn } from "@/lib/utils";
+import { PATH_ROUTE_NAME } from "@/configs/navigation";
+import { getPathName } from "@/utils/blog.utils";
 
 interface NotionRichTextProps {
   rich_text: RichTextItemResponse[];
@@ -79,8 +81,10 @@ const NotionRichText = ({
               item.annotations.color
             )} underline underline-offset-4`}
             key={index}
-            href={item.href}
-            target="_blank"
+            href={
+              item.href.startsWith("http") ? item.href : getPathName(item.href)
+            }
+            target={item.href.startsWith("http") ? "_blank" : "_self"}
           >
             {item.plain_text}
           </Link>

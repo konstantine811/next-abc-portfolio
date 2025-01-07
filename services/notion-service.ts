@@ -105,7 +105,7 @@ export default class NotionService {
   private pageToPostTransformer(page: any): BlogPost {
     let cover = page.cover;
     switch (cover?.type) {
-      case "flie":
+      case "file":
         cover = page.cover.file;
         break;
       case "external":
@@ -121,6 +121,7 @@ export default class NotionService {
       category: page.properties.Category.select,
       langLink: page.properties.langLink.relation[0]?.id,
       lang: page.properties.lang.select.name,
+      order: page.properties.Order.number || 0,
     };
   }
 }

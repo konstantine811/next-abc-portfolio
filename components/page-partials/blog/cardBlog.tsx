@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 // utils
-import { getPathName } from "@/utils/blog-path";
+import { getPathName } from "@/utils/blog.utils";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/routing";
 

@@ -13,6 +13,7 @@ export interface BlogPost {
   category: Tag;
   lang: string;
   langLink: string;
+  order: number;
 }
 
 export interface PostPage {

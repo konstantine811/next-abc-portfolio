@@ -19,7 +19,7 @@ import { onFilteredBlogPost } from "@/lib/store/features/blog-post-state.slice";
 // models
 import { BlogPostEntity } from "@/@types/schema.notion";
 // configs
-import { getPathName } from "@/utils/blog-path";
+import { getPathName, orderBlogPost } from "@/utils/blog.utils";
 import CategoryTabWrap from "./blog/categoryTabWrap";
 import { DEVICE_SIZES } from "@/configs/responsive";
 import { EASING_ANIMATION } from "@/configs/animations";
@@ -90,7 +90,6 @@ const AsidePanel = ({ className, data, style }: Prop) => {
   if (!mounted) {
     return;
   }
-
   return (
     <div style={style} className={cn(`${className}`)}>
       {isOpen && (
@@ -148,7 +147,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
               <AccordionItem className="px-5 xl:px-2" key={key} value={key}>
                 <AccordionTrigger>{key}</AccordionTrigger>
                 <AccordionContent>
-                  {items?.map((post) => {
+                  {orderBlogPost(items).map((post) => {
                     return (
                       <Button
                         className={cn(

@@ -14,7 +14,6 @@ interface Props {
 
 const NotionImage = ({ item }: Props) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  console.log("item", item);
   const captionTitle = item.image.caption.map((i) => i.plain_text).join(" ");
   return (
     <div className="m-auto w-full relative md:h-72 h-32 my-10">
@@ -48,7 +47,7 @@ const NotionImage = ({ item }: Props) => {
           }
           onLoad={() => setIsLoaded(true)}
           alt={captionTitle === "" ? "Notion Image" : captionTitle}
-          className="rounded-2xl h-full overflow-hidden text-white object-contain"
+          className="rounded-2xl h-full overflow-hidden object-contain"
         />
       </ResizableImage>
     </div>
