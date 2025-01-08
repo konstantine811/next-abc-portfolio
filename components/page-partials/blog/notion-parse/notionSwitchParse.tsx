@@ -27,7 +27,7 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
   const numberCacheList: (NumberedListItemBlockObjectResponse &
     BlockObjectChild)[] = [];
   return (
-    <div className="pb-20">
+    <div className={`${level ? "" : "pb-20"}`}>
       {post?.map((item: BlockObjectChildResponse, index) => {
         return (
           <motion.div
@@ -104,14 +104,25 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                 case "table":
                   return <NotionTable key={item.id} item={item} />;
                 case "numbered_list_item":
-                  if (post[index + 1]?.type === "numbered_list_item") {
-                    numberCacheList.push(item);
-                    return null;
-                  } else {
-                    numberCacheList.push(item);
+                  numberCacheList.push(item);
+                  // Перевіряємо, чи наступний елемент відмінний від numbered_list_item або закінчився масив
+                  if (
+                    !post[index + 1] ||
+                    post[index + 1].type !== "numbered_list_item"
+                  ) {
+                    // Копіюємо накопичені елементи для рендерингу
+                    const itemsToRender = [...numberCacheList];
+                    // Очищаємо кеш для наступної групи
+                    numberCacheList.length = 0;
                     return (
-                      <NotionParseItem key={item.id} items={numberCacheList} />
+                      <NotionParseItem
+                        key={item.id}
+                        items={itemsToRender}
+                        level={level || 0}
+                      />
                     );
+                  } else {
+                    return null;
                   }
                 case "divider":
                   return (

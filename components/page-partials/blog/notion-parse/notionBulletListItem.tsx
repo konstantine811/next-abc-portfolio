@@ -7,7 +7,6 @@ import { BlockObjectChildResponse } from "@/@types/schema.notion";
 import { cn } from "@/lib/utils";
 // components
 import NotionSwitchParse from "./notionSwitchParse";
-import NotionText from "./notionText";
 import NotionRichText from "./notionRichText";
 
 interface Prop {
