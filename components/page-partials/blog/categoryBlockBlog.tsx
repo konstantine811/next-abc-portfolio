@@ -19,7 +19,7 @@ const CategoryBlockBlog = ({}: Prop) => {
   const data = useAppSelector(
     (state) => state.blogPostStateReducer.filteredBlogPost
   );
-
+  console.log("data", data);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -39,7 +39,7 @@ const CategoryBlockBlog = ({}: Prop) => {
 
       transition: {
         staggerChildren: 0.01, // Затримка між анімаціями дочірніх елементів
-        duration: 0.9,
+        duration: 0.3,
       },
     },
   };
@@ -49,7 +49,7 @@ const CategoryBlockBlog = ({}: Prop) => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, staggerChildren: 3.1 },
+      transition: { duration: 0.3 },
     },
   };
 

@@ -1,5 +1,4 @@
 "use client";
-
 import { BlogPost } from "@/@types/schema.notion";
 import {
   Card,

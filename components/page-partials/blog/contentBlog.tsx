@@ -13,6 +13,7 @@ interface Props {
   data: BlogPostEntity;
   children: ReactNode;
 }
+
 const ContentBlog = ({ data, children }: Props) => {
   const { headerHeight } = useSelector(
     (state: RootState) => state.uiStateReducer

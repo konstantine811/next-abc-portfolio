@@ -19,6 +19,7 @@ const nextConfig = {
       "images.unsplash.com",
       "opengraph.githubassets.com",
       "github.com",
+      "redux.js.org",
     ],
   },
   sassOptions: {
