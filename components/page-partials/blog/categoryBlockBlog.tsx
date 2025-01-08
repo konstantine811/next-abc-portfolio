@@ -19,7 +19,6 @@ const CategoryBlockBlog = ({}: Prop) => {
   const data = useAppSelector(
     (state) => state.blogPostStateReducer.filteredBlogPost
   );
-  console.log("data", data);
   useEffect(() => {
     setMounted(true);
   }, []);
