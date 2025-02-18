@@ -20,6 +20,9 @@ const nextConfig = {
       "opengraph.githubassets.com",
       "github.com",
       "redux.js.org",
+      "preview.redd.it",
+      "i.ytimg.com",
+      "www.youtube.com",
     ],
   },
   sassOptions: {

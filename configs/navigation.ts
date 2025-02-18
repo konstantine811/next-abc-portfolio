@@ -17,6 +17,7 @@ export enum PATH_ROUTE_NAME {
   fourthScene = "/fourth-scene",
   fifthScene = "/fifth-scene",
   sixthScene = "/sixth-scene",
+  simCityGame = "/sim-city-game",
   seventhScene = "/seventh-scene",
   maps = "/maps",
   leko = "/leko",
@@ -65,6 +66,10 @@ const NavigationConfig = (): INaviagationConfig[] => {
         {
           title: t("nav.three-train.seventh-scene"),
           href: PATH_ROUTE_NAME.seventhScene,
+        },
+        {
+          title: t("nav.three-train.sim-city-game"),
+          href: PATH_ROUTE_NAME.simCityGame,
         },
       ],
     },

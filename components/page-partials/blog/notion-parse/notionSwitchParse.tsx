@@ -16,6 +16,7 @@ import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/
 import NotionBookmark from "./notionBookmark";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import NotionVideo from "./notionVideo";
 
 interface Prop {
   post: BlockObjectChildResponse[];
@@ -101,6 +102,8 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                   );
                 case "image":
                   return <NotionImage key={item.id} item={item} />;
+                case "video":
+                  return <NotionVideo key={item.id} items={item} />;
                 case "table":
                   return <NotionTable key={item.id} item={item} />;
                 case "numbered_list_item":
