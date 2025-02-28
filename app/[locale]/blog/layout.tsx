@@ -25,9 +25,7 @@ const BlogLayout = async ({ children, params }: Props) => {
   }
   return (
     <MainContainer className="grid grid-cols-12 gap-6 justify-center">
-      <Suspense fallback={<Loading />}>
-        <ContentBlog data={categoryPosts}>{children}</ContentBlog>
-      </Suspense>
+      <ContentBlog data={categoryPosts}>{children}</ContentBlog>
     </MainContainer>
   );
 };

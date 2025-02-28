@@ -1,6 +1,7 @@
 "use client";
+import Loading from "@/app/[locale]/loading";
 import { useAppSelector } from "@/lib/store/hooks";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 type Props = {
   children: React.ReactNode;
@@ -20,12 +21,14 @@ const MainWrapper = ({ children, className }: Props) => {
     return null;
   }
   return (
-    <div
-      className={className}
-      style={{ height: `calc(100vh - ${headerHeight}px)` }}
-    >
-      {children}
-    </div>
+    <Suspense fallback={<Loading />}>
+      <div
+        className={className}
+        style={{ height: `calc(100vh - ${headerHeight}px)` }}
+      >
+        {children}
+      </div>
+    </Suspense>
   );
 };
 

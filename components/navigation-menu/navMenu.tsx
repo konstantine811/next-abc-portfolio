@@ -76,7 +76,7 @@ export function NavigationHeaderMenu({
             const isActive =
               pathname === item.href || pathname === `${item.href}/${slug}`;
             return (
-              <NavigationMenuItem key={item.title} asChild>
+              <NavigationMenuItem className="!m-0" key={item.title} asChild>
                 <Link
                   href={{ pathname: item.href }}
                   className={`${navigationMenuTriggerStyle()} bg-transparent ${
@@ -100,12 +100,12 @@ const ListItem = forwardRef<ElementRef<"a">, ComponentPropsWithoutRef<"a">>(
       <li>
         <NavigationMenuLink asChild>
           <Link
+            href={href ? href : "/"}
             ref={ref}
             className={cn(
               "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground bg-transparent",
               className
             )}
-            href={href ? href : "/"}
           >
             <div className="text-sm font-medium leading-none">{title}</div>
           </Link>

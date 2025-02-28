@@ -15,7 +15,7 @@ const BlogPostIdPage = async ({
     console.error(e);
   }
 
-  return data ? <PostBlog data={data} /> : "";
+  return data && <PostBlog data={data} />;
 };
 
 export default BlogPostIdPage;

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { CodeBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 // types
 import { BlockObjectChild } from "@/@types/schema.notion";
@@ -9,9 +9,12 @@ import { Button } from "@/components/ui/button";
 import NoiseGrid from "@/components/page-partials/common/noise-grid";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import dark from "react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark";
+import light from "react-syntax-highlighter/dist/esm/styles/hljs/atom-one-light";
 import useSound from "use-sound";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { useTheme } from "next-themes";
+import { THEME_TYPES } from "@/@types/theme";
 
 interface Prop {
   item: CodeBlockObjectResponse & BlockObjectChild;
@@ -23,6 +26,8 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
   const { isSfxEnabled } = useSelector(
     (state: RootState) => state.uiStateReducer
   );
+  const { theme } = useTheme();
+  const codeStyle = theme === THEME_TYPES.dark ? dark : light;
   const [play] = useSound("/sounds/event-click2.wav", {
     volume: 0.1,
     sprite: {
@@ -72,7 +77,7 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
           </div>
         </div>
         <div className="code-highlighter p-8">
-          <SyntaxHighlighter lang={item.code.language} style={dark}>
+          <SyntaxHighlighter lang={item.code.language} style={codeStyle}>
             {codeString}
           </SyntaxHighlighter>
         </div>

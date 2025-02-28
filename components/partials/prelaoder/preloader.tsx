@@ -6,10 +6,11 @@ import { motion } from "framer-motion";
 
 import Ripple from "@/components/ui/ripple";
 import useSound from "use-sound";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { TextScramble } from "@/components/ui/text-scramble";
 
 const Preloader = () => {
   const t = useTranslations("Common");
@@ -24,7 +25,7 @@ const Preloader = () => {
     (state) => state.uiStateReducer.headerHeight
   );
 
-  const stopWithFade = () => {
+  const stopWithFade = useCallback(() => {
     if (sound) {
       let currentVolume = sound.volume();
       const fadeOutInterval = setInterval(() => {
@@ -37,14 +38,14 @@ const Preloader = () => {
         }
       }, 100); // Затримка для плавності (100 мс)
     }
-  };
+  }, [sound, stop]);
 
   useEffect(() => {
     if (isSfxEnabled) {
       play();
     }
     return () => stopWithFade();
-  }, [play, stopWithFade]);
+  }, [play, stopWithFade, isSfxEnabled]);
 
   return (
     <motion.div
@@ -56,11 +57,16 @@ const Preloader = () => {
         height: `calc(100vh - ${headerHeight}px)`,
         top: `${headerHeight}px`,
       }}
-      className="fixed pointer-events-none flex w-full backdrop-blur-sm  left-0 flex-col items-center justify-center overflow-hidden"
+      className="absolute z-[1000] pointer-events-none flex w-full backdrop-blur-sm  left-0 flex-col items-center justify-center overflow-auto"
     >
-      <p className="z-10 whitespace-pre-wrap text-center text-md font-medium tracking-tighter text-white">
+      <TextScramble
+        className="z-10 opacity-25 whitespace-pre-wrap text-center text-md font-medium tracking-tighter text-foreground"
+        duration={1.2}
+        characterSet=". "
+      >
         {t("loading")}
-      </p>
+      </TextScramble>
+
       <Ripple />
     </motion.div>
   );

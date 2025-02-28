@@ -1,12 +1,14 @@
 "use client";
 
+import CustomOrbitControls from "@/components/three-scenes/customOrbitControls";
 import MainWrapper from "@/components/wrapper/main-wrapper";
 import { Canvas } from "@react-three/fiber";
 
 const SimCityGamePage = () => {
   return (
     <MainWrapper>
-      <Canvas shadows camera={{ position: [0, 6, 6], fov: 60 }}>
+      <Canvas shadows camera={{ fov: 60 }}>
+        <CustomOrbitControls />
         <ambientLight intensity={1} />
         <mesh>
           <boxGeometry args={[1, 1, 1]} />

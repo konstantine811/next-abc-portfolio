@@ -20,7 +20,7 @@ const NotionImage = ({ item }: Props) => {
       {captionTitle && (
         <div className="relative flex justify-center">
           <Badge
-            className="absolute-top-5 shadow-sm bg-indigo-700 border border-indigo-950"
+            className="absolute-top-5 shadow-sm bg-indigo-700 border border-indigo-950 text-white"
             variant="outline"
           >
             {captionTitle}
