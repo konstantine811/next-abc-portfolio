@@ -852,7 +852,7 @@ const Controller: ForwardRefRenderFunction<
     _: number,
     run: boolean,
     slopeAngle: number,
-    movingObjectVelocity: THREE.Vector3
+    movingObjectVelocity: Vector3
   ) => {
     /**
      * Setup moving direction
@@ -1049,7 +1049,6 @@ const Controller: ForwardRefRenderFunction<
     // Apply balance torque impulse
     characterRef.current.applyTorqueImpulse(dragAngForce, true);
   };
-
   /**
    * Character sleep function
    */
@@ -1388,7 +1387,7 @@ const Controller: ForwardRefRenderFunction<
     //   characterRef.current
     // );
 
-    if (rayHit && rayHit.toi < floatingDis + rayHitForgiveness) {
+    if (rayHit && rayHit.timeOfImpact < floatingDis + rayHitForgiveness) {
       if (slopeRayHit && actualSlopeAngle < slopeMaxAngle) {
         canJump = true;
       }
@@ -1404,7 +1403,7 @@ const Controller: ForwardRefRenderFunction<
         // Getting the standing force apply point
         standingForcePoint.set(
           rayOrigin.x,
-          rayOrigin.y - rayHit.toi,
+          rayOrigin.y - rayHit.timeOfImpact,
           rayOrigin.z
         );
         const rayHitObjectBodyType = rayHit?.collider?.parent()?.bodyType();
@@ -1539,12 +1538,13 @@ const Controller: ForwardRefRenderFunction<
         actualSlopeAngle = actualSlopeNormalVec?.angleTo(floorNormal);
       }
     }
-    if (slopeRayHit && rayHit && slopeRayHit.toi < floatingDis + 0.5) {
+    if (slopeRayHit && rayHit && slopeRayHit.timeOfImpact < floatingDis + 0.5) {
       if (canJump) {
         // Round the slope angle to 2 decimal places
         slopeAngle = Number(
           Math.atan(
-            (rayHit.toi - slopeRayHit.toi) / slopeRayOriginOffest
+            (rayHit.timeOfImpact - slopeRayHit.timeOfImpact) /
+              slopeRayOriginOffest
           ).toFixed(2)
         );
       } else {
@@ -1560,7 +1560,7 @@ const Controller: ForwardRefRenderFunction<
     if (rayHit != null) {
       if (canJump && rayHit.collider.parent()) {
         floatingForce =
-          springK * (floatingDis - rayHit.toi) -
+          springK * (floatingDis - rayHit.timeOfImpact) -
           characterRef.current.linvel().y * dampingC;
         characterRef.current.applyImpulse(
           springDirVec.set(0, floatingForce, 0),
@@ -1749,6 +1749,8 @@ const Controller: ForwardRefRenderFunction<
       ref={characterRef}
       position={[0, 5, 0]}
       friction={-0.5}
+      linearDamping={3}
+      angularDamping={3}
       onContactForce={(e) =>
         bodyContactForce.set(e.totalForce.x, e.totalForce.y, e.totalForce.z)
       }

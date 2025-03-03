@@ -9,6 +9,7 @@ import Floor from "./scene-world/Floor";
 // controller
 import CharacterController from "./controller/CharacterController";
 import CharacterJoystickControls from "./controller/CharacterJoystickControl";
+import { useEffect, useState } from "react";
 
 /**
  * Keyboard control preset
@@ -27,6 +28,17 @@ const keyboardMap = [
 ];
 
 const Experience = () => {
+  /**
+   * Delay physics activate
+   */
+  const [pausedPhysics, setPausedPhysics] = useState(true);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setPausedPhysics(false);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, []);
   const { physics } = useControls("World Settings", {
     physics: false,
   });
@@ -43,7 +55,7 @@ const Experience = () => {
           userData={{ camExcludeCollision: true }} // this won't be collide by camera ray
         />
         <Lights />
-        <Physics debug={physics}>
+        <Physics timeStep="vary" debug={physics} paused={pausedPhysics}>
           <KeyboardControls map={keyboardMap}>
             {/* Character Control */}
             <CharacterController modelPath="/3d-models/character.glb" />
