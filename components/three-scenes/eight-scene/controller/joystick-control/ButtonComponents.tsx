@@ -1,4 +1,4 @@
-import { RefObject, Suspense, useEffect, useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { CylinderGeometry, MeshNormalMaterial } from "three";
 import { useSpring, animated } from "@react-spring/three";
 import { useDispatch } from "react-redux";

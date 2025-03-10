@@ -41,7 +41,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Collider,
   QueryFilterFlags,
-  type RayColliderToi,
+  type RayColliderHit,
   type Vector,
 } from "@dimforge/rapier3d-compat";
 
@@ -322,24 +322,24 @@ const Controller: ForwardRefRenderFunction<
    * Load camera pivot and character move preset
    */
 
-  const pivotPosition: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const pivotXAxis: THREE.Vector3 = useMemo(() => new Vector3(1, 0, 0), []);
-  const pivotYAxis: THREE.Vector3 = useMemo(() => new Vector3(0, 1, 0), []);
-  const pivotZAxis: THREE.Vector3 = useMemo(() => new Vector3(0, 0, 1), []);
-  const followCamPosition: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const modelEuler: THREE.Euler = useMemo(() => new Euler(), []);
-  const modelQuat: THREE.Quaternion = useMemo(() => new Quaternion(), []);
-  const moveImpulse: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const movingDirection: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const moveAccNeeded: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const jumpVelocityVec: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const jumpDirection: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const currentVel: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const currentPos: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const dragForce: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const dragAngForce: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const wantToMoveVel: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const rejectVel: THREE.Vector3 = useMemo(() => new Vector3(), []);
+  const pivotPosition: Vector3 = useMemo(() => new Vector3(), []);
+  const pivotXAxis: Vector3 = useMemo(() => new Vector3(1, 0, 0), []);
+  const pivotYAxis: Vector3 = useMemo(() => new Vector3(0, 1, 0), []);
+  const pivotZAxis: Vector3 = useMemo(() => new Vector3(0, 0, 1), []);
+  const followCamPosition: Vector3 = useMemo(() => new Vector3(), []);
+  const modelEuler: Euler = useMemo(() => new Euler(), []);
+  const modelQuat: Quaternion = useMemo(() => new Quaternion(), []);
+  const moveImpulse: Vector3 = useMemo(() => new Vector3(), []);
+  const movingDirection: Vector3 = useMemo(() => new Vector3(), []);
+  const moveAccNeeded: Vector3 = useMemo(() => new Vector3(), []);
+  const jumpVelocityVec: Vector3 = useMemo(() => new Vector3(), []);
+  const jumpDirection: Vector3 = useMemo(() => new Vector3(), []);
+  const currentVel: Vector3 = useMemo(() => new Vector3(), []);
+  const currentPos: Vector3 = useMemo(() => new Vector3(), []);
+  const dragForce: Vector3 = useMemo(() => new Vector3(), []);
+  const dragAngForce: Vector3 = useMemo(() => new Vector3(), []);
+  const wantToMoveVel: Vector3 = useMemo(() => new Vector3(), []);
+  const rejectVel: Vector3 = useMemo(() => new Vector3(), []);
   // game storage
   const { moveToPoint, curAnimation } = useSelector(
     (state: RootState) => state.gameStateReducer
@@ -812,7 +812,7 @@ const Controller: ForwardRefRenderFunction<
   const characterMassForce: Vector3 = useMemo(() => new Vector3(), []);
   const rayOrigin: Vector3 = useMemo(() => new Vector3(), []);
   const rayCast = new rapier.Ray(rayOrigin, rayDir);
-  let rayHit: RayColliderToi | null = null;
+  let rayHit: RayColliderHit | null = null;
   /**Test shape ray */
   // const shape = new rapier.Capsule(0.2,0.1)
 
@@ -827,15 +827,15 @@ const Controller: ForwardRefRenderFunction<
   const slopeRayOriginRef = useRef<Mesh>(null!);
   const slopeRayorigin: Vector3 = useMemo(() => new Vector3(), []);
   const slopeRayCast = new rapier.Ray(slopeRayorigin, slopeRayDir);
-  let slopeRayHit: RayColliderToi | null = null;
+  let slopeRayHit: RayColliderHit | null = null;
 
   /**
    * Point to move setup
    */
   let isBodyHitWall = false;
   let isPointMoving = false;
-  const crossVector: THREE.Vector3 = useMemo(() => new Vector3(), []);
-  const pointToPoint: THREE.Vector3 = useMemo(() => new Vector3(), []);
+  const crossVector: Vector3 = useMemo(() => new Vector3(), []);
+  const pointToPoint: Vector3 = useMemo(() => new Vector3(), []);
   const bodySensorRef = useRef<Collider>(null);
   const handleOnIntersectionEnter = () => {
     isBodyHitWall = true;
@@ -1070,7 +1070,7 @@ const Controller: ForwardRefRenderFunction<
   const pointToMove = (
     delta: number,
     slopeAngle: number,
-    movingObjectVelocity: THREE.Vector3,
+    movingObjectVelocity: Vector3,
     functionKeyDown: boolean
   ) => {
     if (moveToPoint) {
@@ -1425,11 +1425,11 @@ const Controller: ForwardRefRenderFunction<
           // Moving object linear velocity
           const movingObjectLinvel = rayHit.collider
             .parent()
-            ?.linvel() as THREE.Vector3;
+            ?.linvel() as Vector3;
           // Moving object angular velocity
           const movingObjectAngvel = rayHit.collider
             .parent()
-            ?.angvel() as THREE.Vector3;
+            ?.angvel() as Vector3;
           // Combine object linear velocity and angular velocity to movingObjectVelocity
           movingObjectVelocity
             .set(

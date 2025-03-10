@@ -17,7 +17,6 @@ const NotionVideo = ({ items }: Props) => {
       externalUrl = `https://www.youtube.com/embed/${videoId}`;
     }
   }
-  console.log(externalUrl);
   return (
     <>
       {externalUrl && (

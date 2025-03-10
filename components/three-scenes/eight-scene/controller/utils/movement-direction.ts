@@ -1,10 +1,12 @@
+import { Object3D } from "three";
+
 // Retrieve current moving direction of the character
 export const getMovingDirection = (
   forward: boolean,
   backward: boolean,
   leftward: boolean,
   rightward: boolean,
-  pivot: THREE.Object3D
+  pivot: Object3D
 ): number | null => {
   if (!forward && !backward && !leftward && !rightward) return null;
   if (forward && leftward) return pivot.rotation.y + Math.PI / 4;

@@ -1,3 +1,4 @@
+"use client";
 import { BlockObjectChild } from "@/@types/schema.notion";
 import { NumberedListItemBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import NotionRichText from "./notionRichText";
