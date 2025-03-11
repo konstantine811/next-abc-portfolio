@@ -269,10 +269,8 @@ const Controller: ForwardRefRenderFunction<
   const dispatch = useDispatch();
   const characterRef = useRef<CustomControllerRigidBody>(null!);
 
-  characterRef.current.setRotation({ x: 0, y: 0, z: 0, w: 1 }, false);
   // const characterRef = ref as RefObject<RapierRigidBody> || useRef<RapierRigidBody>()
   const characterModelRef = useRef<Group>(null!);
-  characterModelRef.current.quaternion.set(0, 0, 0, 1);
   const characterModelIndicator: Object3D = useMemo(() => new Object3D(), []);
   const defaultControllerKeys = useMemo(
     () => ({

@@ -69,7 +69,7 @@ export function TextScramble({
         onScrambleComplete?.();
       }
     }, speed * 1000);
-  }, [characterSet, duration, isAnimating, onScrambleComplete, speed, text]);
+  }, []);
 
   useEffect(() => {
     if (!trigger) return;

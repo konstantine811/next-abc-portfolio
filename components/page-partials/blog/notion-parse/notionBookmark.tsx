@@ -49,7 +49,9 @@ const NotionBookmark = ({ url }: Prop) => {
               </CardHeader>
               <CardFooter>
                 <LucideLink className="h-3" />
-                <Link href={metadata.url}>{metadata.url}</Link>
+                <Link className="break-all w-auto" href={metadata.url}>
+                  {metadata.url}
+                </Link>
               </CardFooter>
             </div>
             <div className="relative w-1/2">
