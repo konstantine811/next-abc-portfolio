@@ -104,7 +104,7 @@ const AsidePanel = ({ className, data, style }: Prop) => {
           height: `calc(100vh - ${headerHeight}px)`,
         }}
         className={cn(
-          "bg-background/55 backdrop-blur-sm max-w-[300px] xl:min-w-full fixed left-0 xl:sticky py-8  xl:overflow-auto border-r"
+          "bg-background/55 backdrop-blur-md max-w-[300px] xl:min-w-full fixed left-0 xl:sticky py-8  xl:overflow-auto border-r"
         )}
         initial="hidden"
         animate={isOpen ? "visible" : "hidden"}
@@ -129,52 +129,54 @@ const AsidePanel = ({ className, data, style }: Prop) => {
             </motion.span>
           </Button>
         )}
-        <CategoryTabWrap
-          selectedPost={(data) => {
-            setSelectedPost(data);
-            dispatch(onFilteredBlogPost(data));
-          }}
-          data={data}
-        />
-        <Separator />
-        <Accordion
-          type="multiple"
-          className="w-full xl:pr-1"
-          defaultValue={Object.keys(selectedPost).map((i) => i)}
-        >
-          {Object.entries(selectedPost).map(([key, items]) => {
-            return (
-              <AccordionItem className="px-5 xl:px-2" key={key} value={key}>
-                <AccordionTrigger>{key}</AccordionTrigger>
-                <AccordionContent>
-                  {orderBlogPost(items).map((post) => {
-                    return (
-                      <Button
-                        className={cn(
-                          `${
-                            pathname === getPathName(post.id)
-                              ? "!text-foreground underline"
-                              : ""
-                          } whitespace-normal mb-1 last:mb-0 text-muted-foreground block`
-                        )}
-                        key={post.id}
-                        asChild
-                        variant={"link"}
-                      >
-                        <Link
-                          className="!h-auto !py-1"
-                          href={getPathName(post.id)}
+        <div className="overflow-auto h-full">
+          <CategoryTabWrap
+            selectedPost={(data) => {
+              setSelectedPost(data);
+              dispatch(onFilteredBlogPost(data));
+            }}
+            data={data}
+          />
+          <Separator />
+          <Accordion
+            type="multiple"
+            className="w-full xl:pr-1"
+            defaultValue={Object.keys(selectedPost).map((i) => i)}
+          >
+            {Object.entries(selectedPost).map(([key, items]) => {
+              return (
+                <AccordionItem className="px-5 xl:px-2" key={key} value={key}>
+                  <AccordionTrigger>{key}</AccordionTrigger>
+                  <AccordionContent>
+                    {orderBlogPost(items).map((post) => {
+                      return (
+                        <Button
+                          className={cn(
+                            `${
+                              pathname === getPathName(post.id)
+                                ? "!text-foreground underline"
+                                : ""
+                            } whitespace-normal mb-1 last:mb-0 text-muted-foreground block`
+                          )}
+                          key={post.id}
+                          asChild
+                          variant={"link"}
                         >
-                          {post.title}
-                        </Link>
-                      </Button>
-                    );
-                  })}
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
+                          <Link
+                            className="!h-auto !py-1"
+                            href={getPathName(post.id)}
+                          >
+                            {post.title}
+                          </Link>
+                        </Button>
+                      );
+                    })}
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        </div>
       </motion.div>
     </div>
   );

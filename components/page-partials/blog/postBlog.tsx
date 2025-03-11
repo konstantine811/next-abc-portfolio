@@ -13,8 +13,6 @@ import { useLocale } from "next-intl";
 import { useEffect } from "react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { useRouter } from "@/i18n/routing";
-import Particles from "@/components/ui/particles";
-import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextEffect } from "@/components/ui/text-effect";
 import useSound from "use-sound";
 import { useAppSelector } from "@/lib/store/hooks";
@@ -87,7 +85,7 @@ const PostBlog = ({ data: { page, post } }: Props) => {
   return (
     <>
       {page?.cover ? (
-        <div className="h-[30vh] relative w-full">
+        <div className="h-[50vh] relative w-full">
           <Image
             fill
             className="object-cover"
@@ -115,25 +113,15 @@ const PostBlog = ({ data: { page, post } }: Props) => {
         <div
           className={cn(
             `${
-              !page?.cover && "min-h-[300px]"
+              !page?.cover && "min-h-[50vh]"
             } relative flex h-full  w-full flex-col items-center justify-center overflow-hidden rounded-lg backdrop-blur-md bg-background/5`
           )}
         >
-          <h1 className="text-center text-5xl font-bold md:px-10 px-0 py-5">
+          <h1 className="text-center text-5xl font-bold md:px-10 px-0 pt-5 pb-10">
             <TextEffect per="char" preset="fade" variants={blurSlideVariants}>
               {page?.title}
             </TextEffect>
           </h1>
-
-          {!page?.cover && (
-            <Particles
-              className="absolute blur-[1px] inset-0 z-0"
-              quantity={100}
-              ease={1.7}
-              color={"#fff"}
-              refresh
-            />
-          )}
         </div>
       </div>
       <NotionSwitchParse post={post} />

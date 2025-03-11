@@ -9,7 +9,7 @@ type Prop = {
 
 const MainContent = ({ children, className, wrapClassName }: Prop) => {
   return (
-    <main className={cn(`relative lg:gap-10 ${wrapClassName}`)}>
+    <main className={cn(`container relative lg:gap-10 ${wrapClassName}`)}>
       <div className={cn(`mx-auto w-full min-w-0 ${className}`)}>
         {children}
       </div>
