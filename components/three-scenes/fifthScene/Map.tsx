@@ -11,7 +11,7 @@ interface Props {
 
 const Map = ({ model, position, scale }: Props) => {
   const { scene, animations } = useGLTF(model);
-  const group = useRef<Group>();
+  const group = useRef<Group>(null!);
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
     scene.traverse((object) => {

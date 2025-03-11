@@ -76,7 +76,7 @@ const Player = () => {
       },
       true
     );
-    const eulerRot = euler().setFromQuaternion(quat(rb.current.rotation()));
+    const eulerRot = euler().setFromQuaternion(quat(rb.current?.rotation()));
     vel.applyEuler(eulerRot);
   }, [rb, vel]);
 

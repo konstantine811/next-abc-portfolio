@@ -45,7 +45,7 @@ const NotionCode = ({ item, onCopy, isCopied }: Prop) => {
     if (isCopied && isSfxEnabled) {
       play({ id: "first" });
     }
-  }, [isCopied, play]);
+  }, [isCopied, play, isSfxEnabled]);
 
   // UseCallback to memoize the copy logic
   const copyToClipboard = useCallback(() => {

@@ -7,9 +7,7 @@ import { NotionTextColor } from "@/@types/schema.notion";
 import { Link } from "@/i18n/routing";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { TextScramble } from "@/components/ui/text-scramble";
-import Particles from "@/components/ui/particles";
 import { cn } from "@/lib/utils";
-import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { getPathName } from "@/utils/blog.utils";
 
 interface NotionRichTextProps {
@@ -78,7 +76,7 @@ const NotionRichText = ({
             className={`${
               item.annotations.bold ? "font-bold" : ""
             } ${getColorByType(
-              item.annotations.color
+              item.annotations.color as any
             )} underline underline-offset-4`}
             key={index}
             href={
@@ -92,7 +90,7 @@ const NotionRichText = ({
           <span
             className={`${cn(
               `${item.annotations.bold ? "font-bold" : ""} ${getColorByType(
-                item.annotations.color
+                item.annotations.color as any
               )} ${
                 item.annotations.code &&
                 "bg-indigo-500 border border-indigo-700 text-white font-bold px-2 rounded-lg py-0.5"
@@ -118,19 +116,6 @@ const NotionRichText = ({
                       {item.plain_text}
                     </TextScramble>
                   );
-                case "particle-bg":
-                  <div className="relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background md:shadow-xl">
-                    <span className="pointer-events-none z-10 whitespace-pre-wrap text-center text-8xl font-semibold leading-none">
-                      {item.plain_text}
-                    </span>
-                    <Particles
-                      className="absolute inset-0 z-0"
-                      quantity={100}
-                      ease={80}
-                      color={color}
-                      refresh
-                    />
-                  </div>;
                 default:
                   return item.plain_text;
               }

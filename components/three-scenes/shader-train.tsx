@@ -2,7 +2,6 @@
 
 import { Canvas } from "@react-three/fiber";
 import Wave from "./shader-mesh/wave";
-import { Perf } from "r3f-perf";
 
 const ShaderTrain = () => {
   return (

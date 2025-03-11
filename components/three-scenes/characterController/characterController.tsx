@@ -1,13 +1,11 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Expirience from "@/components/three-scenes/characterController/Expirience";
 import JoystickControl from "@/components/three-scenes/characterController/joystickControll";
 import DebugHeadless from "../utils/debug/debugHeadless";
 import Debug from "../utils/debug/debug";
-import dynamic from "next/dynamic";
-import { Perf } from "r3f-perf";
 
 const CharacterController = () => {
   const [isClient, setIsClient] = useState(false);

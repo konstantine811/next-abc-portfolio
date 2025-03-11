@@ -31,7 +31,7 @@ const NotionBookmark = ({ url }: Prop) => {
       .catch((err) => {
         console.error(err);
       });
-  }, [url]);
+  }, [url, locale]);
   return (
     <>
       {metadata && (

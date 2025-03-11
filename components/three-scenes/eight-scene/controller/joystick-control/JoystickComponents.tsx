@@ -6,7 +6,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useSpring, animated } from "@react-spring/three";
+import { useFrame } from "@react-three/fiber";
 import {
   CylinderGeometry,
   MeshNormalMaterial,
@@ -24,7 +24,7 @@ interface JoystickProps {
 }
 
 export const JoystickComponents = ({
-  joystickRunSensitivity,
+  joystickRunSensitivity = 0.9,
   wrapRef,
 }: JoystickProps) => {
   /**
@@ -40,18 +40,17 @@ export const JoystickComponents = ({
   const touch1MovementVec2 = useMemo(() => new Vector2(), []);
   const joystickMovementVec2 = useMemo(() => new Vector2(), []);
 
-  /**
-   * Animation preset
-   */
-  const [springs, api] = useSpring(() => ({
+  // Стан анімації
+  const joystickState = useRef({
     topRotationX: 0,
     topRotationY: 0,
     basePositionX: 0,
     basePositionY: 0,
-    config: {
-      tension: 600,
-    },
-  }));
+    targetRotationX: 0,
+    targetRotationY: 0,
+    targetPositionX: 0,
+    targetPositionY: 0,
+  });
 
   /**
    * Joystick component geometries
@@ -81,7 +80,21 @@ export const JoystickComponents = ({
     () => new MeshNormalMaterial({ transparent: true, opacity: 0.7 }),
     []
   );
-  // Touch move function
+
+  /**
+   * Оновлення стану анімації у кожному кадрі
+   */
+  useFrame(() => {
+    const state = joystickState.current;
+    state.topRotationX += (state.targetRotationX - state.topRotationX) * 0.1;
+    state.topRotationY += (state.targetRotationY - state.topRotationY) * 0.1;
+    state.basePositionX += (state.targetPositionX - state.basePositionX) * 0.1;
+    state.basePositionY += (state.targetPositionY - state.basePositionY) * 0.1;
+  });
+
+  /**
+   * Touch move function
+   */
   const onTouchMove = useCallback(
     (e: TouchEvent) => {
       e.preventDefault();
@@ -102,52 +115,50 @@ export const JoystickComponents = ({
         joystickDis.current * Math.sin(joystickAng.current)
       );
       const runState =
-        joystickDis.current >
-        joystickMaxDis.current * (joystickRunSensitivity ?? 0.9);
+        joystickDis.current > joystickMaxDis.current * joystickRunSensitivity;
 
-      // Apply animations
-      api.start({
-        topRotationX: -joystickMovementVec2.y / joystickHalfHeight.current,
-        topRotationY: joystickMovementVec2.x / joystickHalfWidth.current,
-        basePositionX: joystickMovementVec2.x * 0.002,
-        basePositionY: joystickMovementVec2.y * 0.002,
-      });
+      // Оновлення цільових значень анімації
+      joystickState.current.targetRotationX =
+        -joystickMovementVec2.y / joystickHalfHeight.current;
+      joystickState.current.targetRotationY =
+        joystickMovementVec2.x / joystickHalfWidth.current;
+      joystickState.current.targetPositionX = joystickMovementVec2.x * 0.002;
+      joystickState.current.targetPositionY = joystickMovementVec2.y * 0.002;
 
-      // Pass valus to joystick store
+      // Оновлення стану джойстика у Redux
       setJoystick({
         joystickDis: joystickDis.current,
         joystickAng: joystickAng.current,
         runState,
       });
     },
-    [api, joystickMovementVec2, joystickRunSensitivity, touch1MovementVec2]
+    [joystickRunSensitivity, touch1MovementVec2, joystickMovementVec2]
   );
-  // Touch end function
-  const onTouchEnd = (e: TouchEvent) => {
-    // Reset animations
-    api.start({
-      topRotationX: 0,
-      topRotationY: 0,
-      basePositionX: 0,
-      basePositionY: 0,
-    });
 
-    // Reset joystick store values
+  /**
+   * Touch end function
+   */
+  const onTouchEnd = useCallback(() => {
+    joystickState.current.targetRotationX = 0;
+    joystickState.current.targetRotationY = 0;
+    joystickState.current.targetPositionX = 0;
+    joystickState.current.targetPositionY = 0;
+
+    // Скидання стану джойстика
     resetJoystick();
-  };
+  }, []);
 
   useEffect(() => {
     if (!wrapRef.current) return;
     const joystickDiv = wrapRef.current;
-    const joystickPositionX = joystickDiv.getBoundingClientRect().x;
-    const joystickPositionY = joystickDiv.getBoundingClientRect().y;
-    joystickHalfWidth.current = joystickDiv.getBoundingClientRect().width / 2;
-    joystickHalfHeight.current = joystickDiv.getBoundingClientRect().height / 2;
+    const rect = joystickDiv.getBoundingClientRect();
 
+    joystickHalfWidth.current = rect.width / 2;
+    joystickHalfHeight.current = rect.height / 2;
     joystickMaxDis.current = joystickHalfWidth.current * 0.65;
 
-    joystickCenterX.current = joystickPositionX + joystickHalfWidth.current;
-    joystickCenterY.current = joystickPositionY + joystickHalfHeight.current;
+    joystickCenterX.current = rect.x + joystickHalfWidth.current;
+    joystickCenterY.current = rect.y + joystickHalfHeight.current;
 
     joystickDiv.addEventListener("touchmove", onTouchMove, { passive: false });
     joystickDiv.addEventListener("touchend", onTouchEnd);
@@ -156,22 +167,29 @@ export const JoystickComponents = ({
       joystickDiv.removeEventListener("touchmove", onTouchMove);
       joystickDiv.removeEventListener("touchend", onTouchEnd);
     };
-  });
+  }, [wrapRef, onTouchMove, onTouchEnd]);
+
   return (
-    <Suspense fallback="null">
-      <animated.group
-        position-x={springs.basePositionX}
-        position-y={springs.basePositionY}
+    <Suspense fallback={null}>
+      <group
+        position={[
+          joystickState.current.basePositionX,
+          joystickState.current.basePositionY,
+          0,
+        ]}
       >
         <mesh
           geometry={joystickBaseGeo}
           material={joystickBaseMaterial}
           rotation={[-Math.PI / 2, 0, 0]}
         />
-      </animated.group>
-      <animated.group
-        rotation-x={springs.topRotationX}
-        rotation-y={springs.topRotationY}
+      </group>
+      <group
+        rotation={[
+          joystickState.current.topRotationX,
+          joystickState.current.topRotationY,
+          0,
+        ]}
       >
         <mesh
           geometry={joystickStickGeo}
@@ -184,7 +202,7 @@ export const JoystickComponents = ({
           material={joystickHandleMaterial}
           position={[0, 0, 4]}
         />
-      </animated.group>
+      </group>
     </Suspense>
   );
 };

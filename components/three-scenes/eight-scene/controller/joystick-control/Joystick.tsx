@@ -8,7 +8,7 @@ interface JoysticProps {
 }
 
 const Joystic = ({ buttonNumber }: JoysticProps) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null!);
   return (
     <div>
       <div

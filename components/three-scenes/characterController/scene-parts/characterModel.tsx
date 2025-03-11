@@ -31,7 +31,7 @@ import { GLTF } from "three/addons/loaders/GLTFLoader.js";
 
 const PATH_TO_MODEL =
   "/assets/3dModels/characterController/Floating Character.glb";
-type CharacterModelProps = JSX.IntrinsicElements["group"];
+type CharacterModelProps = React.JSX.IntrinsicElements["group"];
 useGLTF.preload(PATH_TO_MODEL);
 const CharacterModel = (props: CharacterModelProps) => {
   const dispatch = useDispatch();

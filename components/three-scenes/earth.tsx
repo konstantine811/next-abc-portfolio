@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Earch = ({ isScrolled = true }: Props) => {
-  const sceneRef = useRef<HTMLCanvasElement>(null);
+  const sceneRef = useRef<HTMLCanvasElement>(null!);
   return (
     <Canvas ref={sceneRef}>
       <ambientLight intensity={0.1} />

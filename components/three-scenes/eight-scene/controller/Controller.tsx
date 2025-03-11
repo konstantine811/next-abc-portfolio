@@ -10,6 +10,7 @@ import {
   forwardRef,
   ForwardRefRenderFunction,
   ReactNode,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
@@ -34,7 +35,6 @@ import {
   Vector3,
 } from "three";
 import useFollowCamera from "./hooks/useFollowCamera";
-import { useControls } from "leva";
 import { useKeyboardControls } from "@react-three/drei";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -268,20 +268,26 @@ const Controller: ForwardRefRenderFunction<
 ) => {
   const dispatch = useDispatch();
   const characterRef = useRef<CustomControllerRigidBody>(null!);
+
+  characterRef.current.setRotation({ x: 0, y: 0, z: 0, w: 1 }, false);
   // const characterRef = ref as RefObject<RapierRigidBody> || useRef<RapierRigidBody>()
   const characterModelRef = useRef<Group>(null!);
+  characterModelRef.current.quaternion.set(0, 0, 0, 1);
   const characterModelIndicator: Object3D = useMemo(() => new Object3D(), []);
-  const defaultControllerKeys = {
-    forward: 12,
-    backward: 13,
-    leftward: 14,
-    rightward: 15,
-    jump: 2,
-    action1: 11,
-    action2: 3,
-    action3: 1,
-    action4: 0,
-  };
+  const defaultControllerKeys = useMemo(
+    () => ({
+      forward: 12,
+      backward: 13,
+      leftward: 14,
+      rightward: 15,
+      jump: 2,
+      action1: 11,
+      action2: 3,
+      action3: 1,
+      action4: 0,
+    }),
+    []
+  );
 
   /**
    * Mode setup
@@ -358,23 +364,6 @@ const Controller: ForwardRefRenderFunction<
     curRunState: runState,
     curButton1Pressed: button1Pressed,
   } = useSelector((state: RootState) => state.joystickControllsReducer);
-  /**
-   * Rotate camera function
-   */
-  const rotateCamera = (x: number, y: number) => {
-    pivot.rotation.y += y;
-    followCam.rotation.x = Math.min(
-      Math.max(followCam.rotation.x + x, camLowLimit),
-      camUpLimit
-    );
-  };
-
-  /**
-   * Rotate character on Y function
-   */
-  const rotateCharacterOnY = (rad: number) => {
-    modelEuler.y += rad;
-  };
 
   /**
    * Load camera pivot and character move preset
@@ -385,13 +374,28 @@ const Controller: ForwardRefRenderFunction<
     ref,
     () => {
       if (characterRef.current) {
-        characterRef.current.rotateCamera = rotateCamera;
-        characterRef.current.rotateCharacterOnY = rotateCharacterOnY;
+        characterRef.current.rotateCamera = (x: number, y: number) => {
+          pivot.rotation.y += y;
+          followCam.rotation.x = Math.min(
+            Math.max(followCam.rotation.x + x, camLowLimit),
+            camUpLimit
+          );
+        };
+        characterRef.current.rotateCharacterOnY = (rad: number) => {
+          modelEuler.y += rad;
+        };
         return characterRef.current!;
       }
       return null as any;
     },
-    [characterRef.current]
+    [
+      characterRef,
+      camLowLimit,
+      camUpLimit,
+      followCam.rotation,
+      modelEuler,
+      pivot.rotation,
+    ]
   );
 
   /**
@@ -416,263 +420,6 @@ const Controller: ForwardRefRenderFunction<
   const camBasedMoveCrossVecOnY: Vector3 = useMemo(() => new Vector3(), []);
 
   /**
-   * Debug settings
-   */
-  let characterControlsDebug = null;
-  let floatingRayDebug = null;
-  let slopeRayDebug = null;
-  let autoBalanceForceDebug = null;
-  if (debug) {
-    // Character Controls
-    characterControlsDebug = useControls(
-      "Character Controls",
-      {
-        maxVelLimit: {
-          value: maxVelLimit,
-          min: 0,
-          max: 10,
-          step: 0.01,
-        },
-        turnVelMultiplier: {
-          value: turnVelMultiplier,
-          min: 0,
-          max: 1,
-          step: 0.01,
-        },
-        turnSpeed: {
-          value: turnSpeed,
-          min: 5,
-          max: 30,
-          step: 0.1,
-        },
-        sprintMult: {
-          value: sprintMult,
-          min: 1,
-          max: 5,
-          step: 0.01,
-        },
-        jumpVel: {
-          value: jumpVel,
-          min: 0,
-          max: 10,
-          step: 0.01,
-        },
-        jumpForceToGroundMult: {
-          value: jumpForceToGroundMult,
-          min: 0,
-          max: 80,
-          step: 0.1,
-        },
-        slopJumpMult: {
-          value: slopJumpMult,
-          min: 0,
-          max: 1,
-          step: 0.01,
-        },
-        sprintJumpMult: {
-          value: sprintJumpMult,
-          min: 1,
-          max: 3,
-          step: 0.01,
-        },
-        airDragMultiplier: {
-          value: airDragMultiplier,
-          min: 0,
-          max: 1,
-          step: 0.01,
-        },
-        dragDampingC: {
-          value: dragDampingC,
-          min: 0,
-          max: 0.5,
-          step: 0.01,
-        },
-        accDeltaTime: {
-          value: accDeltaTime,
-          min: 0,
-          max: 50,
-          step: 1,
-        },
-        rejectVelMult: {
-          value: rejectVelMult,
-          min: 0,
-          max: 10,
-          step: 0.1,
-        },
-        moveImpulsePointY: {
-          value: moveImpulsePointY,
-          min: 0,
-          max: 3,
-          step: 0.1,
-        },
-        camFollowMult: {
-          value: camFollowMult,
-          min: 0,
-          max: 15,
-          step: 0.1,
-        },
-      },
-      { collapsed: true }
-    );
-
-    // Apply debug values
-    maxVelLimit = characterControlsDebug.maxVelLimit;
-    turnVelMultiplier = characterControlsDebug.turnVelMultiplier;
-    turnSpeed = characterControlsDebug.turnSpeed;
-    sprintMult = characterControlsDebug.sprintMult;
-    jumpVel = characterControlsDebug.jumpVel;
-    jumpForceToGroundMult = characterControlsDebug.jumpForceToGroundMult;
-    slopJumpMult = characterControlsDebug.slopJumpMult;
-    sprintJumpMult = characterControlsDebug.sprintJumpMult;
-    airDragMultiplier = characterControlsDebug.airDragMultiplier;
-    dragDampingC = characterControlsDebug.dragDampingC;
-    accDeltaTime = characterControlsDebug.accDeltaTime;
-    rejectVelMult = characterControlsDebug.rejectVelMult;
-    moveImpulsePointY = characterControlsDebug.moveImpulsePointY;
-    camFollowMult = characterControlsDebug.camFollowMult;
-
-    // Floating Ray
-    floatingRayDebug = useControls(
-      "Floating Ray",
-      {
-        rayOriginOffest: {
-          x: 0,
-          y: -capsuleHalfHeight,
-          z: 0,
-        },
-        rayHitForgiveness: {
-          value: rayHitForgiveness,
-          min: 0,
-          max: 0.5,
-          step: 0.01,
-        },
-        rayLength: {
-          value: capsuleRadius + 2,
-          min: 0,
-          max: capsuleRadius + 10,
-          step: 0.01,
-        },
-        rayDir: { x: 0, y: -1, z: 0 },
-        floatingDis: {
-          value: capsuleRadius + floatHeight,
-          min: 0,
-          max: capsuleRadius + 2,
-          step: 0.01,
-        },
-        springK: {
-          value: springK,
-          min: 0,
-          max: 5,
-          step: 0.01,
-        },
-        dampingC: {
-          value: dampingC,
-          min: 0,
-          max: 3,
-          step: 0.01,
-        },
-      },
-      { collapsed: true }
-    );
-    // Apply debug values
-    rayOriginOffest = floatingRayDebug.rayOriginOffest;
-    rayHitForgiveness = floatingRayDebug.rayHitForgiveness;
-    rayLength = floatingRayDebug.rayLength;
-    rayDir = floatingRayDebug.rayDir;
-    floatingDis = floatingRayDebug.floatingDis;
-    springK = floatingRayDebug.springK;
-    dampingC = floatingRayDebug.dampingC;
-
-    // Slope Ray
-    slopeRayDebug = useControls(
-      "Slope Ray",
-      {
-        showSlopeRayOrigin: false,
-        slopeMaxAngle: {
-          value: slopeMaxAngle,
-          min: 0,
-          max: 1.57,
-          step: 0.01,
-        },
-        slopeRayOriginOffest: {
-          value: capsuleRadius,
-          min: 0,
-          max: capsuleRadius + 3,
-          step: 0.01,
-        },
-        slopeRayLength: {
-          value: capsuleRadius + 3,
-          min: 0,
-          max: capsuleRadius + 13,
-          step: 0.01,
-        },
-        slopeRayDir: { x: 0, y: -1, z: 0 },
-        slopeUpExtraForce: {
-          value: slopeUpExtraForce,
-          min: 0,
-          max: 5,
-          step: 0.01,
-        },
-        slopeDownExtraForce: {
-          value: slopeDownExtraForce,
-          min: 0,
-          max: 5,
-          step: 0.01,
-        },
-      },
-      { collapsed: true }
-    );
-    // Apply debug values
-    showSlopeRayOrigin = slopeRayDebug.showSlopeRayOrigin;
-    slopeMaxAngle = slopeRayDebug.slopeMaxAngle;
-    slopeRayLength = slopeRayDebug.slopeRayLength;
-    slopeRayDir = slopeRayDebug.slopeRayDir;
-    slopeUpExtraForce = slopeRayDebug.slopeUpExtraForce;
-    slopeDownExtraForce = slopeRayDebug.slopeDownExtraForce;
-
-    // AutoBalance Force
-    autoBalanceForceDebug = useControls(
-      "AutoBalance Force",
-      {
-        autoBalance: {
-          value: true,
-        },
-        autoBalanceSpringK: {
-          value: autoBalanceSpringK,
-          min: 0,
-          max: 5,
-          step: 0.01,
-        },
-        autoBalanceDampingC: {
-          value: autoBalanceDampingC,
-          min: 0,
-          max: 0.1,
-          step: 0.001,
-        },
-        autoBalanceSpringOnY: {
-          value: autoBalanceSpringOnY,
-          min: 0,
-          max: 5,
-          step: 0.01,
-        },
-        autoBalanceDampingOnY: {
-          value: autoBalanceDampingOnY,
-          min: 0,
-          max: 0.1,
-          step: 0.001,
-        },
-      },
-      { collapsed: true }
-    );
-    // Apply debug values
-    autoBalance = autoBalanceForceDebug.autoBalance;
-    autoBalanceSpringK = autoBalanceForceDebug.autoBalanceSpringK;
-    autoBalanceDampingC = autoBalanceForceDebug.autoBalanceDampingC;
-    autoBalanceSpringOnY = autoBalanceForceDebug.autoBalanceSpringOnY;
-    autoBalanceDampingOnY = autoBalanceForceDebug.autoBalanceDampingOnY;
-  }
-
-  /**
    * Check if inside keyboardcontrols
    */
   function useIsInsideKeyboardControls() {
@@ -695,9 +442,8 @@ const Controller: ForwardRefRenderFunction<
     jump: false,
     run: false,
   };
-  const [subscribeKeys, getKeys] = isInsideKeyboardControls
-    ? useKeyboardControls()
-    : [() => {}, () => presetKeys];
+
+  const [, getKeys] = useKeyboardControls();
 
   const { rapier, world } = useRapier();
 
@@ -714,15 +460,15 @@ const Controller: ForwardRefRenderFunction<
   const gamepadJoystickVec2: Vector2 = useMemo(() => new Vector2(), []);
   let gamepadJoystickDis: number = 0;
   let gamepadJoystickAng: number = 0;
-  const gamepadConnect = (e: any) => {
+  const gamepadConnect = useCallback((e: any) => {
     setControllerIndex(e.gamepad.index);
-  };
-  const gamepadDisconnect = () => {
+  }, []);
+  const gamepadDisconnect = useCallback(() => {
     setControllerIndex(null);
-  };
+  }, []);
   const mergedKeys = useMemo(
     () => Object.assign({}, defaultControllerKeys, controllerKeys),
-    [controllerKeys]
+    [controllerKeys, defaultControllerKeys]
   );
   const handleButtons = (buttons: readonly GamepadButton[]) => {
     gamepadKeys.forward = buttons[mergedKeys.forward].pressed;
@@ -802,7 +548,7 @@ const Controller: ForwardRefRenderFunction<
   /**
    * Initial light setup
    */
-  let dirLight: DirectionalLight;
+  const dirLight = useRef<DirectionalLight>(null!);
 
   /**
    * Floating Ray setup
@@ -1052,7 +798,7 @@ const Controller: ForwardRefRenderFunction<
   /**
    * Character sleep function
    */
-  const sleepCharacter = () => {
+  const sleepCharacter = useCallback(() => {
     if (characterRef.current) {
       if (document.visibilityState === "hidden") {
         characterRef.current.sleep();
@@ -1062,7 +808,7 @@ const Controller: ForwardRefRenderFunction<
         }, wakeUpDelay);
       }
     }
-  };
+  }, [wakeUpDelay]);
 
   /**
    * Point-to-move function
@@ -1113,46 +859,46 @@ const Controller: ForwardRefRenderFunction<
       characterModelRef.current.parent &&
       characterModelRef.current.parent.parent
     ) {
-      dirLight = characterModelRef.current.parent.parent.children.find(
+      dirLight.current = characterModelRef.current.parent.parent.children.find(
         (item) => {
           return item.name === "followLight";
         }
       ) as DirectionalLight;
     }
-  });
+  }, [followLight]);
 
   /**
    * Keyboard controls subscribe setup
    */
   // If inside keyboardcontrols, active subscribeKeys
-  if (isInsideKeyboardControls) {
-    useEffect(() => {
-      const handleKeyDown = (event: KeyboardEvent) => {
-        switch (event.code) {
-          case "KeyQ":
-            if (animated) dispatch(action1());
-            break;
-          case "KeyE":
-            if (animated) dispatch(action2());
-            break;
-          case "KeyR":
-            if (animated) dispatch(action3());
-            break;
-          case "KeyF":
-            if (animated) dispatch(action4());
-            break;
-          default:
-            break;
-        }
-      };
-
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.code) {
+        case "KeyQ":
+          if (animated) dispatch(action1());
+          break;
+        case "KeyE":
+          if (animated) dispatch(action2());
+          break;
+        case "KeyR":
+          if (animated) dispatch(action3());
+          break;
+        case "KeyF":
+          if (animated) dispatch(action4());
+          break;
+        default:
+          break;
+      }
+    };
+    if (isInsideKeyboardControls) {
       window.addEventListener("keydown", handleKeyDown);
-
-      return () => {
+    }
+    return () => {
+      if (isInsideKeyboardControls) {
         window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [dispatch, animated]);
-  }
+      }
+    };
+  }, [dispatch, animated, isInsideKeyboardControls]);
 
   useEffect(() => {
     if (animated) {
@@ -1171,21 +917,12 @@ const Controller: ForwardRefRenderFunction<
   ]);
 
   useEffect(() => {
-    // Lock character rotations at Y axis
-    characterRef.current.setEnabledRotations(
-      autoBalance ? true : false,
-      autoBalance ? true : false,
-      autoBalance ? true : false,
-      false
-    );
+    if (!characterRef.current || !characterModelRef.current) return;
 
-    // Reset character quaternion
-    return () => {
-      if (characterRef.current && characterModelRef.current) {
-        characterModelRef.current.quaternion.set(0, 0, 0, 1);
-        characterRef.current.setRotation({ x: 0, y: 0, z: 0, w: 1 }, false);
-      }
-    };
+    const character = characterRef.current;
+
+    // Lock character rotations at Y axis
+    character.setEnabledRotations(autoBalance, autoBalance, autoBalance, false);
   }, [autoBalance]);
 
   useEffect(() => {
@@ -1201,7 +938,13 @@ const Controller: ForwardRefRenderFunction<
       window.removeEventListener("gamepadconnected", gamepadConnect);
       window.removeEventListener("gamepaddisconnected", gamepadDisconnect);
     };
-  }, []);
+  }, [
+    modelEuler,
+    characterInitDir,
+    sleepCharacter,
+    gamepadConnect,
+    gamepadDisconnect,
+  ]);
 
   useFrame((state, delta) => {
     if (delta > 1) delta %= 1;
@@ -1222,11 +965,11 @@ const Controller: ForwardRefRenderFunction<
     /**
      * Apply character position to directional light
      */
-    if (followLight && dirLight) {
-      dirLight.position.x = currentPos.x + followLightPos.x;
-      dirLight.position.y = currentPos.y + followLightPos.y;
-      dirLight.position.z = currentPos.z + followLightPos.z;
-      dirLight.target = characterModelRef.current;
+    if (followLight && dirLight.current) {
+      dirLight.current.position.x = currentPos.x + followLightPos.x;
+      dirLight.current.position.y = currentPos.y + followLightPos.y;
+      dirLight.current.position.z = currentPos.z + followLightPos.z;
+      dirLight.current.target = characterModelRef.current;
     }
 
     /**

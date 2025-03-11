@@ -63,7 +63,6 @@ const NotionSwitchParse = ({ post, level }: Prop) => {
                     <NotionRichText
                       key={item.id}
                       as={"h2"}
-                      typeAnimation="particle-bg"
                       rich_text={item.heading_1.rich_text}
                       color={item.heading_1.color}
                       className="text-4xl font-bold mb-2 md:mt-20 mt-5"

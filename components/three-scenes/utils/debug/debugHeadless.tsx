@@ -1,7 +1,4 @@
-import { get } from "http";
-import { parse } from "path";
 import { usePerf } from "r3f-perf";
-import { useMemo } from "react";
 
 const DebugHeadless = () => {
   /* @ts-ignore */

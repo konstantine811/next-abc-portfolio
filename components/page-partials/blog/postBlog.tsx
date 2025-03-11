@@ -76,7 +76,7 @@ const PostBlog = ({ data: { page, post } }: Props) => {
       play({ id: "first" });
     }
     return () => stop();
-  }, [play, isSfxEnabled]);
+  }, [play, isSfxEnabled, stop]);
   useEffect(() => {
     if (page.lang !== locale && page.langLink) {
       router.replace(`${PATH_ROUTE_NAME.blog}/${page.langLink}`);

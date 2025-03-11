@@ -1,6 +1,6 @@
 import { useThree } from "@react-three/fiber";
 import { camListenerTargetType } from "../types/controller.model";
-import { useEffect, useMemo, useRef } from "react";
+import { use, useCallback, useEffect, useMemo, useRef } from "react";
 import { Mesh, Object3D, Raycaster, Vector3 } from "three";
 
 interface UseFollowCamProps {
@@ -38,9 +38,9 @@ const useFollowCamera = ({
 }: UseFollowCamProps) => {
   const { scene, camera, gl } = useThree();
 
-  let isMouseDown = false;
-  let previousTouch1: Touch | null = null;
-  let previousTouch2: Touch | null = null;
+  const isMouseDown = useRef<boolean>(false);
+  let previousTouch1 = useRef<Touch | null>(null);
+  let previousTouch2 = useRef<Touch | null>(null);
 
   const originZDis = useRef<number>(camInitDis ?? -5);
   const pivot = useMemo(() => new Object3D(), []);
@@ -52,14 +52,14 @@ const useFollowCamera = ({
       originZDis.current * Math.cos(-camInitDir.x)
     );
     return origin;
-  }, []);
+  }, [camInitDir]);
 
   /** Camera collison detect setups */
   let smallestDistance = null;
-  let cameraDistance = null;
+  const cameraDistance = useRef<number>(null);
   let intersects = null;
   // let intersectObjects: THREE.Object3D[] = [];
-  const intersectObjects = useRef<THREE.Object3D[]>([]);
+  const intersectObjects = useRef<Object3D[]>([]);
   const cameraRayDir = useMemo(() => new Vector3(), []);
   const cameraRayOrigin = useMemo(() => new Vector3(), []);
   const cameraPosition = useMemo(() => new Vector3(), []);
@@ -71,82 +71,37 @@ const useFollowCamera = ({
     -camMaxDis
   );
   // Mouse move event
-  const onDocumentMouseMove = (e: MouseEvent) => {
-    if (document.pointerLockElement || isMouseDown) {
-      pivot.rotation.y -= e.movementX * 0.002 * camMoveSpeed;
-      const vy = followCam.rotation.x + e.movementY * 0.002 * camMoveSpeed;
+  const onDocumentMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (document.pointerLockElement || isMouseDown) {
+        pivot.rotation.y -= e.movementX * 0.002 * camMoveSpeed;
+        const vy = followCam.rotation.x + e.movementY * 0.002 * camMoveSpeed;
 
-      cameraDistance = followCam.position.length();
+        cameraDistance.current = followCam.position.length();
 
-      if (vy >= camLowLimit && vy <= camUpLimit) {
-        followCam.rotation.x = vy;
-        followCam.position.y = -cameraDistance * Math.sin(-vy);
-        followCam.position.z = -cameraDistance * Math.cos(-vy);
+        if (vy >= camLowLimit && vy <= camUpLimit) {
+          followCam.rotation.x = vy;
+          followCam.position.y = -cameraDistance.current * Math.sin(-vy);
+          followCam.position.z = -cameraDistance.current * Math.cos(-vy);
+        }
       }
-    }
-    return false;
-  };
+      return false;
+    },
+    [
+      cameraDistance,
+      camLowLimit,
+      camMoveSpeed,
+      camUpLimit,
+      isMouseDown,
+      followCam,
+      pivot,
+    ]
+  );
   // Mouse scroll event
-  const onDocumentMouseWheel = (e: Event) => {
-    const vz =
-      originZDis.current - (e as WheelEvent).deltaY * 0.002 * camZoomSpeed;
-    const vy = followCam.rotation.x;
-
-    if (vz >= camMaxDis && vz <= camMinDis) {
-      originZDis.current = vz;
-      followCam.position.z = originZDis.current * Math.cos(-vy);
-      followCam.position.y = originZDis.current * Math.sin(-vy);
-    }
-    return false;
-  };
-  /**
-   * Touch events
-   */
-  // Touch end event
-  const onTouchEnd = (e: TouchEvent) => {
-    previousTouch1 = null;
-    previousTouch2 = null;
-  };
-
-  // Touch move event
-  const onTouchMove = (e: TouchEvent) => {
-    // prevent swipe to navigate gesture
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    const touch1 = e.targetTouches[0];
-    const touch2 = e.targetTouches[1];
-
-    // One finger touch to rotate camera
-    if (previousTouch1 && !previousTouch2) {
-      const touch1MovementX = touch1.pageX - previousTouch1.pageX;
-      const touch1MovementY = touch1.pageY - previousTouch1.pageY;
-
-      pivot.rotation.y -= touch1MovementX * 0.005 * camMoveSpeed;
-      const vy = followCam.rotation.x + touch1MovementY * 0.005 * camMoveSpeed;
-
-      cameraDistance = followCam.position.length();
-
-      if (vy >= camLowLimit && vy <= camUpLimit) {
-        followCam.rotation.x = vy;
-        followCam.position.y = -cameraDistance * Math.sin(-vy);
-        followCam.position.z = -cameraDistance * Math.cos(-vy);
-      }
-    }
-
-    // Two fingers touch to zoom in/out camera
-    if (previousTouch2 && previousTouch1) {
-      const prePinchDis = Math.hypot(
-        previousTouch1.pageX - previousTouch2.pageX,
-        previousTouch1.pageY - previousTouch2.pageY
-      );
-      const pinchDis = Math.hypot(
-        e.touches[0].pageX - e.touches[1].pageX,
-        e.touches[0].pageY - e.touches[1].pageY
-      );
-
+  const onDocumentMouseWheel = useCallback(
+    (e: Event) => {
       const vz =
-        originZDis.current - (prePinchDis - pinchDis) * 0.01 * camZoomSpeed;
+        originZDis.current - (e as WheelEvent).deltaY * 0.002 * camZoomSpeed;
       const vy = followCam.rotation.x;
 
       if (vz >= camMaxDis && vz <= camMinDis) {
@@ -154,11 +109,88 @@ const useFollowCamera = ({
         followCam.position.z = originZDis.current * Math.cos(-vy);
         followCam.position.y = originZDis.current * Math.sin(-vy);
       }
-    }
+      return false;
+    },
+    [camMaxDis, camMinDis, camZoomSpeed, followCam]
+  );
+  /**
+   * Touch events
+   */
+  // Touch end event
+  const onTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      previousTouch1.current = null;
+      previousTouch2.current = null;
+    },
+    [previousTouch1, previousTouch2]
+  );
 
-    previousTouch1 = touch1;
-    previousTouch2 = touch2;
-  };
+  // Touch move event
+  const onTouchMove = useCallback(
+    (e: TouchEvent) => {
+      // prevent swipe to navigate gesture
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const touch1 = e.targetTouches[0];
+      const touch2 = e.targetTouches[1];
+
+      // One finger touch to rotate camera
+      if (previousTouch1.current && !previousTouch2.current) {
+        const touch1MovementX = touch1.pageX - previousTouch1.current.pageX;
+        const touch1MovementY = touch1.pageY - previousTouch1.current.pageY;
+
+        pivot.rotation.y -= touch1MovementX * 0.005 * camMoveSpeed;
+        const vy =
+          followCam.rotation.x + touch1MovementY * 0.005 * camMoveSpeed;
+
+        cameraDistance.current = followCam.position.length();
+
+        if (vy >= camLowLimit && vy <= camUpLimit) {
+          followCam.rotation.x = vy;
+          followCam.position.y = -cameraDistance.current * Math.sin(-vy);
+          followCam.position.z = -cameraDistance.current * Math.cos(-vy);
+        }
+      }
+
+      // Two fingers touch to zoom in/out camera
+      if (previousTouch2.current && previousTouch1.current) {
+        const prePinchDis = Math.hypot(
+          previousTouch1.current.pageX - previousTouch2.current.pageX,
+          previousTouch1.current.pageY - previousTouch2.current.pageY
+        );
+        const pinchDis = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+
+        const vz =
+          originZDis.current - (prePinchDis - pinchDis) * 0.01 * camZoomSpeed;
+        const vy = followCam.rotation.x;
+
+        if (vz >= camMaxDis && vz <= camMinDis) {
+          originZDis.current = vz;
+          followCam.position.z = originZDis.current * Math.cos(-vy);
+          followCam.position.y = originZDis.current * Math.sin(-vy);
+        }
+      }
+
+      previousTouch1.current = touch1;
+      previousTouch2.current = touch2;
+    },
+    [
+      camLowLimit,
+      camMoveSpeed,
+      camUpLimit,
+      camZoomSpeed,
+      followCam,
+      pivot,
+      previousTouch1,
+      previousTouch2,
+      camMaxDis,
+      camMinDis,
+    ]
+  );
 
   /**
    * Gamepad second joystick event
@@ -167,12 +199,12 @@ const useFollowCamera = ({
     pivot.rotation.y -= movementX * 0.005 * camMoveSpeed * 5;
     const vy = followCam.rotation.x + movementY * 0.005 * camMoveSpeed * 5;
 
-    cameraDistance = followCam.position.length();
+    cameraDistance.current = followCam.position.length();
 
     if (vy >= camLowLimit && vy <= camUpLimit) {
       followCam.rotation.x = vy;
-      followCam.position.y = -cameraDistance * Math.sin(-vy);
-      followCam.position.z = -cameraDistance * Math.cos(vy);
+      followCam.position.y = -cameraDistance.current * Math.sin(-vy);
+      followCam.position.z = -cameraDistance.current * Math.cos(vy);
     }
   };
 
@@ -180,7 +212,7 @@ const useFollowCamera = ({
    * Custom traverse function
    */
   // Prepare intersect objects for camera collision
-  function customTraverseAdd(object: Object3D) {
+  const customTraverseAdd = useCallback((object: Object3D) => {
     // Chekc if the object's userData camExcludeCollision is true
     if (object.userData && object.userData.camExcludeCollision === true) {
       return;
@@ -195,10 +227,10 @@ const useFollowCamera = ({
     object.children.forEach((child) => {
       customTraverseAdd(child); // Continue the traversal for all child objects
     });
-  }
+  }, []);
 
   // Remove intersect objects from camera collision array
-  function customTraverseRemove(object: Object3D) {
+  const customTraverseRemove = useCallback((object: Object3D) => {
     intersectObjects.current = intersectObjects.current.filter(
       (item) => item.uuid !== object.uuid // Keep all items except the one to remove
     );
@@ -207,7 +239,7 @@ const useFollowCamera = ({
     object.children.forEach((child) => {
       customTraverseRemove(child); // Continue the traversal for all child objects
     });
-  }
+  }, []);
 
   /**
    * Camera collision detection function
@@ -269,10 +301,10 @@ const useFollowCamera = ({
 
     if (camListenerTarget === "domElement") {
       gl.domElement.addEventListener("mousedown", () => {
-        isMouseDown = true;
+        isMouseDown.current = true;
       });
       gl.domElement.addEventListener("mouseup", () => {
-        isMouseDown = false;
+        isMouseDown.current = false;
       });
       gl.domElement.addEventListener("mousemove", onDocumentMouseMove);
       gl.domElement.addEventListener("mousewheel", onDocumentMouseWheel);
@@ -283,10 +315,10 @@ const useFollowCamera = ({
       });
     } else if (camListenerTarget === "document") {
       document.addEventListener("mousedown", () => {
-        isMouseDown = true;
+        isMouseDown.current = true;
       });
       document.addEventListener("mouseup", () => {
-        isMouseDown = false;
+        isMouseDown.current = false;
       });
       document.addEventListener("mousemove", onDocumentMouseMove);
       document.addEventListener("mousewheel", onDocumentMouseWheel);
@@ -298,10 +330,10 @@ const useFollowCamera = ({
     return () => {
       if (camListenerTarget === "domElement") {
         gl.domElement.removeEventListener("mousedown", () => {
-          isMouseDown = true;
+          isMouseDown.current = true;
         });
         gl.domElement.removeEventListener("mouseup", () => {
-          isMouseDown = false;
+          isMouseDown.current = false;
         });
         gl.domElement.removeEventListener("mousemove", onDocumentMouseMove);
         gl.domElement.removeEventListener("mousewheel", onDocumentMouseWheel);
@@ -310,10 +342,10 @@ const useFollowCamera = ({
         gl.domElement.removeEventListener("touchmove", onTouchMove);
       } else if (camListenerTarget === "document") {
         document.removeEventListener("mousedown", () => {
-          isMouseDown = true;
+          isMouseDown.current = true;
         });
         document.removeEventListener("mouseup", () => {
-          isMouseDown = false;
+          isMouseDown.current = false;
         });
         document.removeEventListener("mousemove", onDocumentMouseMove);
         document.removeEventListener("mousewheel", onDocumentMouseWheel);
@@ -324,7 +356,20 @@ const useFollowCamera = ({
       // Remove camera from followCam
       // followCam.remove(camera);
     };
-  }, []);
+  }, [
+    isMouseDown,
+    camInitDir,
+    camListenerTarget,
+    customTraverseAdd,
+    followCam,
+    gl,
+    onDocumentMouseMove,
+    onDocumentMouseWheel,
+    pivot,
+    scene,
+    onTouchEnd,
+    onTouchMove,
+  ]);
 
   // If followCam is disabled set to disableFollowCamPos, target to disableFollowCamTarget
   useEffect(() => {
@@ -344,7 +389,7 @@ const useFollowCamera = ({
           )
         );
     }
-  }, [disableFollowCam]);
+  }, [disableFollowCam, camera, disableFollowCamPos, disableFollowCamTarget]);
 
   // Handle scene add/remove objects events
   useEffect(() => {
@@ -356,7 +401,7 @@ const useFollowCamera = ({
       scene.removeEventListener("childadded", onObjectAdded);
       scene.removeEventListener("childremoved", onObjectRemoved);
     };
-  }, [scene]);
+  }, [scene, customTraverseAdd, customTraverseRemove]);
 
   return { pivot, followCam, cameraCollisionDetect, joystickCamMove };
 };

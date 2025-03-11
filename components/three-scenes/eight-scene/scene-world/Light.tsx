@@ -1,7 +1,8 @@
 import { useRef } from "react";
+import { DirectionalLight } from "three";
 
 const Lights = () => {
-  const directionalLightRef = useRef<THREE.DirectionalLight>(null);
+  const directionalLightRef = useRef<DirectionalLight>(null);
 
   // useHelper(directionalLightRef, THREE.DirectionalLightHelper, 1);
 
