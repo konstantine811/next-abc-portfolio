@@ -57,7 +57,7 @@ const Preloader = () => {
         height: `calc(100vh - ${headerHeight}px)`,
         top: `${headerHeight}px`,
       }}
-      className="absolute z-[1000] pointer-events-none flex w-full backdrop-blur-sm  left-0 flex-col items-center justify-center overflow-auto"
+      className="absolute z-10 pointer-events-none flex w-full backdrop-blur-sm  left-0 flex-col items-center justify-center overflow-auto"
     >
       <TextScramble
         className="z-10 opacity-25 whitespace-pre-wrap text-center text-md font-medium tracking-tighter text-foreground"
