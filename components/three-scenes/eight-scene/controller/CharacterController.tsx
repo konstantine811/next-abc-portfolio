@@ -25,17 +25,23 @@ const CharacterController = ({ modelPath }: CharacterControllerProps) => {
       animated
       followLight
       springK={2}
-      dampingC={0.2}
-      autoBalanceSpringK={1.2}
+      dampingC={0.4}
+      autoBalanceSpringK={1.6}
       autoBalanceDampingC={0.04}
       autoBalanceSpringOnY={0.7}
-      //   autoBalanceDampingOnY={0.05}
+      // autoBalanceDampingOnY={0.5}
       disableControl={disableControl}
       disableFollowCam={disableFollowCam}
+      capsuleHalfHeight={0.25}
+      capsuleRadius={0.3}
+      floatHeight={0}
     >
       <CharacterLoaderAnimation
         model={modelPath}
         animation={characterAnimation}
+        props={{
+          position: [0, -0.5, 0],
+        }}
       />
     </Controller>
   );

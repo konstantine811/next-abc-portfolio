@@ -1,18 +1,46 @@
-import { Environment, OrbitControls, Text3D, useGLTF } from "@react-three/drei";
+import {
+  Environment,
+  OrbitControls,
+  Scroll,
+  Text3D,
+  useGLTF,
+  useScroll,
+} from "@react-three/drei";
 import { foodItems } from "./SceneInit";
 import Panda from "./partials/Panda";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import { Group } from "three";
 
 const FoodItem = ({ model, page }: { model: string; page: number }) => {
   const gltf = useGLTF(model);
+  const ref = useRef<Group>(null!);
+  const viewport = useThree((state) => state.viewport);
+  const scrollData = useScroll();
+  useFrame(() => {
+    const pageScroll = scrollData.offset;
+    ref.current.rotation.y = pageScroll * Math.PI * 2;
+    const pages = scrollData.pages - 1;
+    const offsetX = 2;
+    ref.current.position.x =
+      scrollData.curve((page - 1) / pages, 1 / pages) * offsetX;
+  });
 
   return (
-    <group>
-      <primitive object={gltf.scene} position={[0, -page, 0]} />
+    <group ref={ref}>
+      <primitive
+        object={gltf.scene}
+        position={[0, -viewport.height * page, 0]}
+      />
     </group>
   );
 };
 
 const Experience = () => {
+  const scrollData = useScroll();
+  useFrame(({ camera }) => {
+    camera.position.x = -2 + scrollData.offset * 4;
+  });
   return (
     <>
       <OrbitControls
@@ -47,9 +75,11 @@ const Experience = () => {
           props={{ position: [2.5, 0, -5], rotation: [0, -Math.PI / 6, 0] }}
         />
       </group>
-      {foodItems.map((foodItem, idx) => (
-        <FoodItem key={idx} {...foodItem} />
-      ))}
+      <Scroll>
+        {foodItems.map((foodItem, idx) => (
+          <FoodItem key={idx} {...foodItem} />
+        ))}
+      </Scroll>
     </>
   );
 };

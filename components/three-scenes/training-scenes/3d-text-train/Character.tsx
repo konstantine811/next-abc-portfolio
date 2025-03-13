@@ -8,7 +8,6 @@ const Character = () => {
     "/3d-models/text-scene/Character Animated.glb"
   );
   const { actions } = useAnimations(animations, group);
-  console.log(actions);
   useEffect(() => {
     actions["Attacking_Idle"]?.play();
   }, []);

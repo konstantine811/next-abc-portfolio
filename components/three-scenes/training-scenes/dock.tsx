@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Baseline, Loader, Scroll } from "lucide-react";
+import { Baseline, Loader, Scroll, Rabbit, Joystick } from "lucide-react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { Link } from "@/i18n/routing";
 
@@ -26,6 +26,16 @@ const apps = [
     icon: Scroll,
     name: "Scroll Scene",
     link: getRepativePath("/scroll-scene"),
+  },
+  {
+    icon: Rabbit,
+    name: "Animation Scene",
+    link: getRepativePath("/animation-scene"),
+  },
+  {
+    icon: Joystick,
+    name: "Character Controller",
+    link: getRepativePath("/character-controller"),
   },
 ];
 

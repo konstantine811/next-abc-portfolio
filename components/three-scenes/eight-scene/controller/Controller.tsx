@@ -681,10 +681,10 @@ const Controller: ForwardRefRenderFunction<
     /**
      * Check if character complete turned to the wanted direction
      */
+
     characterRotated =
       Math.sin(characterModelIndicator.rotation.y).toFixed(3) ==
       Math.sin(modelEuler.y).toFixed(3);
-
     // If character hasn't complete turning, change the impulse quaternion follow characterModelIndicator quaternion
     if (!characterRotated) {
       moveImpulse.set(
@@ -718,7 +718,6 @@ const Controller: ForwardRefRenderFunction<
         moveForceNeeded.z * (canJump ? 1 : airDragMultiplier)
       );
     }
-
     // Move character at proper direction and impulse
     characterRef.current.applyImpulseAtPoint(
       moveImpulse,

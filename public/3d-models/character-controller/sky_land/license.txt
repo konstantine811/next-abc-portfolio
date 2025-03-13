@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sky Land
+* source:	https://sketchfab.com/3d-models/sky-land-5e09168d0f394f3d9e153f2e99daa011
+* author:	Pablo D. Becerril (https://sketchfab.com/pablobs182)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sky Land" (https://sketchfab.com/3d-models/sky-land-5e09168d0f394f3d9e153f2e99daa011) by Pablo D. Becerril (https://sketchfab.com/pablobs182) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
