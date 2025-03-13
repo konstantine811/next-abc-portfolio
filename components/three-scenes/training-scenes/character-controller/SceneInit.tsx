@@ -3,9 +3,17 @@
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Map from "./partials/Map";
 import CharacterController from "./CharacterController";
+import CharacterLoaderAnimation from "../../utils/CharacterLoaderAnimation";
+
+export enum CharacterAnimation {
+  Idle = "Idle",
+  Run = "Running",
+  Walk = "Walking",
+  Jump = "Jumping",
+}
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "KeyW"] },
@@ -17,6 +25,8 @@ const keyboardMap = [
 ];
 
 const SceneInit = () => {
+  const [characterAnimation, setCharacterAnimation] =
+    useState<CharacterAnimation>(CharacterAnimation.Idle);
   return (
     <Canvas shadows camera={{ position: [0, 5, 10] }}>
       <Suspense fallback={null}>
@@ -37,7 +47,19 @@ const SceneInit = () => {
           />
           <KeyboardControls map={keyboardMap}>
             {/* Character Control */}
-            <CharacterController />
+            <CharacterController
+              capsuleHalfHeight={0.6}
+              capsuleRadius={0.3}
+              maxVelLimit={3}
+            >
+              <CharacterLoaderAnimation
+                model={"/3d-models/character-controller/character.glb"}
+                animation={characterAnimation}
+                props={{
+                  position: [0, -0.9, 0],
+                }}
+              />
+            </CharacterController>
           </KeyboardControls>
           <Map />
         </Physics>

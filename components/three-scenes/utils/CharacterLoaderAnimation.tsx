@@ -26,8 +26,10 @@ const CharacterLoaderAnimation = ({ model, animation, props }: Props) => {
     const animSet: AnimationSet = {
       idle: "Idle",
       walk: "Walking",
-      run: "Running",
-      jump: "Jumping",
+      run: "Run",
+      jump: "Jump",
+      jumpLand: "JumpLand",
+      jumpIdle: "JumpIdle",
     };
     dispatch(initializeAnimationSet(animSet));
   }, []);

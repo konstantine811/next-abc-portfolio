@@ -46,10 +46,6 @@ const NavigationConfig = (): INaviagationConfig[] => {
           href: PATH_ROUTE_NAME.firstScene,
         },
         {
-          title: t("nav.three-train.second-scene"),
-          href: PATH_ROUTE_NAME.secondScene,
-        },
-        {
           title: t("nav.three-train.third-scene"),
           href: PATH_ROUTE_NAME.thirdScene,
         },
@@ -66,16 +62,8 @@ const NavigationConfig = (): INaviagationConfig[] => {
           href: PATH_ROUTE_NAME.sixthScene,
         },
         {
-          title: t("nav.three-train.seventh-scene"),
-          href: PATH_ROUTE_NAME.seventhScene,
-        },
-        {
           title: t("nav.three-train.sim-city-game"),
           href: PATH_ROUTE_NAME.simCityGame,
-        },
-        {
-          title: t("nav.three-train.eight-scene"),
-          href: PATH_ROUTE_NAME.eightScene,
         },
         {
           title: t("nav.three-train.traine-scene"),

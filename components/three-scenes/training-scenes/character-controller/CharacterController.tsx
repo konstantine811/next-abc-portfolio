@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import {
   CapsuleCollider,
   quat,
@@ -6,18 +6,25 @@ import {
   RigidBody,
   useRapier,
 } from "@react-three/rapier";
-import CharacterModel from "./CharacterModel";
 import { Euler, Group, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
-import useFollowCam from "../../eight-scene/controller/hooks/useFollowCamera";
+import useFollowCam from "./useFollowCamera";
 import { useKeyboardControls } from "@react-three/drei";
 import { getPivotMovingDirection } from "@/services/three-js/game.utils";
 import {
-  Collider,
   QueryFilterFlags,
   RayColliderHit,
   Vector,
 } from "@dimforge/rapier3d-compat";
+import { useDispatch } from "react-redux";
+import {
+  fall as fallAnimation,
+  idle as idleAnimation,
+  jumpIdle as jumpIdleAnimation,
+  walk as walkAnimation,
+  run as runAnimation,
+  jump as jumpAnimation,
+} from "@/lib/store/features/character-contoller/game-state.slice";
 
 export enum ActionName {
   Idle = "Idle",
@@ -38,6 +45,7 @@ export interface userDataType {
 }
 
 interface CharacterControllerProps {
+  children: ReactNode;
   capsuleHalfHeight?: number;
   capsuleRadius?: number;
   rayOriginOffest?: { x: number; y: number; z: number };
@@ -79,6 +87,7 @@ interface CharacterControllerProps {
   autoBalanceDampingOnY?: number;
   disableFollowCam?: boolean;
   camLerpMult?: number;
+  animated?: boolean;
 }
 
 export interface CustomControllerRigidBody extends RapierRigidBody {
@@ -128,7 +137,10 @@ const CharacterController = ({
   autoBalanceDampingOnY = 0.015,
   disableFollowCam = false,
   camLerpMult = 25,
+  animated = true,
+  children,
 }: CharacterControllerProps) => {
+  const dispatch = useDispatch();
   const [animation, setAnimation] = useState(ActionName.Idle);
   const characterRef = useRef<CustomControllerRigidBody>(null!);
   const characterModelRef = useRef<Group>(null!);
@@ -764,6 +776,32 @@ const CharacterController = ({
      * Apply auto balance force to the character
      */
     if (autoBalance && characterRef.current) autoBalanceCharacter();
+
+    /**
+     * Apply all the animations
+     */
+    if (animated) {
+      if (
+        !forward &&
+        !backward &&
+        !leftward &&
+        !rightward &&
+        !jump &&
+        canJump
+      ) {
+        dispatch(idleAnimation());
+      } else if (jump && canJump) {
+        dispatch(jumpAnimation());
+      } else if (canJump && (forward || backward || leftward || rightward)) {
+        run ? dispatch(runAnimation()) : dispatch(walkAnimation());
+      } else if (!canJump) {
+        dispatch(jumpIdleAnimation());
+      }
+      // On high sky, play falling animation
+      if (rayHit == null && isFalling) {
+        dispatch(fallAnimation());
+      }
+    }
   });
 
   return (
@@ -797,12 +835,7 @@ const CharacterController = ({
           <boxGeometry args={[0.15, 0.15, 0.15]} />
         </mesh>
         {/* Character model */}
-        <CharacterModel
-          path={"/3d-models/character-controller/character.glb"}
-          position={[0, -0.9, 0]}
-          animation={animation}
-          scale={1}
-        />
+        {children}
       </group>
     </RigidBody>
   );
