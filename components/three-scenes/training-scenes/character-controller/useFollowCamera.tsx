@@ -1,8 +1,8 @@
 import { useThree } from "@react-three/fiber";
-import { camListenerTargetType } from "../types/controller.model";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Mesh, Object3D, Raycaster, Vector3 } from "three";
 
+type camListenerTargetType = "document" | "domElement";
 interface UseFollowCamProps {
   disableFollowCam?: boolean;
   disableFollowCamPos?: { x: number; y: number; z: number };

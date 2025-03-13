@@ -10,7 +10,7 @@ const Character = () => {
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
     actions["Attacking_Idle"]?.play();
-  }, []);
+  }, [actions]);
 
   return (
     <group ref={group} dispose={null}>
