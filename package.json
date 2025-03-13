@@ -36,7 +36,6 @@
     "clsx": "^2.1.1",
     "ecctrl": "^1.0.92",
     "framer-motion": "^12.5.0",
-    "framer-motion-3d": "^12.4.13",
     "glsl-noise": "^0.0.0",
     "glslify": "^7.1.1",
     "got": "^14.4.6",
