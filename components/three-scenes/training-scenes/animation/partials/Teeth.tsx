@@ -56,7 +56,7 @@ const Teeth = () => {
         <mesh
           ref={ref}
           key={i}
-          position={[i - 1, i - 1, 0]}
+          position={[i - 1, i % 2 ? -1 : 1, 0]}
           rotation-x={i % 2 ? 0 : Math.PI}
         >
           <coneGeometry args={[0.5, 1, 4]} />
