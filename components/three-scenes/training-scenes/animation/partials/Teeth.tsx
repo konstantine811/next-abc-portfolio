@@ -17,7 +17,7 @@ const Teeth = () => {
       meshRefs.forEach((ref, i) => {
         if (ref.current) {
           gsap.to(ref.current.position, {
-            y: opened ? -1 : 0,
+            y: opened ? (i % 2 !== 0 ? -1 : 1) : 0,
             duration: 0.5,
             ease: "power2.inOut",
           });

@@ -37,6 +37,11 @@ const apps = [
     name: "Character Controller",
     link: getRepativePath("/character-controller"),
   },
+  {
+    icon: Joystick,
+    name: "Simple Character Controller",
+    link: getRepativePath("/simple-character-controller"),
+  },
 ];
 
 export default function Dock() {
