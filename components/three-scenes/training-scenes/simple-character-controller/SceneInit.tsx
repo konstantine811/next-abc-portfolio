@@ -3,14 +3,10 @@
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useRef } from "react";
 import Map from "../character-controller/partials/Map";
 import CharacterController from "./CharacterController";
-import Grass from "./grasses/Grass";
-import { RigidBody } from "@dimforge/rapier3d-compat";
-import { Group, Vector3 } from "three";
-import GrassBlade from "./grasses/GrassBlade";
-import GrassBladeV2 from "./grasses/GrassBlade_v2";
+import { Vector3 } from "three";
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "KeyW"] },

@@ -145,4 +145,6 @@ const CharacterController = forwardRef((props, ref) => {
   );
 });
 
+CharacterController.displayName = "CharacterController";
+
 export default CharacterController;

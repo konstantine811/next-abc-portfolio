@@ -8,7 +8,6 @@ import Map from "./partials/Map";
 import CharacterController from "./CharacterController";
 import CharacterLoaderAnimation from "../../utils/CharacterLoaderAnimation";
 import GrassBladeV2 from "../simple-character-controller/grasses/GrassBlade_v2";
-import FootprintTexture from "../simple-character-controller/grasses/FootPrint";
 import {
   LinearFilter,
   NearestFilter,
@@ -18,7 +17,6 @@ import {
   WebGLRenderTarget,
 } from "three";
 import FootprintTextureDebug from "../simple-character-controller/grasses/FootPrintDebug";
-import TrailTexture from "../simple-character-controller/grasses/TrailTexture";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 import TrailCapsule from "../simple-character-controller/grasses/TrailCapsule";

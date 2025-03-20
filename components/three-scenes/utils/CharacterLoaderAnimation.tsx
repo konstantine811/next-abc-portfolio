@@ -32,7 +32,7 @@ const CharacterLoaderAnimation = ({ model, animation, props }: Props) => {
       jumpIdle: "JumpIdle",
     };
     dispatch(initializeAnimationSet(animSet));
-  }, []);
+  }, [dispatch]);
   useEffect(() => {
     // Play animation
     const action = actions[curAnimation ? curAnimation : "Idle"];
@@ -66,7 +66,7 @@ const CharacterLoaderAnimation = ({ model, animation, props }: Props) => {
       );
       (action as any)._mixer._listeners = [];
     };
-  }, [curAnimation, dispatch, actions, animationSet, dispatch]);
+  }, [curAnimation, dispatch, actions, animationSet]);
 
   return <primitive object={scene} {...props} />;
 };
