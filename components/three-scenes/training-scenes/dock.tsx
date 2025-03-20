@@ -10,6 +10,7 @@ import {
   Airplay,
   Earth,
   Car,
+  Theater,
 } from "lucide-react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { Link } from "@/i18n/routing";
@@ -65,6 +66,11 @@ const apps = [
     icon: Car,
     name: "Game Engine",
     link: getRepativePath("/game-engine"),
+  },
+  {
+    icon: Theater,
+    name: "Theater Scene",
+    link: getRepativePath("/theatre-animation"),
   },
 ];
 

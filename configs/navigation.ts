@@ -39,7 +39,6 @@ const NavigationConfig = (): INaviagationConfig[] => {
     {
       title: t("nav.three-train.title"),
       href: PATH_ROUTE_NAME.threeTrain,
-      isDev: true,
       children: [
         {
           title: t("nav.three-train.first-scene"),
