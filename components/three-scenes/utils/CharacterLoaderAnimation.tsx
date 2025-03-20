@@ -66,7 +66,7 @@ const CharacterLoaderAnimation = ({ model, animation, props }: Props) => {
       );
       (action as any)._mixer._listeners = [];
     };
-  }, [curAnimation]);
+  }, [curAnimation, dispatch, actions, animationSet, dispatch]);
 
   return <primitive object={scene} {...props} />;
 };

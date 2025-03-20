@@ -50,7 +50,7 @@ const Earth = ({ speed }: { speed: number }) => {
     };
 
     earthMaterial.current.needsUpdate = true; // Оновлюємо шейдер
-  }, []);
+  }, [cloudsMap]);
 
   const { bumpScale } = useControls("Earth", {
     bumpScale: { value: 251, min: 0, max: 5000 },

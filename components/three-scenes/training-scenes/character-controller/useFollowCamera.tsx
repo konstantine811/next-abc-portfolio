@@ -401,6 +401,7 @@ const useFollowCamera = ({
     onPointerMove,
     onPointerUp,
     isDraged,
+    camera,
   ]);
 
   // If followCam is disabled set to disableFollowCamPos, target to disableFollowCamTarget

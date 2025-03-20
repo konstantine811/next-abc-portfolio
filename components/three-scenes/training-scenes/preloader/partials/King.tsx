@@ -15,7 +15,7 @@ const King = ({ groupProps }: KingProps) => {
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
     actions["Sword_Slash"]?.fadeIn(0.5).play();
-  }, []);
+  }, [actions]);
   return (
     <group ref={group} {...groupProps} dispose={null}>
       <group name="Scene">

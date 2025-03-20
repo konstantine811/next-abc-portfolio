@@ -1,54 +1,13 @@
-import { useRef, useEffect, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import gsap from "gsap";
-import { Material, Mesh, MeshStandardMaterial } from "three";
+import { useRef } from "react";
+import { Mesh } from "three";
 
 const Teeth = () => {
-  const [opened, setOpened] = useState(false);
+  // ✅ Створюємо рефи на верхньому рівні без `useMemo`
   const meshRefs = [
     useRef<Mesh>(null!),
     useRef<Mesh>(null),
     useRef<Mesh>(null),
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOpened((prev) => !prev);
-      meshRefs.forEach((ref, i) => {
-        if (ref.current) {
-          gsap.to(ref.current.position, {
-            y: opened ? (i % 2 !== 0 ? -1 : 1) : 0,
-            duration: 0.5,
-            ease: "power2.inOut",
-          });
-
-          gsap.to(ref.current.rotation, {
-            y: opened ? 0 : Math.PI / 2,
-            duration: 0.5,
-            ease: "power2.inOut",
-          });
-
-          gsap.to(ref.current.scale, {
-            x: opened ? 1 : 1.1 + i * 0.05,
-            y: opened ? 1 : 1.1 + i * 0.05,
-            z: opened ? 1 : 1.1 + i * 0.05,
-            duration: 0.5,
-            ease: "power2.inOut",
-          });
-
-          gsap.to((ref.current.material as MeshStandardMaterial).color, {
-            r: opened ? 1 : 0.49,
-            g: opened ? 1 : 0.36,
-            b: opened ? 1 : 0.81,
-            duration: 0.5,
-            ease: "power2.inOut",
-          });
-        }
-      });
-    }, 1500);
-
-    return () => clearInterval(interval);
-  }, [opened]);
 
   return (
     <group>

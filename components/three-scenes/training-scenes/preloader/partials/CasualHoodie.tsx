@@ -15,7 +15,7 @@ const CasualHoodie = ({ groupProps }: CasualHoodieProps) => {
 
   useEffect(() => {
     actions["Run_Back"]?.fadeIn(0.5).play();
-  }, []);
+  }, [actions]);
   return (
     <group ref={group} {...groupProps} dispose={null}>
       <group name="Scene">

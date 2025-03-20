@@ -17,7 +17,7 @@ const Panda = ({ props }: PandaProps) => {
     return () => {
       actions[animation]?.fadeOut(0.5);
     };
-  }, [animation]);
+  }, [animation, actions]);
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Scene">

@@ -14,7 +14,7 @@ const Spacesuit = ({ groupProps }: SpacesuitProps) => {
   const { actions } = useAnimations(animations, group);
   useEffect(() => {
     actions["Gun_Shoot"]?.fadeIn(0.5).play();
-  }, []);
+  }, [actions]);
   return (
     <group ref={group} {...groupProps} dispose={null}>
       <group name="Scene">
