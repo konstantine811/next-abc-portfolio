@@ -1,12 +1,27 @@
 "use client";
 
-import { KeyboardControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { KeyboardControls, useTrailTexture } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import Map from "./partials/Map";
 import CharacterController from "./CharacterController";
 import CharacterLoaderAnimation from "../../utils/CharacterLoaderAnimation";
+import GrassBladeV2 from "../simple-character-controller/grasses/GrassBlade_v2";
+import FootprintTexture from "../simple-character-controller/grasses/FootPrint";
+import {
+  LinearFilter,
+  NearestFilter,
+  RGBAFormat,
+  Texture,
+  Vector2,
+  WebGLRenderTarget,
+} from "three";
+import FootprintTextureDebug from "../simple-character-controller/grasses/FootPrintDebug";
+import TrailTexture from "../simple-character-controller/grasses/TrailTexture";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
+import TrailCapsule from "../simple-character-controller/grasses/TrailCapsule";
 
 export enum CharacterAnimation {
   Idle = "Idle",
@@ -27,8 +42,29 @@ const keyboardMap = [
 const SceneInit = () => {
   const [characterAnimation, setCharacterAnimation] =
     useState<CharacterAnimation>(CharacterAnimation.Idle);
+  const currentPositionTextureRef = useRef<Texture>(null!);
+
   return (
     <Canvas shadows camera={{ position: [0, 5, 10] }}>
+      <TrailCapsule
+        isDebug
+        onTextureUpdate={(texture) => {
+          currentPositionTextureRef.current = texture;
+        }}
+      />
+      {/* <FootprintTextureDebug /> */}
+      {/* Площина з текстурою сліду */}
+      {/* Компонент, що малює текстуру */}
+      {/* <TrailTexture fadeSpeed={3} trailRT={footprintRT} /> */}
+
+      {/* Відображення сліду на землі */}
+      {/* <mesh position={[0, -2.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[10, 10]} />
+        <meshBasicMaterial
+          map={footprintRT.current?.texture || null}
+          color={"white"}
+        />
+      </mesh> */}
       <Suspense fallback={null}>
         <Physics debug>
           <ambientLight intensity={1} />
@@ -62,6 +98,7 @@ const SceneInit = () => {
             </CharacterController>
           </KeyboardControls>
           <Map />
+          <GrassBladeV2 currentPositionTextureRef={currentPositionTextureRef} />
         </Physics>
       </Suspense>
     </Canvas>

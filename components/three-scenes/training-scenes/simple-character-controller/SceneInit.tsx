@@ -3,9 +3,14 @@
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import Map from "../character-controller/partials/Map";
 import CharacterController from "./CharacterController";
+import Grass from "./grasses/Grass";
+import { RigidBody } from "@dimforge/rapier3d-compat";
+import { Group, Vector3 } from "three";
+import GrassBlade from "./grasses/GrassBlade";
+import GrassBladeV2 from "./grasses/GrassBlade_v2";
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "KeyW"] },
@@ -17,9 +22,15 @@ const keyboardMap = [
 ];
 
 const SceneInit = () => {
+  const characterRef = useRef<{
+    getPosition: () => Vector3;
+  }>(null!);
+
   return (
     <Canvas shadows camera={{ position: [0, 5, 10] }}>
       <Suspense fallback={null}>
+        <directionalLight position={[5, 5, 5]} intensity={1.5} />
+        <ambientLight intensity={0.5} />
         {/* <CameraOrbitControls /> */}
         <Physics debug>
           <ambientLight intensity={1} />
@@ -38,9 +49,12 @@ const SceneInit = () => {
           />
           <KeyboardControls map={keyboardMap}>
             {/* Character Control */}
-            <CharacterController />
+            <CharacterController ref={characterRef} />
           </KeyboardControls>
           <Map />
+          {/* <Grass characterRef={characterRef} /> */}
+          {/* <GrassBlade /> */}
+          {/* <GrassBladeV2 /> */}
         </Physics>
       </Suspense>
     </Canvas>

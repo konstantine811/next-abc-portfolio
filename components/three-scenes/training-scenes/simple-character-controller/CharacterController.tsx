@@ -3,7 +3,7 @@ import {
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
-import { useRef, useState } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Group, Vector3 } from "three";
 import { useFrame } from "@react-three/fiber";
 import { useControls } from "leva";
@@ -13,7 +13,7 @@ import { ActionName } from "../character-controller/CharacterController";
 import { lerpAngle } from "@/services/three-js/game.utils";
 import CharacterModel from "../character-controller/CharacterModel";
 
-const CharacterController = () => {
+const CharacterController = forwardRef((props, ref) => {
   const { WALK_SPEED, RUN_SPEED, ROTATION_SPEED, JUMP_FORCE } = useControls({
     WALK_SPEED: { value: 2.2, min: 0.1, max: 4, step: 0.1 },
     RUN_SPEED: { value: 6.4, min: 0.2, max: 12, step: 0.2 },
@@ -38,12 +38,21 @@ const CharacterController = () => {
   const cameraLookAtWorldPosition = useRef<Vector3>(new Vector3());
   const cameraLookAt = useRef<Vector3>(new Vector3());
   const [, get] = useKeyboardControls();
+  const characterPosition = useRef(new Vector3());
+  useImperativeHandle(ref, () => ({
+    getPosition: () => characterPosition.current.clone(),
+  }));
+
   useFrame(({ camera }) => {
     const vel = { x: 0, z: 0, y: 0 };
 
     if (rb.current) {
       const curVel = rb.current.linvel(); // Поточна швидкість
-
+      characterPosition.current.set(
+        rb.current.translation().x,
+        rb.current.translation().y,
+        rb.current.translation().z
+      );
       // Дозволити рух лише на землі
       if (get().forward) {
         vel.z = 1;
@@ -107,35 +116,33 @@ const CharacterController = () => {
   });
 
   return (
-    <>
-      <RigidBody
-        userData={{ isGround: true }}
-        colliders={false}
-        position={[0, 3, 0]}
-        lockRotations
-        ref={rb}
-        onCollisionEnter={({ other }) => {
-          if (other.rigidBodyObject?.userData?.isGround) {
-            inTheAir.current = false;
-          }
-        }}
-      >
-        <group ref={container}>
-          <group ref={cameraTarget} position-z={1.5} />
-          <group ref={cameraPosition} position-y={4} position-z={-4} />
-          <group ref={character}>
-            <CharacterModel
-              path={"/3d-models/character-controller/character.glb"}
-              position={[0, -0.9, 0]}
-              animation={animation}
-              scale={1}
-            />
-          </group>
+    <RigidBody
+      userData={{ isGround: true }}
+      colliders={false}
+      position={[0, 3, 0]}
+      lockRotations
+      ref={rb}
+      onCollisionEnter={({ other }) => {
+        if (other.rigidBodyObject?.userData?.isGround) {
+          inTheAir.current = false;
+        }
+      }}
+    >
+      <group ref={container}>
+        <group ref={cameraTarget} position-z={1.5} />
+        <group ref={cameraPosition} position-y={4} position-z={-4} />
+        <group ref={character}>
+          <CharacterModel
+            path={"/3d-models/character-controller/character.glb"}
+            position={[0, -0.9, 0]}
+            animation={animation}
+            scale={1}
+          />
         </group>
-        <CapsuleCollider args={[0.6, 0.4]} />
-      </RigidBody>
-    </>
+      </group>
+      <CapsuleCollider args={[0.6, 0.4]} />
+    </RigidBody>
   );
-};
+});
 
 export default CharacterController;

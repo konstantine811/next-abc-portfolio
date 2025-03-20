@@ -12,17 +12,25 @@ const Mapbox = () => {
   const orbitAngle = useRef(0);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const isAnimatingRef = useRef(true);
-  const [{ isAnimating }, set] = useControls(() => ({
+  // Контролери для leva
+  const [{ isAnimating, speed }, set] = useControls(() => ({
     isAnimating: { value: true, label: "Animate Orbit" },
+    speed: {
+      value: 0.0002,
+      min: 0.000000001,
+      max: 0.01,
+      step: 0.0001,
+      label: "Orbit Speed",
+    },
   }));
   const animationId = useRef<number | null>(null);
   function getCoordinates() {
-    const radius = 30; // Радіус орбіти
-    const centerLng = 0; // Довгота центру орбіти
-    const centerLat = 0; // Широта центру орбіти
+    const radius = 170; // Радіус орбіти
+    const centerLng = 50; // Довгота центру орбіти
+    const centerLat = 30; // Широта центру орбіти
 
-    // Зміна кута для обертання по орбіті
-    orbitAngle.current += 0.0002;
+    // Використання динамічної швидкості з leva
+    orbitAngle.current += 0.00003;
 
     // Обчислення нових координат на основі кута орбіти
     const lng = centerLng + radius * Math.cos(orbitAngle.current);

@@ -24,6 +24,8 @@ import {
   walk as walkAnimation,
   run as runAnimation,
   jump as jumpAnimation,
+  onMove,
+  setOnGround,
 } from "@/lib/store/features/character-contoller/game-state.slice";
 
 export enum ActionName {
@@ -487,6 +489,13 @@ const CharacterController = ({
     );
     if (forward || backward || leftward || rightward) {
       moveCharacter(delta, run, slopeAngle, movingObjectVelocity);
+      dispatch(
+        onMove({
+          x: currentPos.x,
+          y: currentPos.y - capsuleHalfHeight - capsuleRadius,
+          z: currentPos.z,
+        })
+      );
     }
 
     rayOrigin.addVectors(currentPos, rayOriginOffest as Vector3);
@@ -546,10 +555,12 @@ const CharacterController = ({
     }
 
     if (rayHit && rayHit.timeOfImpact < floatingDis + rayHitForgiveness) {
+      dispatch(setOnGround(true));
       if (slopeRayHit && actualSlopeAngle < slopeMaxAngle) {
         canJump = true;
       }
     } else {
+      dispatch(setOnGround(false));
       canJump = false;
     }
 

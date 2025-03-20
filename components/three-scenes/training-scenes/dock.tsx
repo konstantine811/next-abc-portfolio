@@ -1,7 +1,16 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Baseline, Loader, Scroll, Rabbit, Joystick } from "lucide-react";
+import {
+  Baseline,
+  Loader,
+  Scroll,
+  Rabbit,
+  Joystick,
+  Airplay,
+  Earth,
+  Car,
+} from "lucide-react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { Link } from "@/i18n/routing";
 
@@ -41,6 +50,21 @@ const apps = [
     icon: Joystick,
     name: "Simple Character Controller",
     link: getRepativePath("/simple-character-controller"),
+  },
+  {
+    icon: Airplay,
+    name: "Airplane Game",
+    link: getRepativePath("/airplane-game"),
+  },
+  {
+    icon: Earth,
+    name: "Earth Scene",
+    link: getRepativePath("/earth"),
+  },
+  {
+    icon: Car,
+    name: "Game Engine",
+    link: getRepativePath("/game-engine"),
   },
 ];
 

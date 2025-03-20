@@ -19,12 +19,18 @@ interface GameState {
   moveToPoint: THREE.Vector3 | null;
   curAnimation: string | null;
   animationSet: AnimationSet;
+  currentPosition: { x: number; y: number; z: number };
+  onGround?: boolean;
+  grassMaterial: THREE.ShaderMaterial | null;
 }
 
 const initialState: GameState = {
   moveToPoint: null,
   curAnimation: null,
   animationSet: {},
+  currentPosition: { x: 0, y: 0, z: 0 },
+  onGround: true,
+  grassMaterial: null,
 };
 
 // Функція для перевірки, чи можна змінити анімацію
@@ -134,6 +140,15 @@ export const gameSlice = createSlice({
     setMoveToPoint: (state, action: PayloadAction<THREE.Vector3 | null>) => {
       state.moveToPoint = action.payload;
     },
+    onMove: (
+      state,
+      action: PayloadAction<{ x: number; y: number; z: number }>
+    ) => {
+      state.currentPosition = action.payload;
+    },
+    setOnGround: (state, action: PayloadAction<boolean>) => {
+      state.onGround = action.payload;
+    },
   },
 });
 
@@ -152,6 +167,8 @@ export const {
   action3,
   action4,
   setMoveToPoint,
+  onMove,
+  setOnGround,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;
