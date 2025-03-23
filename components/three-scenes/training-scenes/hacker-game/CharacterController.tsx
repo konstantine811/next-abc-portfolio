@@ -13,6 +13,8 @@ import { Group, Mesh, Vector3 } from "three";
 import CharacterModel from "../character-controller/CharacterModel";
 import { ActionName } from "../character-controller/CharacterController";
 import { lerpAngle } from "@/services/three-js/game.utils";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 const CharacterController = ({
   cameraControl,
@@ -30,9 +32,11 @@ const CharacterController = ({
   const characterRotationTarget = useRef(0);
   const rotationTarget = useRef(0);
   const bobbingTimeRef = useRef(0);
+  const lastCharacterRotation = useRef(0);
 
-  const [, getKeys] = useKeyboardControls();
-
+  const { backward, forward, jump, leftward, rightward, run } = useSelector(
+    (state: RootState) => state.controlGameState
+  );
   const { JUMP_FORCE, RUN_SPEED, WALK_SPEED } = useControls({
     JUMP_FORCE: { value: 6, min: 1, max: 20, step: 0.1 },
     WALK_SPEED: { value: 2.2, min: 0.1, max: 4, step: 0.1 },
@@ -57,7 +61,6 @@ const CharacterController = ({
   }, [cameraControl]);
 
   useFrame(({ camera, clock }) => {
-    const { forward, backward, leftward, rightward, jump, run } = getKeys();
     const delta = clock.getDelta();
 
     if (!rigidBody.current) return;
@@ -133,11 +136,12 @@ const CharacterController = ({
     // Обертання персонажа
     character.current.rotation.y = lerpAngle(
       character.current.rotation.y,
-      characterRotationTarget.current,
+      lastCharacterRotation.current,
       inTheAir.current ? 0.03 : 0.1
     );
 
     if (isMoving) {
+      lastCharacterRotation.current = Math.atan2(vel.x, vel.z);
       bobbingTimeRef.current += delta * movingSpeedBob;
     } else {
       bobbingTimeRef.current = 0;

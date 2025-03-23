@@ -1,129 +1,149 @@
-// JoystickControlsProvider.tsx
-"use client";
+import {
+  setAll,
+  setJump,
+  setRun,
+} from "@/lib/store/features/character-contoller/control-state.slice";
+import { useState, useRef, TouchEvent } from "react";
+import { useDispatch } from "react-redux";
 
-import { useEffect, useRef, useState } from "react";
+const getDirectionFromAngle = (degree: number) => {
+  const normalized = (degree + 360) % 360;
 
-const initialInput = {
-  forward: false,
-  backward: false,
-  leftward: false,
-  rightward: false,
-  jump: false,
-  run: false,
+  if (normalized >= 337.5 || normalized < 22.5) return "right";
+  if (normalized >= 22.5 && normalized < 67.5) return "down-right";
+  if (normalized >= 67.5 && normalized < 112.5) return "down";
+  if (normalized >= 112.5 && normalized < 157.5) return "down-left";
+  if (normalized >= 157.5 && normalized < 202.5) return "left";
+  if (normalized >= 202.5 && normalized < 247.5) return "up-left";
+  if (normalized >= 247.5 && normalized < 292.5) return "up";
+  if (normalized >= 292.5 && normalized < 337.5) return "up-right";
+
+  return "right";
 };
 
-export default function JoystickControlsProvider({}: {}) {
-  const [input, setInput] = useState(initialInput);
-  const [stickPos, setStickPos] = useState({ x: 0, y: 0 });
-  const jumpPressed = useRef(false);
-  const runPressed = useRef(false);
-  const baseRef = useRef<HTMLDivElement>(null);
+const JoystickController = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [origin, setOrigin] = useState({ x: 0, y: 0 });
+  const [active, setActive] = useState(false);
+  const joystickAreaRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space") jumpPressed.current = true;
-      if (e.code === "ShiftLeft" || e.code === "ShiftRight")
-        runPressed.current = true;
-    };
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "Space") jumpPressed.current = false;
-      if (e.code === "ShiftLeft" || e.code === "ShiftRight")
-        runPressed.current = false;
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
+  const handleTouchStart = (e: TouchEvent) => {
+    const touch = e.touches[0];
+    const rect = joystickAreaRef.current?.getBoundingClientRect();
+    if (!rect) return;
 
-  const handleJoystickMove = (angle: number | null, distance: number) => {
-    if (angle === null || distance < 10) {
-      setInput((prev) => ({
-        ...prev,
-        forward: false,
-        backward: false,
-        leftward: false,
-        rightward: false,
-      }));
-      setStickPos({ x: 0, y: 0 });
-      return;
+    if (
+      touch.clientX >= rect.left &&
+      touch.clientX <= rect.right &&
+      touch.clientY >= rect.top &&
+      touch.clientY <= rect.bottom
+    ) {
+      setOrigin({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+      setPosition({ x: 0, y: 0 });
+      setActive(true);
     }
-    const deg = (angle * 180) / Math.PI;
-
-    const forward = deg >= 315 || deg <= 45;
-    const rightward = deg > 45 && deg < 135;
-    const backward = deg >= 135 && deg <= 225;
-    const leftward = deg > 225 && deg < 315;
-
-    setInput({
-      forward,
-      backward,
-      leftward,
-      rightward,
-      jump: jumpPressed.current,
-      run: runPressed.current,
-    });
-
-    // Відображення положення стіку
-    const maxDist = 40;
-    const x = Math.cos(angle) * Math.min(distance, maxDist);
-    const y = -Math.sin(angle) * Math.min(distance, maxDist);
-    setStickPos({ x, y });
   };
 
-  return (
-    <div
-      ref={baseRef}
-      style={{
-        position: "absolute",
-        bottom: 20,
-        left: 20,
-        width: 120,
-        height: 120,
-        borderRadius: "50%",
-        background: "rgba(255, 255, 255, 0.05)",
-        touchAction: "none",
-      }}
-      className="z-[10000]"
-      onTouchStart={(e) => e.preventDefault()}
-      onTouchMove={(e) => {
-        if (e.touches.length > 0 && baseRef.current) {
-          const rect = baseRef.current.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-          const touch = e.touches[0];
-          const dx = touch.clientX - centerX;
-          const dy = centerY - touch.clientY;
-          const angle = Math.atan2(dy, dx);
-          const distance = Math.min(Math.sqrt(dx * dx + dy * dy), 60);
-          handleJoystickMove(angle, distance);
-        }
-      }}
-      onTouchEnd={() => {
-        setInput((prev) => ({
-          ...prev,
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!active) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - origin.x;
+    const dy = touch.clientY - origin.y;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angleRad = Math.atan2(dy, dx);
+    const deg = (angleRad * 180) / Math.PI;
+
+    if (distance < 8) {
+      dispatch(
+        setAll({
           forward: false,
           backward: false,
           leftward: false,
           rightward: false,
-        }));
-        setStickPos({ x: 0, y: 0 });
-      }}
-    >
+        })
+      );
+      setPosition({ x: 0, y: 0 });
+      return;
+    }
+
+    const maxDistance = 40;
+    const limitedX = Math.cos(angleRad) * Math.min(distance, maxDistance);
+    const limitedY = Math.sin(angleRad) * Math.min(distance, maxDistance);
+
+    setPosition({ x: limitedX, y: limitedY });
+
+    const dir = getDirectionFromAngle(deg);
+
+    dispatch(
+      setAll({
+        forward: dir.includes("up"),
+        backward: dir.includes("down"),
+        leftward: dir.includes("left"),
+        rightward: dir.includes("right"),
+      })
+    );
+  };
+
+  const handleTouchEnd = () => {
+    setPosition({ x: 0, y: 0 });
+    setActive(false);
+    dispatch(
+      setAll({
+        forward: false,
+        backward: false,
+        leftward: false,
+        rightward: false,
+      })
+    );
+  };
+
+  return (
+    <>
+      {/* Joystick (left) */}
       <div
-        style={{
-          position: "absolute",
-          width: 40,
-          height: 40,
-          borderRadius: "50%",
-          background: "rgba(255, 255, 255, 0.3)",
-          transform: `translate(${40 + stickPos.x}px, ${40 + stickPos.y}px)`,
-          transition:
-            stickPos.x === 0 && stickPos.y === 0 ? "transform 0.2s" : "none",
-        }}
-      />
-    </div>
+        className="fixed bottom-6 left-6 w-[100px] h-[100px] z-[10000] touch-none"
+        ref={joystickAreaRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="relative w-full h-full rounded-full border border-black/30 bg-white/10">
+          <div
+            className="absolute w-[50px] h-[50px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/60"
+            style={{
+              transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px))`,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Action Buttons (right) */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-[10000] touch-none">
+        {/* Jump Button */}
+        <button
+          className="w-[60px] h-[60px] rounded-full bg-blue-600 text-white text-sm font-semibold shadow-md active:scale-95 transition-transform"
+          onTouchStart={() => dispatch(setJump(true))}
+          onTouchEnd={() => dispatch(setJump(false))}
+        >
+          Jump
+        </button>
+
+        {/* Run Button */}
+        <button
+          className="w-[60px] h-[60px] rounded-full bg-green-600 text-white text-sm font-semibold shadow-md active:scale-95 transition-transform"
+          onTouchStart={() => dispatch(setRun(true))}
+          onTouchEnd={() => dispatch(setRun(false))}
+        >
+          Run
+        </button>
+      </div>
+    </>
   );
-}
+};
+
+export default JoystickController;

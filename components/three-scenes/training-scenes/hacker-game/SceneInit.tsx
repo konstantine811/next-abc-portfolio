@@ -1,15 +1,17 @@
 "use client";
 
-import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import CharacterController from "./CharacterController";
 import Boxes from "./Boxes";
 import CameraControlsProvider from "./CameraControls";
 import CameraControls from "camera-controls";
 import { useControls } from "leva";
-import JoystickControlsProvider from "./JoystickController";
+import JoystickController from "./JoystickController";
+import KeyboardController from "./KeyboardController";
+import { Key } from "lucide-react";
+import { KeyboardControls } from "@react-three/drei";
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "KeyW"] },
@@ -25,13 +27,19 @@ const SceneInit = () => {
     null
   );
 
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    setIsTouch("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
+
   const { isDebugPhysics } = useControls({
     isDebugPhysics: { value: true, label: "Debug Physics" },
   });
 
   return (
     <>
-      <JoystickControlsProvider />
+      {isTouch ? <JoystickController /> : <KeyboardController />}
       <Canvas shadows camera={{ position: [0, 5, 10] }}>
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
@@ -41,9 +49,8 @@ const SceneInit = () => {
           {/* <CameraOrbitControls /> */}
           <Physics debug={isDebugPhysics}>
             <Boxes />
-            <KeyboardControls map={keyboardMap}>
-              <CharacterController cameraControl={cameraControl} />
-            </KeyboardControls>
+
+            <CharacterController cameraControl={cameraControl} />
             {/* Groud */}
             <RigidBody
               type="fixed"
