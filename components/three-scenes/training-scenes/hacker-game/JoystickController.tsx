@@ -58,6 +58,7 @@ const JoystickController = () => {
     const angleRad = Math.atan2(dy, dx);
     const deg = (angleRad * 180) / Math.PI;
 
+    // Якщо дуже близько до центру — вважаємо що стік у центрі
     if (distance < 8) {
       dispatch(
         setAll({
@@ -67,13 +68,14 @@ const JoystickController = () => {
           rightward: false,
         })
       );
+      dispatch(setRun(false));
       setPosition({ x: 0, y: 0 });
       return;
     }
 
-    const maxDistance = 40;
-    const limitedX = Math.cos(angleRad) * Math.min(distance, maxDistance);
-    const limitedY = Math.sin(angleRad) * Math.min(distance, maxDistance);
+    const maxDrag = 60; // 🔥 новий максимум перетягування
+    const limitedX = Math.cos(angleRad) * Math.min(distance, maxDrag);
+    const limitedY = Math.sin(angleRad) * Math.min(distance, maxDrag);
 
     setPosition({ x: limitedX, y: limitedY });
 
@@ -87,11 +89,15 @@ const JoystickController = () => {
         rightward: dir.includes("right"),
       })
     );
+
+    // 🔥 Run режим при сильному нахилі
+    dispatch(setRun(distance > 30));
   };
 
   const handleTouchEnd = () => {
     setPosition({ x: 0, y: 0 });
     setActive(false);
+    dispatch(setRun(false));
     dispatch(
       setAll({
         forward: false,
@@ -104,7 +110,7 @@ const JoystickController = () => {
 
   return (
     <>
-      {/* Joystick (left) */}
+      {/* Joystick */}
       <div
         className="fixed bottom-6 left-6 w-[100px] h-[100px] z-[10000] touch-none"
         ref={joystickAreaRef}
@@ -122,24 +128,14 @@ const JoystickController = () => {
         </div>
       </div>
 
-      {/* Action Buttons (right) */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-[10000] touch-none">
-        {/* Jump Button */}
+      {/* Jump Button */}
+      <div className="fixed bottom-6 right-6 z-[10000] touch-none">
         <button
           className="w-[60px] h-[60px] rounded-full bg-blue-600 text-white text-sm font-semibold shadow-md active:scale-95 transition-transform"
           onTouchStart={() => dispatch(setJump(true))}
           onTouchEnd={() => dispatch(setJump(false))}
         >
           Jump
-        </button>
-
-        {/* Run Button */}
-        <button
-          className="w-[60px] h-[60px] rounded-full bg-green-600 text-white text-sm font-semibold shadow-md active:scale-95 transition-transform"
-          onTouchStart={() => dispatch(setRun(true))}
-          onTouchEnd={() => dispatch(setRun(false))}
-        >
-          Run
         </button>
       </div>
     </>
