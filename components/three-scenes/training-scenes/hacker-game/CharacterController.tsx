@@ -48,7 +48,7 @@ const CharacterController = ({
       cameraControl.setLookAt(
         pos.x, // camera x
         pos.y + 3, // camera y
-        pos.z - 5, // camera z
+        pos.z - 2, // camera z
         pos.x, // target x
         pos.y + 1, // target y
         pos.z // target z
@@ -76,6 +76,7 @@ const CharacterController = ({
 
     const airDamping = 0.96; // як швидко згасає інерція
     const airControl = 0.02;
+    const adjustedAirControl = airControl * (JUMP_FORCE / 6);
     const moveDir = new Vector3();
 
     if (forward) {
@@ -103,6 +104,14 @@ const CharacterController = ({
       z: moveDir.z,
     };
 
+    characterRotationTarget.current = Math.atan2(vel.x, vel.z);
+    vel.x =
+      Math.sin(rotationTarget.current + characterRotationTarget.current) *
+      speed;
+    vel.z =
+      Math.cos(rotationTarget.current + characterRotationTarget.current) *
+      speed;
+
     // Анімації
     if (!inTheAir.current) {
       if (jump) {
@@ -110,20 +119,13 @@ const CharacterController = ({
         inTheAir.current = true;
       } else if (isMoving) {
         setAnimation(run ? ActionName.Run : ActionName.Walk);
-        characterRotationTarget.current = Math.atan2(vel.x, vel.z);
-        vel.x =
-          Math.sin(rotationTarget.current + characterRotationTarget.current) *
-          speed;
-        vel.z =
-          Math.cos(rotationTarget.current + characterRotationTarget.current) *
-          speed;
       } else {
         setAnimation(ActionName.Idle);
         vel.x = 0;
         vel.z = 0;
       }
     } else {
-      vel.x = curVel.x * airDamping + inputDir.x * speed * airControl;
+      vel.x = curVel.x * airDamping + inputDir.x * speed * adjustedAirControl;
       vel.z = curVel.z * airDamping + inputDir.z * speed * airControl;
       bobAmount = 0;
     }
@@ -132,7 +134,7 @@ const CharacterController = ({
     character.current.rotation.y = lerpAngle(
       character.current.rotation.y,
       characterRotationTarget.current,
-      0.3
+      inTheAir.current ? 0.03 : 0.1
     );
 
     if (isMoving) {
@@ -169,6 +171,7 @@ const CharacterController = ({
         colliders={false}
         position={[0, 5, 0]}
         friction={5.5}
+        mass={60}
         onCollisionEnter={({ other }) => {
           if (other.rigidBodyObject?.userData?.isGround) {
             inTheAir.current = false;
@@ -187,7 +190,7 @@ const CharacterController = ({
             />
           </group>
         </group>
-        <CapsuleCollider args={[0.6, 0.4]} />
+        <CapsuleCollider args={[0.7, 0.3]} />
       </RigidBody>
     </>
   );
