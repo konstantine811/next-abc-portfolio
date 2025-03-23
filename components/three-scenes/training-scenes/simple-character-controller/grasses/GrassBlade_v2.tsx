@@ -35,10 +35,7 @@ const GrassBlade = ({ currentPositionTextureRef }: GrassBladeProps) => {
   const ref = useRef<InstancedMesh>(null!);
 
   const refMaterial = useRef<ShaderMaterial>(null!);
-  useEffect(() => {
-    console.log("currentPositionTextureRef", currentPositionTextureRef);
-  }, [currentPositionTextureRef]);
-  // useTextureTrail({ grassMaterial: refMaterial.current });
+
   const [grassDiffuse, grass] = useTexture([
     "/textures/grass/new-grass/grass_diffuse.jpg",
     "/textures/grass/new-grass/grass.jpg",
@@ -103,15 +100,6 @@ const GrassBlade = ({ currentPositionTextureRef }: GrassBladeProps) => {
     if (refMaterial.current) {
       refMaterial.current.uniforms.time.value = clock.elapsedTime;
     }
-
-    if (refMaterial.current && currentPositionTextureRef.current) {
-      refMaterial.current.uniforms.footprintTexture.value =
-        currentPositionTextureRef.current;
-      refMaterial.current.uniforms.footprintTexture.value.needsUpdate = true;
-    }
-    // if (currentPositoin) {
-    //   refMaterial.current.uniforms.characterPos.value = currentPositoin;
-    // }
   });
   return (
     <>

@@ -45,7 +45,7 @@ const SceneInit = () => {
   return (
     <Canvas shadows camera={{ position: [0, 5, 10] }}>
       <TrailCapsule
-        isDebug
+        isDebug={false}
         onTextureUpdate={(texture) => {
           currentPositionTextureRef.current = texture;
         }}

@@ -11,6 +11,7 @@ import {
   Earth,
   Car,
   Theater,
+  FanIcon,
 } from "lucide-react";
 import { PATH_ROUTE_NAME } from "@/configs/navigation";
 import { Link } from "@/i18n/routing";
@@ -71,6 +72,21 @@ const apps = [
     icon: Theater,
     name: "Theater Scene",
     link: getRepativePath("/theatre-animation"),
+  },
+  {
+    icon: Airplay,
+    name: "Airplane Game 2",
+    link: getRepativePath("/airplane-game-2"),
+  },
+  {
+    icon: FanIcon,
+    name: "Character creator",
+    link: getRepativePath("/character-creator"),
+  },
+  {
+    icon: Joystick,
+    name: "Hacker Game",
+    link: getRepativePath("/hacker-game"),
   },
 ];
 

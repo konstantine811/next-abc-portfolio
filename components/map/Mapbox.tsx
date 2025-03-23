@@ -75,6 +75,9 @@ const Mapbox = () => {
       cancelAnimationFrame(animationId.current);
       animationId.current = null;
     }
+    return () => {
+      if (animationId.current) cancelAnimationFrame(animationId.current);
+    };
   }, [isAnimating, animateOrbit, mapRef]);
 
   useEffect(() => {

@@ -2,12 +2,18 @@
 
 import { SoftShadows } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UI } from "./UI";
 import { Experience } from "./Experience";
 
 import { getProject } from "@theatre/core";
 import { SheetProvider } from "@theatre/r3f";
+
+import studio from "@theatre/studio";
+import extension from "@theatre/r3f/dist/extension";
+
+studio.initialize();
+studio.extend(extension);
 
 const project = getProject("MedievalTownVideo");
 const mainSheet = project.sheet("Main");
