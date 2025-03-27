@@ -7,6 +7,7 @@ interface ControlState {
   rightward: boolean;
   jump: boolean;
   run: boolean;
+  isCameraFlow: boolean;
 }
 
 const initialState: ControlState = {
@@ -16,6 +17,7 @@ const initialState: ControlState = {
   rightward: false,
   jump: false,
   run: false,
+  isCameraFlow: true,
 };
 
 export const controlSlice = createSlice({
@@ -46,6 +48,9 @@ export const controlSlice = createSlice({
     resetControls: (state) => {
       Object.assign(state, initialState);
     },
+    setIsCameraFlow: (state, action: PayloadAction<boolean>) => {
+      state.isCameraFlow = action.payload;
+    },
   },
 });
 
@@ -58,6 +63,7 @@ export const {
   setRun,
   setAll,
   resetControls,
+  setIsCameraFlow,
 } = controlSlice.actions;
 
 export default controlSlice.reducer;

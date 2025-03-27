@@ -15,6 +15,7 @@ import { ActionName } from "../character-controller/CharacterController";
 import { lerpAngle } from "@/services/three-js/game.utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
+import { Collider } from "@dimforge/rapier3d-compat";
 
 const CharacterController = ({
   cameraControl,
@@ -22,6 +23,9 @@ const CharacterController = ({
   cameraControl: CameraControls | null;
 }) => {
   const rigidBody = useRef<RapierRigidBody>(null!);
+  const { isCameraFlow } = useSelector(
+    (state: RootState) => state.controlGameState
+  );
   const cameraTarget = useRef<Group>(null!);
   const container = useRef<Group>(null!);
   const character = useRef<Group>(null!);
@@ -33,15 +37,21 @@ const CharacterController = ({
   const rotationTarget = useRef(0);
   const bobbingTimeRef = useRef(0);
   const lastCharacterRotation = useRef(0);
-
+  const canJump = useRef(true);
+  const [colliderArgs, setColliderArgs] = useState<[number, number]>([
+    0.7, 0.3,
+  ]);
   const { backward, forward, jump, leftward, rightward, run } = useSelector(
     (state: RootState) => state.controlGameState
   );
-  const { JUMP_FORCE, RUN_SPEED, WALK_SPEED } = useControls({
-    JUMP_FORCE: { value: 6, min: 1, max: 20, step: 0.1 },
-    WALK_SPEED: { value: 2.2, min: 0.1, max: 4, step: 0.1 },
-    RUN_SPEED: { value: 6.4, min: 0.2, max: 12, step: 0.2 },
-  });
+  const { JUMP_FORCE, RUN_SPEED, WALK_SPEED, isShakingCamera, GRAVITY_SCALE } =
+    useControls({
+      JUMP_FORCE: { value: 7, min: 1, max: 20, step: 0.1 },
+      WALK_SPEED: { value: 2.9, min: 0.1, max: 4, step: 0.1 },
+      RUN_SPEED: { value: 6.4, min: 0.2, max: 12, step: 0.2 },
+      GRAVITY_SCALE: { value: 1.5, min: 0, max: 10, step: 0.1 },
+      isShakingCamera: { value: false },
+    });
 
   const [animation, setAnimation] = useState(ActionName.Idle);
 
@@ -77,8 +87,8 @@ const CharacterController = ({
     const cameraRight = new Vector3();
     cameraRight.crossVectors(cameraDir, camera.up).normalize();
 
-    const airDamping = 0.96; // як швидко згасає інерція
-    const airControl = 0.02;
+    const airDamping = 0.97; // як швидко згасає інерція
+    const airControl = 0.03;
     const adjustedAirControl = airControl * (JUMP_FORCE / 6);
     const moveDir = new Vector3();
 
@@ -103,7 +113,7 @@ const CharacterController = ({
     let bobAmount = isMoving ? (run ? 0.41 : 0.09) : 0;
     const vel = {
       x: moveDir.x,
-      y: jump && !inTheAir.current ? JUMP_FORCE : curVel.y,
+      y: jump && canJump.current && !inTheAir.current ? JUMP_FORCE : curVel.y,
       z: moveDir.z,
     };
 
@@ -115,8 +125,8 @@ const CharacterController = ({
       Math.cos(rotationTarget.current + characterRotationTarget.current) *
       speed;
 
-    // Анімації
     if (!inTheAir.current) {
+      setColliderArgs([0.7, 0.3]);
       if (jump) {
         setAnimation(ActionName.JumpIdle);
         inTheAir.current = true;
@@ -128,6 +138,7 @@ const CharacterController = ({
         vel.z = 0;
       }
     } else {
+      setColliderArgs([0.3, 0.5]);
       vel.x = curVel.x * airDamping + inputDir.x * speed * adjustedAirControl;
       vel.z = curVel.z * airDamping + inputDir.z * speed * airControl;
       bobAmount = 0;
@@ -137,7 +148,7 @@ const CharacterController = ({
     character.current.rotation.y = lerpAngle(
       character.current.rotation.y,
       lastCharacterRotation.current,
-      inTheAir.current ? 0.03 : 0.1
+      inTheAir.current ? 0.03 : 0.27
     );
 
     if (isMoving) {
@@ -146,14 +157,18 @@ const CharacterController = ({
     } else {
       bobbingTimeRef.current = 0;
     }
-    const bobY = Math.sin(bobbingTimeRef.current) * bobAmount;
-    const bobX = Math.cos(bobbingTimeRef.current) * bobAmount;
+    let bobY = 0;
+    let bobX = 0;
+    if (isShakingCamera) {
+      bobY = Math.sin(bobbingTimeRef.current) * bobAmount;
+      bobX = Math.cos(bobbingTimeRef.current) * bobAmount;
+    }
 
     // Фізика
     rigidBody.current.setLinvel(vel, true);
 
     // Камера з покачуванням
-    if (cameraControl) {
+    if (cameraControl && isCameraFlow) {
       cameraControl.moveTo(pos.x + bobX / 13, pos.y + bobY, pos.z, true);
       cameraControl.update(delta);
     }
@@ -174,8 +189,10 @@ const CharacterController = ({
         ref={rigidBody}
         colliders={false}
         position={[0, 5, 0]}
-        friction={5.5}
+        friction={0}
+        gravityScale={GRAVITY_SCALE}
         mass={60}
+        linearDamping={0.1}
         onCollisionEnter={({ other }) => {
           if (other.rigidBodyObject?.userData?.isGround) {
             inTheAir.current = false;
@@ -194,7 +211,7 @@ const CharacterController = ({
             />
           </group>
         </group>
-        <CapsuleCollider args={[0.7, 0.3]} />
+        <CapsuleCollider key={colliderArgs.join("-")} args={colliderArgs} />
       </RigidBody>
     </>
   );

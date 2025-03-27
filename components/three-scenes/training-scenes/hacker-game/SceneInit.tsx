@@ -11,7 +11,14 @@ import { useControls } from "leva";
 import JoystickController from "./JoystickController";
 import KeyboardController from "./KeyboardController";
 import { Key } from "lucide-react";
-import { KeyboardControls } from "@react-three/drei";
+import { KeyboardControls, TransformControls } from "@react-three/drei";
+import Room from "./Building/Room";
+import AddInputModel from "./UI/AddInputModel";
+import { Object3D } from "three";
+import InstancedGrid from "./Building/InstancedGrid";
+import TouchTerrain from "./Building/Terrain";
+import VoxelPainter from "./Building/VoxelPainter";
+import { RoomScene } from "./Building/RoomScene";
 
 const keyboardMap = [
   { name: "forward", keys: ["ArrowUp", "KeyW"] },
@@ -27,6 +34,14 @@ const SceneInit = () => {
     null
   );
 
+  const [models, setModels] = useState<Object3D[]>([]);
+
+  const addModel = (object: Object3D) => {
+    // Копіюємо позицію трохи випадково, щоб вони не накладались
+    object.position.set(Math.random() * 2, 0, Math.random() * 2);
+    setModels((prev) => [...prev, object]);
+  };
+
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
@@ -39,20 +54,39 @@ const SceneInit = () => {
 
   return (
     <>
+      <AddInputModel onLoad={addModel} />
       {isTouch ? <JoystickController /> : <KeyboardController />}
       <Canvas shadows camera={{ position: [0, 5, 10] }}>
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <CameraControlsProvider onCameraControls={setCameraControl} />
+
           {/* <CameraController config={MODELS} /> */}
-          <directionalLight position={[0, 30, 0]} intensity={5} castShadow />
+          <directionalLight
+            position={[5, 5, 5]}
+            intensity={10}
+            castShadow
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+          />
           {/* <CameraOrbitControls /> */}
+          {/* <TouchTerrain />
+          <VoxelPainter /> */}
           <Physics debug={isDebugPhysics}>
             <Boxes />
-
-            <CharacterController cameraControl={cameraControl} />
+            <RoomScene />
+            <CharacterController
+              cameraControl={cameraControl}
+              isWalkSide={false}
+            />
+            <Room cameraControl={cameraControl} />
+            {models.map((model, i) => (
+              <TransformControls key={i} object={model}>
+                <primitive object={model} />
+              </TransformControls>
+            ))}
             {/* Groud */}
-            <RigidBody
+            {/* <RigidBody
               type="fixed"
               colliders="cuboid"
               rotation-x={-Math.PI / 2}
@@ -63,7 +97,7 @@ const SceneInit = () => {
                 <planeGeometry args={[100, 100, 1]} />
                 <meshStandardMaterial color="blue" />
               </mesh>
-            </RigidBody>
+            </RigidBody> */}
           </Physics>
         </Suspense>
       </Canvas>

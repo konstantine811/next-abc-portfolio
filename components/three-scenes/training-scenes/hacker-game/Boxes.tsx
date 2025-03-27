@@ -1,4 +1,5 @@
 import { RigidBody } from "@react-three/rapier";
+import { Vector3 } from "three";
 
 const Boxes = () => {
   return (
@@ -12,7 +13,7 @@ const Boxes = () => {
             userData={{ isGround: true }}
             position={[(i - 50) * Math.random(), 1, (i - 50) * Math.random()]}
             mass={100.1}
-            friction={10}
+            friction={0.3}
             restitution={0} // прибрати стрибки
             linearDamping={20} // сильно зменшити ковзання
             angularDamping={3} // зменшити обертання
