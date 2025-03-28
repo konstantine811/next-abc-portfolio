@@ -1,12 +1,14 @@
 import { setIsCameraFlow } from "@/lib/store/features/character-contoller/control-state.slice";
-import { TransformControls, useGLTF } from "@react-three/drei";
+import { TransformControls, useCamera, useGLTF } from "@react-three/drei";
 import CameraControls from "camera-controls";
 import { useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Mesh } from "three";
+import { useCameraControls } from "../CameraControls";
 
-const Room = ({ cameraControl }: { cameraControl: CameraControls | null }) => {
+const Room = () => {
   const { scene } = useGLTF("/3d-models/hacker-game/BuilingKit/wall-half.glb");
+  const cameraControl = useCameraControls();
   const meshRef = useRef<Mesh>(null!);
   const dispatch = useDispatch();
   return (

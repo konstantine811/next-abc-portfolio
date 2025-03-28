@@ -5,6 +5,7 @@ import blogPostStateReducer from "@/lib/store/features/blog-post-state.slice";
 import gameStateReducer from "@/lib/store/features/character-contoller/game-state.slice";
 import joystickControllsReducer from "@/lib/store/features/character-contoller/joystick-controlls-state";
 import controlGameState from "@/lib/store/features/character-contoller/control-state.slice";
+import gameEngineState from "@/lib/store/features/game-engine/game-engine-state.slice";
 
 export const makeStore = () => {
   return configureStore({
@@ -14,6 +15,7 @@ export const makeStore = () => {
       gameStateReducer,
       joystickControllsReducer,
       controlGameState,
+      gameEngineState,
     },
   });
 };

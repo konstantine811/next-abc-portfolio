@@ -11,7 +11,7 @@ const CharacterModel = ({
 }: {
   path: string;
   position: [number, number, number];
-  scale: number;
+  scale?: number;
   animation?: ActionName;
 }) => {
   const { scene, animations } = useGLTF(path);

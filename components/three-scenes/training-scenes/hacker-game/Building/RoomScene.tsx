@@ -1,6 +1,6 @@
 // RoomScene.tsx
 import { useThree } from "@react-three/fiber";
-import { RigidBody } from "@react-three/rapier";
+import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import { useMemo } from "react";
 import { BackSide, Plane, Vector3 } from "three";
 
@@ -19,15 +19,71 @@ export const RoomScene = () => {
 
   return (
     <>
-      <RigidBody type="fixed">
-        <mesh position={[0, 0, -5]} rotation-x={-Math.PI / 2}>
-          <planeGeometry args={[100, 100, 1]} />
-          <meshStandardMaterial
-            color="lightblue"
-            side={BackSide}
-            // clippingPlanes={[clippingPlane]}
-            clipShadows
-          />
+      <RigidBody
+        type="fixed"
+        position={[-20, 0, 0]}
+        angularDamping={2}
+        linearDamping={1}
+        userData={{ isGround: true }}
+        gravityScale={3}
+      >
+        <mesh>
+          <boxGeometry args={[10, 0.4, 10]} />
+          <meshStandardMaterial color="orange" />
+        </mesh>
+      </RigidBody>
+      <RigidBody
+        type="fixed"
+        position={[20, 0, 0]}
+        angularDamping={2}
+        linearDamping={1}
+        userData={{ isGround: true }}
+        gravityScale={3}
+      >
+        <mesh>
+          <boxGeometry args={[10, 0.4, 10]} />
+          <meshStandardMaterial color="orange" />
+        </mesh>
+      </RigidBody>
+      <RigidBody
+        type="fixed"
+        position={[0, 0, -20]}
+        angularDamping={2}
+        linearDamping={1}
+        userData={{ isGround: true }}
+        gravityScale={3}
+      >
+        <mesh>
+          <boxGeometry args={[10, 0.4, 10]} />
+          <meshStandardMaterial color="orange" />
+        </mesh>
+      </RigidBody>
+      <RigidBody
+        type="fixed"
+        position={[0, 0, 20]}
+        angularDamping={2}
+        linearDamping={1}
+        userData={{ isGround: true }}
+        gravityScale={3}
+      >
+        <mesh>
+          <boxGeometry args={[10, 0.4, 10]} />
+          <meshStandardMaterial color="orange" />
+        </mesh>
+      </RigidBody>
+      <RigidBody
+        type="fixed"
+        position={[0, 0, 0]}
+        angularDamping={2}
+        linearDamping={1}
+        colliders={false}
+        userData={{ isGround: true }}
+        gravityScale={3}
+      >
+        <CuboidCollider args={[5, 0.2, 5]} />
+        <mesh>
+          <boxGeometry args={[10, 0.4, 10]} />
+          <meshStandardMaterial color="orange" />
         </mesh>
       </RigidBody>
     </>

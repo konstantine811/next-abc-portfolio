@@ -3,7 +3,6 @@ import { memo, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 // components
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useAppSelector } from "@/lib/store/hooks";
 
 interface Props {
   categories: string[];
@@ -17,9 +16,6 @@ const CategoryTabs = ({
   onValueChange,
 }: Props) => {
   const [mounted, setMounted] = useState(false);
-  const headerHeight = useAppSelector(
-    (state) => state.uiStateReducer.headerHeight
-  );
 
   useEffect(() => {
     setMounted(true);

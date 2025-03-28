@@ -6,7 +6,6 @@ import {
   RigidBody,
   useRapier,
 } from "@react-three/rapier";
-import CameraControls from "camera-controls";
 import { useControls } from "leva";
 import { useEffect, useRef, useState } from "react";
 import { Group, Mesh, Vector3 } from "three";
@@ -15,14 +14,11 @@ import { ActionName } from "../character-controller/CharacterController";
 import { lerpAngle } from "@/services/three-js/game.utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
-import { Collider } from "@dimforge/rapier3d-compat";
+import { useCameraControls } from "./CameraControls";
 
-const CharacterController = ({
-  cameraControl,
-}: {
-  cameraControl: CameraControls | null;
-}) => {
+const CharacterController = ({}) => {
   const rigidBody = useRef<RapierRigidBody>(null!);
+  const cameraControl = useCameraControls();
   const { isCameraFlow } = useSelector(
     (state: RootState) => state.controlGameState
   );
@@ -56,7 +52,7 @@ const CharacterController = ({
   const [animation, setAnimation] = useState(ActionName.Idle);
 
   useEffect(() => {
-    if (cameraControl && rigidBody.current) {
+    if (rigidBody.current) {
       const pos = rigidBody.current.translation();
       // Наприклад: камера позаду і трохи вище гравця
       cameraControl.setLookAt(
@@ -168,21 +164,21 @@ const CharacterController = ({
     rigidBody.current.setLinvel(vel, true);
 
     // Камера з покачуванням
-    if (cameraControl && isCameraFlow) {
+    if (isCameraFlow) {
       cameraControl.moveTo(pos.x + bobX / 13, pos.y + bobY, pos.z, true);
       cameraControl.update(delta);
     }
 
     // debug mesh (можна видалити)
-    testRef.current.position.set(pos.x, pos.y, pos.z + 3);
+    // testRef.current.position.set(pos.x, pos.y, pos.z + 3);
   });
 
   return (
     <>
-      <mesh ref={testRef} position={[0, 1, 3]} visible={false}>
+      {/* <mesh ref={testRef} position={[0, 1, 3]} visible={false}>
         <sphereGeometry args={[0.4, 32, 32]} />
         <meshStandardMaterial wireframe color="blue" />
-      </mesh>
+      </mesh> */}
 
       <RigidBody
         lockRotations
@@ -207,7 +203,6 @@ const CharacterController = ({
               path={"/3d-models/character-controller/character.glb"}
               position={[0, -1.0, 0]}
               animation={animation}
-              scale={1.13}
             />
           </group>
         </group>
