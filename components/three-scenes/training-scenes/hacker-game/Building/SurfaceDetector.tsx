@@ -23,7 +23,7 @@ export const SurfaceDetector = ({
       const first = intersects[0];
       onSurfaceDetected(first);
     }
-  }, [position]);
+  }, [position, raycaster, scene.children, onSurfaceDetected]);
 
   return null;
 };

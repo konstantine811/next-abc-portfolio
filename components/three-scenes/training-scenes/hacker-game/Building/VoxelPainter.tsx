@@ -25,13 +25,7 @@ const VoxelPainter = () => {
 
   const planeRef = useRef<THREE.PlaneGeometry>(null!);
   const lineRef = useRef<Line2>(null!);
-  useEffect(() => {
-    const element = gl.domElement;
-    element.addEventListener("mousemove", onMouseMove);
-    return () => {
-      element.removeEventListener("mousemove", onMouseMove);
-    };
-  }, [camera, lineRef.current]);
+
   const onMouseMove = useCallback(
     (e: MouseEvent) => {
       mouse.x = ((e.clientX - canvasLeft) / canvasWidth) * 2 - 1;
@@ -46,6 +40,14 @@ const VoxelPainter = () => {
     },
     [raycaster, camera]
   );
+
+  useEffect(() => {
+    const element = gl.domElement;
+    element.addEventListener("mousemove", onMouseMove);
+    return () => {
+      element.removeEventListener("mousemove", onMouseMove);
+    };
+  }, [camera, lineRef.current, onMouseMove]);
 
   const onPointerMove = useCallback(
     (event: PointerEvent) => {
@@ -74,38 +76,38 @@ const VoxelPainter = () => {
     [camera]
   );
 
-  const onPointerDown = useCallback(
-    (event: PointerEvent) => {
-      pointer.set(
-        (event.clientX / window.innerWidth) * 2 - 1,
-        -(event.clientY / window.innerHeight) * 2 + 1
-      );
-      raycaster.setFromCamera(pointer, camera);
-      const intersects = raycaster.intersectObjects(
-        [planeRef.current, ...objects],
-        false
-      );
-      console.log("intersects", intersects);
-      if (intersects.length > 0) {
-        const intersect = intersects[0];
-        if (isShiftDown.current) {
-          if (intersect.object !== planeRef.current) {
-            scene.remove(intersect.object);
-            setObjects((prev) =>
-              prev.filter((obj) => obj !== intersect.object)
-            );
-          }
-        } else {
-          const voxel = new THREE.Mesh(cubeGeo.current, cubeMat.current);
-          voxel.position.copy(intersect.point).add(intersect.face.normal);
-          voxel.position.divideScalar(1).floor().multiplyScalar(1).addScalar(1);
-          scene.add(voxel);
-          setObjects((prev) => [...prev, voxel]);
-        }
-      }
-    },
-    [camera, objects, scene]
-  );
+  // const onPointerDown = useCallback(
+  //   (event: PointerEvent) => {
+  //     pointer.set(
+  //       (event.clientX / window.innerWidth) * 2 - 1,
+  //       -(event.clientY / window.innerHeight) * 2 + 1
+  //     );
+  //     raycaster.setFromCamera(pointer, camera);
+  //     const intersects = raycaster.intersectObjects(
+  //       [planeRef.current as any, ...objects],
+  //       false
+  //     );
+  //     console.log("intersects", intersects);
+  //     if (intersects.length > 0) {
+  //       const intersect = intersects[0];
+  //       if (isShiftDown.current) {
+  //         if (intersect.object !== planeRef.current) {
+  //           scene.remove(intersect.object);
+  //           setObjects((prev) =>
+  //             prev.filter((obj) => obj !== intersect.object)
+  //           );
+  //         }
+  //       } else {
+  //         const voxel = new THREE.Mesh(cubeGeo.current, cubeMat.current);
+  //         voxel.position.copy(intersect.point).add(intersect.face.normal);
+  //         voxel.position.divideScalar(1).floor().multiplyScalar(1).addScalar(1);
+  //         scene.add(voxel);
+  //         setObjects((prev) => [...prev, voxel]);
+  //       }
+  //     }
+  //   },
+  //   [camera, objects, scene]
+  // );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -134,7 +136,7 @@ const VoxelPainter = () => {
       <mesh
         ref={planeRef}
         onPointerMove={onPointerMove}
-        onClick={onPointerDown}
+        // onClick={onPointerDown}
         rotation={[-Math.PI / 2, 0, 0]}
         position={[-10, 0.5, 10]}
       >

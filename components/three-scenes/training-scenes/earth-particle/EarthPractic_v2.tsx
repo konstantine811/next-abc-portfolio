@@ -47,11 +47,14 @@ const EarthPracticV2 = () => {
     return geometry;
   }, []);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    const x = ((e.clientX - canvasLeft) / canvasWidth) * 2 - 1;
-    const y = -((e.clientY - canvasTop) / canvasHeight) * 2 + 1;
-    pointerPos.set(x, y);
-  }, []);
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      const x = ((e.clientX - canvasLeft) / canvasWidth) * 2 - 1;
+      const y = -((e.clientY - canvasTop) / canvasHeight) * 2 + 1;
+      pointerPos.set(x, y);
+    },
+    [canvasHeight, canvasWidth, canvasLeft, canvasTop, pointerPos]
+  );
 
   const handleRaycaster = (globe: Object3D) => {
     raycaster.setFromCamera(pointerPos, camera);

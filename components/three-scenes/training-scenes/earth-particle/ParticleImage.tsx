@@ -79,7 +79,7 @@ const ParticleImage = () => {
       new InstancedBufferAttribute(angles, 1, false)
     );
     return geometry;
-  }, []);
+  }, [numPoints, size.width]);
   return (
     <>
       <points geometry={geo}>

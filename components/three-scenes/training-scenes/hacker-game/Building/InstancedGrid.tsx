@@ -38,7 +38,7 @@ const InstancedGrid = () => {
         3
       );
     }
-  }, [meshRef.current]);
+  }, [meshRef, dummy]);
 
   const handlePointerDown = (event: any) => {
     console.log("event", event);

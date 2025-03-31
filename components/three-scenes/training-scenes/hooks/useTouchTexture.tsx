@@ -65,13 +65,6 @@ const useTouchTexture = ({
     };
   }, [size, canvasEl, ctx, isTest]);
 
-  const onPointerMove = useCallback((e: ThreeEvent<PointerEvent>) => {
-    if (e.uv) {
-      const { x, y } = e.uv;
-      addTouch({ x, y });
-    }
-  }, []);
-
   useFrame((_, delta) => {
     update(delta);
   });
@@ -155,6 +148,16 @@ const useTouchTexture = ({
     }
     trail.current.push({ ...point, age: 0, force });
   };
+
+  const onPointerMove = useCallback(
+    (e: ThreeEvent<PointerEvent>) => {
+      if (e.uv) {
+        const { x, y } = e.uv;
+        addTouch({ x, y });
+      }
+    },
+    [addTouch]
+  );
 
   return { texture: textureRef.current, onPointerMove };
 };

@@ -70,7 +70,7 @@ const EarthParticles = () => {
     );
 
     return baseGeometry;
-  }, []);
+  }, [height, numPoints, width]);
 
   useFrame((_, delta) => {
     if (materialRef.current) {

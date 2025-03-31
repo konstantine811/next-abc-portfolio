@@ -95,7 +95,7 @@ const CameraSaver = () => {
         dispatch(setCameraState({ position, target }));
       }
     }
-  }, [cameraState, dispatch]);
+  }, [cameraState, dispatch, cameraTarget, cameraPosition]);
 
   return (
     <CameraControls

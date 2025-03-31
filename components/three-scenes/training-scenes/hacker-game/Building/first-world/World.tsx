@@ -5,7 +5,7 @@ import WallMonkey from "./Wall_Monkey";
 const World = () => {
   return (
     <>
-      {/* <Floor /> */}
+      <Floor />
       <WallMonkey />
       {/* <RigidBody userData={{ isGround: true }} type="fixed">
         <mesh>
