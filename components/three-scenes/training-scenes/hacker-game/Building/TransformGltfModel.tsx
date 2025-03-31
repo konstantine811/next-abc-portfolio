@@ -1,10 +1,10 @@
-import { TransformControls } from "@react-three/drei";
+import { CameraControls, TransformControls } from "@react-three/drei";
 import { Object3D } from "three";
-import { useCameraControls } from "../CameraControls";
 import { useControls } from "leva";
+import { useThree } from "@react-three/fiber";
 
 const TransformGltfControl = ({ models }: { models: Object3D[] }) => {
-  const cameraControl = useCameraControls();
+  const cameraControl = useThree().controls as CameraControls;
   const { mode } = useControls("Transform", {
     mode: {
       options: ["translate", "rotate", "scale"],

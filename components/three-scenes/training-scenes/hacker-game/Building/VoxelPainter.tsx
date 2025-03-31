@@ -1,8 +1,7 @@
-import { useFrame, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
-import { Line, OrbitControls, useTexture } from "@react-three/drei";
-import CameraControls from "camera-controls";
+import { Line } from "@react-three/drei";
 import { Line2 } from "three/examples/jsm/Addons.js";
 
 const VoxelPainter = () => {
@@ -15,8 +14,13 @@ const VoxelPainter = () => {
   const { camera, scene } = useThree();
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const pointer = useMemo(() => new THREE.Vector2(), []);
-  const rayDataRef = useRef<[THREE.Vector3, THREE.Vector3] | null>(null);
-  const { gl } = useThree();
+  const { gl, size } = useThree();
+  const {
+    width: canvasWidth,
+    height: canvasHeight,
+    left: canvasLeft,
+    top: canvasTop,
+  } = size;
   const mouse = useMemo(() => new THREE.Vector2(), []);
 
   const planeRef = useRef<THREE.PlaneGeometry>(null!);
@@ -30,9 +34,8 @@ const VoxelPainter = () => {
   }, [camera, lineRef.current]);
   const onMouseMove = useCallback(
     (e: MouseEvent) => {
-      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      console.log("camera", camera.position);
+      mouse.x = ((e.clientX - canvasLeft) / canvasWidth) * 2 - 1;
+      mouse.y = -((e.clientY - canvasTop) / canvasHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
       setRayData([
         raycaster.ray.origin.clone(),
@@ -51,7 +54,10 @@ const VoxelPainter = () => {
         -(event.clientY / window.innerHeight) * 2 + 1
       );
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects([planeRef.current], false);
+      const intersects = raycaster.intersectObjects(
+        [planeRef.current as any],
+        false
+      );
 
       if (intersects.length > 0) {
         const intersect = intersects[0];
@@ -136,13 +142,7 @@ const VoxelPainter = () => {
         <meshBasicMaterial wireframe={true} />
       </mesh>
       {rayData && (
-        <Line
-          ref={lineRef}
-          points={rayData}
-          color={"#ff00ff"}
-          lineWidth={10}
-          w
-        />
+        <Line ref={lineRef} points={rayData} color={"#ff00ff"} lineWidth={10} />
       )}
     </>
   );

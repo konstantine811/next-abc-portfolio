@@ -88,6 +88,11 @@ const apps = [
     name: "Hacker Game",
     link: getRepativePath("/hacker-game"),
   },
+  {
+    icon: Earth,
+    name: "Earth Particle",
+    link: getRepativePath("/earth-particle"),
+  },
 ];
 
 export default function Dock() {

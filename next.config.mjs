@@ -34,7 +34,7 @@ const nextConfig = {
     config.externals["undici"] = "commonjs undici";
     config.module.rules.push(
       {
-        test: /\.(glsl|frag|vert)$/,
+        test: /\.(glsl|frag|vert|vs|fs)$/,
         exclude: /node_modules/,
         use: ["raw-loader", "glslify-loader"],
       },

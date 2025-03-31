@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { DirectionalLight } from "three";
 
 interface ControlState {
   forward: boolean;

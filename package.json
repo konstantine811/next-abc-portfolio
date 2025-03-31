@@ -34,6 +34,7 @@
     "@theatre/core": "^0.7.2",
     "@theatre/r3f": "^0.7.2",
     "@theatre/studio": "^0.7.2",
+    "@turf/turf": "^7.2.0",
     "@types/mapbox-gl": "^3.4.1",
     "axios": "^1.8.1",
     "camera-controls": "^2.10.0",

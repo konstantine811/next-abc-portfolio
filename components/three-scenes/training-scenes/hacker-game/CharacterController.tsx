@@ -1,24 +1,27 @@
-import { useKeyboardControls } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { CameraControls } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
 import {
   CapsuleCollider,
   RapierRigidBody,
   RigidBody,
-  useRapier,
 } from "@react-three/rapier";
 import { useControls } from "leva";
 import { useEffect, useRef, useState } from "react";
-import { Group, Mesh, Vector3 } from "three";
+import { DirectionalLight, Group, Mesh, Vector3 } from "three";
 import CharacterModel from "../character-controller/CharacterModel";
 import { ActionName } from "../character-controller/CharacterController";
 import { lerpAngle } from "@/services/three-js/game.utils";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
-import { useCameraControls } from "./CameraControls";
+import { SceneObjectName } from "./config/scene.config";
 
 const CharacterController = ({}) => {
   const rigidBody = useRef<RapierRigidBody>(null!);
-  const cameraControl = useCameraControls();
+  const { controls, scene } = useThree();
+  const cameraControl = controls as CameraControls;
+  const characterLight = scene.getObjectByName(
+    SceneObjectName.characterLight
+  ) as DirectionalLight;
   const { isCameraFlow } = useSelector(
     (state: RootState) => state.controlGameState
   );
@@ -26,7 +29,6 @@ const CharacterController = ({}) => {
   const container = useRef<Group>(null!);
   const character = useRef<Group>(null!);
   const cameraPosition = useRef<Group>(null!);
-  const testRef = useRef<Mesh>(null!);
   const characterPosition = useRef(new Vector3());
   const inTheAir = useRef(false);
   const characterRotationTarget = useRef(0);
@@ -52,13 +54,13 @@ const CharacterController = ({}) => {
   const [animation, setAnimation] = useState(ActionName.Idle);
 
   useEffect(() => {
-    if (rigidBody.current) {
+    if (rigidBody.current && cameraControl) {
       const pos = rigidBody.current.translation();
       // Наприклад: камера позаду і трохи вище гравця
       cameraControl.setLookAt(
         pos.x, // camera x
-        pos.y + 3, // camera y
-        pos.z - 2, // camera z
+        pos.y + 13, // camera y
+        pos.z - 12, // camera z
         pos.x, // target x
         pos.y + 1, // target y
         pos.z // target z
@@ -68,9 +70,8 @@ const CharacterController = ({}) => {
 
   useFrame(({ camera, clock }) => {
     const delta = clock.getDelta();
-
     if (!rigidBody.current) return;
-
+    // console.log("delta", delta);
     const curVel = rigidBody.current.linvel();
     const pos = rigidBody.current.translation();
     characterPosition.current.set(pos.x, pos.y, pos.z);
@@ -113,14 +114,6 @@ const CharacterController = ({}) => {
       z: moveDir.z,
     };
 
-    characterRotationTarget.current = Math.atan2(vel.x, vel.z);
-    vel.x =
-      Math.sin(rotationTarget.current + characterRotationTarget.current) *
-      speed;
-    vel.z =
-      Math.cos(rotationTarget.current + characterRotationTarget.current) *
-      speed;
-
     if (!inTheAir.current) {
       setColliderArgs([0.7, 0.3]);
       if (jump) {
@@ -147,6 +140,13 @@ const CharacterController = ({}) => {
       inTheAir.current ? 0.03 : 0.27
     );
 
+    // characterRotationTarget.current = Math.atan2(vel.x, vel.z);
+    // vel.x =
+    //   Math.sin(rotationTarget.current + characterRotationTarget.current) *
+    //   speed;
+    // vel.z =
+    //   Math.cos(rotationTarget.current + characterRotationTarget.current) *
+    //   speed;
     if (isMoving) {
       lastCharacterRotation.current = Math.atan2(vel.x, vel.z);
       bobbingTimeRef.current += delta * movingSpeedBob;
@@ -157,16 +157,24 @@ const CharacterController = ({}) => {
     let bobX = 0;
     if (isShakingCamera) {
       bobY = Math.sin(bobbingTimeRef.current) * bobAmount;
-      bobX = Math.cos(bobbingTimeRef.current) * bobAmount;
+      bobX = Math.cos(bobbingTimeRef.current) * bobAmount * (Math.random() + 1);
     }
 
     // Фізика
     rigidBody.current.setLinvel(vel, true);
+    // applly force wind
+    // rigidBody.current.applyImpulse(new Vector3(0.3, 0, 0.1), true);
 
     // Камера з покачуванням
     if (isCameraFlow) {
-      cameraControl.moveTo(pos.x + bobX / 13, pos.y + bobY, pos.z, true);
+      cameraControl.moveTo(pos.x + bobX, pos.y + bobY, pos.z, true);
       cameraControl.update(delta);
+    }
+
+    if (characterLight) {
+      characterLight.position.set(pos.x + 5, pos.y + 10, pos.z + 5);
+      characterLight.target.position.set(pos.x, pos.y + 1, pos.z); // важливо!
+      characterLight.target.updateMatrixWorld(); // щоб зміни застосувались
     }
 
     // debug mesh (можна видалити)
